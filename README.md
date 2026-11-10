@@ -29,35 +29,45 @@ the project to **Built — review**. Someone then looks at it and clicks send.
 
 ## One-time setup
 
-1. **Create the Cloudflare Pages project — as Direct Upload, not Connect to Git.**
-   Dashboard → Workers & Pages → Create → Pages → Upload assets, named to match
-   `CF_PAGES_PROJECT` below. The Action publishes with `wrangler pages deploy`,
-   which is a direct upload; connecting the project to Git as well would give
-   every push two competing deploys of the same commit.
-2. **Point the domain at it.** Add `preview.vocsotech.com` as a custom domain on that
-   Pages project.
-3. **Add the repository secrets** (Settings → Secrets and variables → Actions):
+Cloudflare Pages watches this repository directly and publishes on every push,
+the same way the stackroom site works. That means **no API token, no Cloudflare
+credentials in GitHub, and no build step in CI.**
+
+1. **Create the Pages project from Git.** Cloudflare → Workers & Pages → Create
+   → Pages → **Connect to Git** → pick `vocso-com/prospects-sites`.
+   - Framework preset: **None**
+   - Build command: *(leave empty)*
+   - Build output directory: **`sites`**
+2. **Point the domain at it.** On that project → Custom domains → add
+   `preview.vocsotech.com`. DNS is set up automatically when the zone is on the
+   same Cloudflare account.
+3. **Add one repository secret** (Settings → Secrets and variables → Actions):
 
    | Secret | Where it comes from |
    |---|---|
-   | `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens, with the "Cloudflare Pages — Edit" template |
-   | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard URL, or the right-hand sidebar |
    | `DEPLOY_WEBHOOK_SECRET` | Must match PROSPECTS → Settings → Playbooks → Deploy webhook secret |
 
 4. **Add the repository variables** (same screen, Variables tab):
 
    | Variable | Example |
    |---|---|
-   | `CF_PAGES_PROJECT` | `vocso-websites` |
    | `PROSPECTS_URL` | `https://go.vocsotech.com` — no trailing slash |
    | `WEBSITES_BASE_URL` | `https://preview.vocsotech.com` — no trailing slash |
 
-## What the Action does
+> A Pages project is fixed at creation as either **direct upload** or
+> **Git-connected** — Cloudflare will not convert one into the other. If a
+> direct-upload project is already using the name you want, delete it first.
 
-On every push to `main` it publishes the whole `sites/` folder, then works out
-which site folders that push touched and reports each one to PROSPECTS.
+## What the workflow does
+
+Cloudflare does the publishing. The workflow only tells PROSPECTS about it.
+
+On every push to `main` it works out which site folders changed, waits until
+each one is actually reachable at its public URL, and only then reports it. The
+wait matters: Cloudflare builds asynchronously after the push, so reporting
+straight away would tell a lead their site is ready slightly before it is.
 
 A slug with no matching project returns 404 and is skipped rather than failing
-the run — that's a hand-built site or a rename, not a broken deploy. If the
-publish itself fails, the Action reports `status: failed`, which alerts the team
-instead of leaving the lead's project stuck in Building.
+the run — that's a hand-built site or a rename, not a broken deploy. A site that
+never becomes reachable is reported as a failed deploy, which alerts the team
+rather than leaving the lead's project stuck in Building.

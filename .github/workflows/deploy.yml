@@ -1,4 +1,10 @@
-name: Deploy sites
+name: Tell PROSPECTS which sites went live
+
+# Cloudflare Pages is connected to this repository directly and publishes on
+# every push by itself — there is no build or deploy step here, and no
+# Cloudflare credentials. All this workflow does is wait for the new site to
+# actually be reachable, then tell PROSPECTS, which moves the lead's project
+# from Building to "Built — review".
 
 on:
   push:
@@ -6,26 +12,19 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-sites
+  group: notify-prospects
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  notify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          # Two commits so we can diff and work out which sites changed.
+          # Two commits so we can diff and see which site folders changed.
           fetch-depth: 2
 
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy sites --project-name=${{ vars.CF_PAGES_PROJECT }} --branch=main
-
-      - name: Tell PROSPECTS which sites went live
+      - name: Wait for Cloudflare to publish, then report each changed site
         env:
           SECRET: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}
           APP: ${{ vars.PROSPECTS_URL }}
@@ -33,52 +32,51 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Which site folders did this push touch? One notification per slug.
           slugs=$(git diff --name-only HEAD^ HEAD -- sites/ | cut -d/ -f2 | sort -u)
-
           if [ -z "$slugs" ]; then
             echo "No site folders changed; nothing to report."
             exit 0
           fi
 
+          report() {  # slug status [url] [detail]
+            curl -sS -o /tmp/resp.json -w '%{http_code}' \
+              -X POST "$APP/api/webhooks/deploy" \
+              -H 'content-type: application/json' \
+              -H "x-deploy-secret: $SECRET" \
+              -d "{\"slug\":\"$1\",\"status\":\"$2\",\"url\":\"${3:-}\",\"detail\":\"${4:-}\"}"
+          }
+
           for slug in $slugs; do
-            # A deleted folder has nothing live to report.
             if [ ! -d "sites/$slug" ]; then
               echo "· $slug was removed; skipping"
               continue
             fi
 
-            echo "· reporting $slug"
-            code=$(curl -sS -o /tmp/resp.json -w '%{http_code}' \
-              -X POST "$APP/api/webhooks/deploy" \
-              -H 'content-type: application/json' \
-              -H "x-deploy-secret: $SECRET" \
-              -d "{\"slug\":\"$slug\",\"status\":\"success\",\"url\":\"$PUBLIC_BASE/$slug\"}")
+            url="$PUBLIC_BASE/$slug/"
+            echo "· waiting for $url"
 
-            if [ "$code" = "200" ]; then
-              echo "  ok: $(cat /tmp/resp.json)"
-            elif [ "$code" = "404" ]; then
+            # Cloudflare builds asynchronously after the push, so reporting
+            # immediately would tell PROSPECTS a site is ready before it is.
+            # Poll for up to five minutes instead.
+            live=""
+            for _ in $(seq 1 60); do
+              code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$url" || true)
+              if [ "$code" = "200" ]; then live=1; break; fi
+              sleep 5
+            done
+
+            if [ -z "$live" ]; then
+              echo "  never became reachable — reporting a failed deploy"
+              report "$slug" failed "" "Not reachable at $url after 5 minutes" >/dev/null || true
+              continue
+            fi
+
+            code=$(report "$slug" success "$url")
+            case "$code" in
+              200) echo "  ok: $(cat /tmp/resp.json)" ;;
               # No project is waiting on this slug — a hand-built site, or a
               # rename. Not a deploy failure, so don't fail the run.
-              echo "  no project matched slug '$slug' — skipping"
-            else
-              echo "  FAILED ($code): $(cat /tmp/resp.json)"
-              exit 1
-            fi
-          done
-
-      - name: Report a failed deploy
-        # Runs only when something above broke, so the lead's project doesn't sit
-        # in Building forever with nobody knowing.
-        if: failure()
-        env:
-          SECRET: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}
-          APP: ${{ vars.PROSPECTS_URL }}
-        run: |
-          slugs=$(git diff --name-only HEAD^ HEAD -- sites/ | cut -d/ -f2 | sort -u || true)
-          for slug in $slugs; do
-            curl -sS -X POST "$APP/api/webhooks/deploy" \
-              -H 'content-type: application/json' \
-              -H "x-deploy-secret: $SECRET" \
-              -d "{\"slug\":\"$slug\",\"status\":\"failed\",\"detail\":\"GitHub Actions run ${{ github.run_id }} failed\"}" || true
+              404) echo "  no project matched slug '$slug' — skipping" ;;
+              *)   echo "  FAILED ($code): $(cat /tmp/resp.json)"; exit 1 ;;
+            esac
           done
