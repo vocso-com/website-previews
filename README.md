@@ -34,7 +34,7 @@ the same way the stackroom site works. That means **no API token, no Cloudflare
 credentials in GitHub, and no build step in CI.**
 
 1. **Create the Pages project from Git.** Cloudflare → Workers & Pages → Create
-   → Pages → **Connect to Git** → pick `vocso-com/prospects-sites`.
+   → Pages → **Connect to Git** → pick `vocso-com/website-previews`.
    - Framework preset: **None**
    - Build command: *(leave empty)*
    - Build output directory: **`sites`**
