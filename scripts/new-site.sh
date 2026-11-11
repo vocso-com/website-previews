@@ -3,14 +3,13 @@
 #
 #   ./scripts/new-site.sh acme-dental-co
 #
-# The slug is the one printed on the project's card in PROSPECTS, under the
-# "Rebuilt site URL" field. It has to match, or the deploy webhook won't know
-# which lead the site belongs to.
+# The slug is the project's Site folder, shown on its card in PROSPECTS. It has
+# to match, or the deploy webhook won't know which lead the site belongs to.
 set -euo pipefail
 
 slug="${1:-}"
 if [ -z "$slug" ]; then
-  echo "usage: $0 <slug>   (copy it from the project card in PROSPECTS)" >&2
+  echo "usage: $0 <slug>   (the Site folder on the project card in PROSPECTS)" >&2
   exit 1
 fi
 

@@ -11,10 +11,10 @@ sites/
 
 Each folder is served at `https://preview.vocsotech.com/<folder>`.
 
-**The folder name is the slug PROSPECTS generated for that lead.** It's printed
-on the project's card, under the "Rebuilt site URL" field. If it doesn't match,
-the deploy webhook can't tell which lead the site belongs to and the project sits
-in Building forever.
+**The folder name is the project's Site folder in PROSPECTS.** It's on the
+project's card, in the field prefixed `sites/`, and an operator can edit it
+there. If it doesn't match, the deploy webhook can't tell which lead the site
+belongs to and the project sits in Building forever.
 
 ## Building a site
 
