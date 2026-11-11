@@ -1,0 +1,4 @@
+# Wrangler writes an account-id cache here when run from this directory.
+# Not a credential, but it has no business in the repository.
+.wrangler/
+.DS_Store
