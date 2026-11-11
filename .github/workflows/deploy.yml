@@ -58,9 +58,18 @@ jobs:
             # Cloudflare builds asynchronously after the push, so reporting
             # immediately would tell PROSPECTS a site is ready before it is.
             # Poll for up to five minutes instead.
+            #
+            # Poll past Cloudflare's edge cache, not through it. A 404 served
+            # before the site existed — anyone opening the link early, or the
+            # previous run of this very loop — is cached at the edge and still
+            # answered for hours afterwards, so a plain request can keep
+            # reporting "not reachable" long after the site is live. A unique
+            # query string each time is a different cache key, so every check
+            # reaches the origin.
             live=""
-            for _ in $(seq 1 60); do
-              code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$url" || true)
+            for i in $(seq 1 60); do
+              probe="$url?ci=$GITHUB_RUN_ID-$i"
+              code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$probe" || true)
               if [ "$code" = "200" ]; then live=1; break; fi
               sleep 5
             done
