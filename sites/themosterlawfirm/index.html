@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Moster Law Firm — Texas Construction, Business & Litigation Attorneys</title>
+<meta name="description" content="AV Preeminent Texas law firm. 20 attorneys, 5 offices statewide. Construction defects, pool defects, solar panel fraud, TWC audits and corporate law." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: '#060A14',
+          navy: { 950: '#050B1F', 900: '#0A1636', 800: '#0E2152', 700: '#163084' },
+          royal: '#1F4CC4',
+          gold: { DEFAULT: '#C9A35A', light: '#E7CD92', dark: '#8A6A2E' },
+          paper: '#F7F5F0',
+          mist: '#EEF1F7',
+        },
+        fontFamily: {
+          display: ['"Playfair Display"', 'Georgia', 'serif'],
+          sans: ['Manrope', 'system-ui', 'sans-serif'],
+        },
+        maxWidth: { site: '1280px' },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: Manrope, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .grain::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.06;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .gold-text { background: linear-gradient(100deg,#E7CD92 0%,#C9A35A 45%,#F3E2B6 60%,#B88E45 100%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hairline { background: linear-gradient(90deg, transparent, rgba(201,163,90,.55), transparent); height:1px; }
+  :focus-visible { outline: 2px solid #C9A35A; outline-offset: 3px; border-radius: 6px; }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#060A14; color:#C9A35A; font: 600 13px Manrope, sans-serif; letter-spacing:.3em; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-paper text-ink">
+<div id="boot">MOSTER</div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, useInView, animate, useMotionValueEvent } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (header/footer) + Collection "page" with a
+   Dynamic Zone `sections`. Each section below = one Strapi component
+   (`__component` key). Reorder / add / remove sections in Strapi and the
+   Next.js <SectionRenderer/> renders them — no code changes.
+   ========================================================================== */
+const img = (id, w = 1600) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+
+const CMS = {
+  global: {
+    logo: { url: 'assets/logo.png', alt: 'The Moster Law Firm — Strategic. Relentless. Results.' },
+    phone: '(512) 887-4708',
+    announcement: { text: 'Served with a lawsuit? We can help — today.', linkLabel: 'Rapid Response Litigation', href: '#consultation' },
+    nav: [
+      { label: 'Practice Areas', href: '#services', mega: [
+        { heading: 'Construction', links: ['Residential Construction Defects', 'Pool Construction Defects', 'Commercial Construction Litigation', 'Construction Delay Claims', 'Contract Review', 'Pre-Litigation'] },
+        { heading: 'Business & Litigation', links: ['Business & Corporate Law', 'TWC Audits & Employment', 'Breach of Contract', 'Fraud & Solar Panel Scams', 'Intellectual Property', 'Texas Energy'] },
+      ]},
+      { label: 'Attorneys', href: '#' },
+      { label: 'Results', href: '#approach' },
+      { label: 'Insights', href: '#insights' },
+      { label: 'Locations', href: '#footer' },
+    ],
+    ctaButton: { label: 'Free Consultation', href: '#consultation' },
+    footer: {
+      blurb: 'An AV Preeminent® Texas law firm helping homeowners and businesses fight back — with 20 attorneys and five offices statewide.',
+      columns: [
+        { title: 'Practice Areas', links: ['Construction Defects', 'Pool Defects', 'Solar Panel Fraud', 'Commercial Litigation', 'Business Law', 'TWC Audits'] },
+        { title: 'Firm', links: ['Attorneys & Staff', 'Client Reviews', 'Success Stories', 'Insights', 'Careers', 'Español'] },
+      ],
+      offices: [
+        { city: 'Austin', zip: 'Austin, TX 78759', phone: '(512) 887-4708' },
+        { city: 'Dallas', zip: 'Dallas, TX 75207', phone: '(512) 887-4708' },
+        { city: 'Houston', zip: 'Houston, TX 77002', phone: '(512) 887-4708' },
+        { city: 'Midland & Odessa', zip: 'Midland, TX 79705', phone: '(432) 203-6961' },
+        { city: 'Lubbock', zip: 'Lubbock, TX 79414', phone: '(806) 412-5150' },
+      ],
+      legal: ['Privacy Policy', 'Disclaimer', 'Attorney Advertising', 'Accessibility'],
+    },
+  },
+
+  page: {
+    sections: [
+      {
+        __component: 'sections.hero',
+        eyebrow: 'AV Preeminent® Rated · Texas Statewide',
+        titleLines: ['We go hard.', 'We don’t bluff.'],
+        subtitle: 'Texas attorneys for construction and building defects, pool defects, solar panel fraud, TWC audits and corporate law — for homeowners and businesses who need someone relentless in their corner.',
+        primaryCta: { label: 'Get a free consultation', href: '#consultation' },
+        secondaryCta: { label: 'Served with a lawsuit?', href: '#cta' },
+        image: { url: img('photo-1589829545856-d10d557cf95f', 1400), alt: 'Gavel and law books on an attorney’s desk' },
+        floatingCard: { kicker: 'Rapid Response Litigation', title: 'Defense or offense.', body: 'Named in a lawsuit or filing one? Get immediate guidance from a trusted Texas firm.' },
+        stats: [
+          { value: 40, suffix: '+', label: 'Years of construction law experience' },
+          { value: 20, suffix: '', label: 'Attorneys across Texas' },
+          { value: 5, suffix: '', label: 'Offices statewide' },
+          { value: 'AV', suffix: '', label: 'Preeminent® peer rating' },
+        ],
+      },
+      {
+        __component: 'sections.press-strip',
+        label: 'As featured in',
+        items: ['KPRC 2 Houston', 'The Dallas Morning News', 'Martindale-Hubbell® AV Preeminent', 'Texas Bar', 'KPRC 2 Houston', 'The Dallas Morning News'],
+      },
+      {
+        __component: 'sections.services',
+        eyebrow: 'Practice Areas',
+        title: 'Focused where Texans get hurt the most.',
+        intro: 'Construction projects fail. Contractors walk off jobs. Builders cut corners. Liens cloud title. We handle it all — from first demand letter to verdict.',
+        items: [
+          { icon: 'home', title: 'Residential Construction Defects', body: 'Foundation failures, water intrusion, code violations and builders who walk away. We hold them accountable.', image: img('photo-1541888946425-d81bb19240f5', 1400), featured: true },
+          { icon: 'waves', title: 'Pool Construction Defects', body: 'Cracked shells, failed equipment and abandoned projects.', image: img('photo-1576013551627-0cc20b96c2a7', 800) },
+          { icon: 'building', title: 'Commercial Construction Litigation', body: 'Defects, delay claims, payment disputes and mechanics liens.', image: img('photo-1504307651254-35680f356dfd', 800) },
+          { icon: 'sun', title: 'Solar Panel Fraud', body: 'Misleading contracts, broken savings promises and bad installs.', image: img('photo-1508514177221-188b1cf16e9d', 800) },
+          { icon: 'briefcase', title: 'Business & Corporate Law', body: 'Entity formation, contracts, partnerships and growth.', image: img('photo-1600880292203-757bb62b4baf', 800) },
+          { icon: 'users', title: 'TWC Audits & Employment', body: 'Protect your business through TWC audits and employment claims.', image: img('photo-1521791136064-7986c2920216', 800) },
+          { icon: 'wind', title: 'Texas Energy', body: 'Oil & gas, wind, solar and hydrogen fuel matters.', image: img('photo-1466611653911-95081537e5b7', 800) },
+        ],
+        allLink: { label: 'Explore all 30+ practice areas', href: '#' },
+      },
+      {
+        __component: 'sections.approach',
+        eyebrow: 'The Moster Method',
+        title: 'Strategic. Relentless. Results.',
+        body: 'Every engagement is built on the three words in our name plate — and backed by more than four decades of Texas construction law.',
+        image: { url: img('photo-1450101499163-c8848c66ca85', 1200), alt: 'Attorney reviewing and signing legal documents' },
+        pillars: [
+          { icon: 'target', title: 'Strategic', body: 'We map the fastest path to leverage before we file anything — evidence, experts and the right venue.' },
+          { icon: 'zap', title: 'Relentless', body: 'Rapid response litigation. We move first, press hard and never let the other side set the pace.' },
+          { icon: 'trophy', title: 'Results', body: 'Our success stories are published monthly. Outcomes, not billable hours, are the scoreboard.' },
+        ],
+      },
+      {
+        __component: 'sections.consultation',
+        eyebrow: 'Get a Free Consultation',
+        title: 'Tell us what happened. We’ll tell you where you stand.',
+        body: 'Speak with a Texas attorney about your case at no cost and with no obligation. Please — take a deep breath before proceeding. You are in the right place.',
+        steps: [
+          { title: 'Share your situation', body: 'A few details about the dispute, defect or lawsuit.' },
+          { title: 'Attorney review', body: 'An experienced attorney reviews your matter personally.' },
+          { title: 'A clear plan', body: 'Your options, risks and next steps — in plain English.' },
+        ],
+        practiceOptions: ['Construction defect', 'Pool defect', 'Solar panel fraud', 'Business / TWC', 'I’ve been sued', 'Other'],
+        privacyNote: 'Submitting this form does not create an attorney–client relationship. Your information stays confidential.',
+      },
+      {
+        __component: 'sections.insights',
+        eyebrow: 'Insights & Media',
+        title: 'Know your rights before you need them.',
+        link: { label: 'View all insights', href: '#' },
+        posts: [
+          { category: 'Construction Defects', date: 'Oct 2026', read: '8 min read', title: 'Broken Foundation: The Hidden Epidemic Destroying Texas Homes', excerpt: 'Why foundation failures are surging across Texas, the warning signs to watch for, and what the law says about who pays.', image: img('photo-1503387762-592deb58ef4e', 1400), featured: true },
+          { category: 'Pool Defects', date: 'Sep 2026', read: '6 min read', title: 'Your Pool Contractor May Have Failed You — But Texas Law Hasn’t', image: img('photo-1576013551627-0cc20b96c2a7', 600) },
+          { category: 'In the Media', date: 'Aug 2026', read: 'Video', video: true, title: 'Featured on KPRC Houston: Dealing with a bad contractor or home builder', image: img('photo-1497366216548-37526070297c', 600) },
+          { category: 'Bootcamp', date: 'Jul 2026', read: 'Video', video: true, title: 'How To Sue Your Home Builder — a legal bootcamp for Texas homeowners', image: img('photo-1560179707-f14e90ef3623', 600) },
+        ],
+      },
+      {
+        __component: 'sections.cta-banner',
+        title: 'Served with a lawsuit?',
+        accent: 'Take a deep breath.',
+        body: 'Whether you’ve been named as a defendant or need to file as a plaintiff, you need immediate answers from an experienced Texas firm.',
+        primaryCta: { label: 'Start your free consultation', href: '#consultation' },
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M12 5l7 7-7 7',
+  phone: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z',
+  home: 'M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z',
+  waves: 'M2 7c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2M2 13c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2M2 19c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2',
+  building: 'M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1',
+  sun: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+  briefcase: 'M3 7h18v13H3zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18',
+  users: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  wind: 'M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2M9.6 4.6A2 2 0 1 1 11 8H2M12.6 19.4A2 2 0 1 0 14 16H2',
+  target: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  zap: 'M13 2 3 14h9l-1 8 10-12h-9z',
+  trophy: 'M6 9H4a2 2 0 0 1 0-4h2M18 9h2a2 2 0 0 0 0-4h-2M6 3h12v6a6 6 0 0 1-12 0zM9 21h6M12 15v6',
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',
+  check: 'M20 6 9 17l-5-5',
+  menu: 'M4 7h16M4 12h16M4 17h10',
+  x: 'M18 6 6 18M6 6l12 12',
+  pin: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  play: 'M7 4l13 8-13 8z',
+  chevron: 'M6 9l6 6 6-6',
+  lock: 'M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4',
+};
+const Icon = ({ name, className = 'w-5 h-5', sw = 1.75 }) => html`
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth=${sw} strokeLinecap="round" strokeLinejoin="round" className=${className} aria-hidden="true">
+    <path d=${ICONS[name]} />
+  </svg>`;
+
+const ease = [0.22, 1, 0.36, 1];
+const fadeUp = { hidden: { opacity: 0, y: 28 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease } } };
+const stagger = (s = 0.08, d = 0) => ({ hidden: {}, show: { transition: { staggerChildren: s, delayChildren: d } } });
+
+const Reveal = ({ children, className = '', as = 'div', delay = 0 }) => {
+  const M = motion[as];
+  return html`<${M} className=${className} initial="hidden" whileInView="show" viewport=${{ once: true, margin: '-80px' }}
+    variants=${{ hidden: { opacity: 0, y: 28 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease, delay } } }}>${children}<//>`;
+};
+
+const Eyebrow = ({ children, dark }) => html`
+  <div className=${`inline-flex items-center gap-3 text-[12px] font-bold tracking-[0.22em] uppercase ${dark ? 'text-gold' : 'text-gold-dark'}`}>
+    <span className="h-px w-8 bg-current opacity-70"></span>${children}
+  </div>`;
+
+const Button = ({ href, children, variant = 'gold', className = '', icon = 'arrow' }) => {
+  const styles = {
+    gold: 'bg-gold text-ink hover:bg-gold-light shadow-[0_10px_30px_-10px_rgba(201,163,90,.6)]',
+    ghost: 'border border-white/20 text-white hover:bg-white/10 hover:border-white/40',
+    dark: 'bg-ink text-white hover:bg-navy-800',
+    outline: 'border border-ink/15 text-ink hover:border-ink/40 bg-white',
+  };
+  return html`<${motion.a} href=${href} whileHover=${{ y: -2 }} whileTap=${{ scale: 0.98 }}
+    className=${`group inline-flex items-center justify-center gap-2.5 rounded-full px-6 h-12 text-[15px] font-semibold transition-colors duration-200 ${styles[variant]} ${className}`}>
+    ${children}
+    ${icon && html`<span className="grid place-items-center transition-transform duration-300 group-hover:translate-x-1"><${Icon} name=${icon} className="w-4 h-4" sw=${2} /></span>`}
+  <//>`;
+};
+
+const Counter = ({ value, suffix }) => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+  const [n, setN] = useState(typeof value === 'number' ? 0 : value);
+  useEffect(() => {
+    if (!inView || typeof value !== 'number') return;
+    const c = animate(0, value, { duration: 1.6, ease, onUpdate: (v) => setN(Math.round(v)) });
+    return () => c.stop();
+  }, [inView]);
+  return html`<span ref=${ref}>${n}${suffix}</span>`;
+};
+
+/* ============================== Header ============================== */
+const Announcement = ({ data }) => html`
+  <div className="bg-ink text-white/80 text-[13px]">
+    <div className="max-w-site mx-auto px-5 lg:px-8 h-10 flex items-center justify-center gap-3">
+      <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-60"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-gold"></span></span>
+      <span className="hidden sm:inline">${data.text}</span>
+      <a href=${data.href} className="font-semibold text-gold hover:text-gold-light underline-offset-4 hover:underline">${data.linkLabel} →</a>
+    </div>
+  </div>`;
+
+const Header = ({ g }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [hover, setHover] = useState(null);
+  const [mega, setMega] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 40));
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+
+  return html`
+  <header className="sticky top-0 z-50">
+    <div className=${`transition-all duration-300 ${scrolled ? 'bg-navy-950/85 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)]' : 'bg-navy-950'}`}>
+      <div className=${`max-w-site mx-auto px-5 lg:px-8 flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-[68px]' : 'h-[84px]'}`}>
+        <a href="#" className="flex items-center gap-3 shrink-0" aria-label="The Moster Law Firm home">
+          <img src=${g.logo.url} alt=${g.logo.alt} className=${`rounded-lg object-cover ring-1 ring-white/10 transition-all duration-300 ${scrolled ? 'h-11 w-[66px]' : 'h-14 w-[84px]'}`} />
+          <span className="hidden xl:flex flex-col leading-tight">
+            <span className="text-white font-display text-[17px] tracking-wide">The Moster Law Firm</span>
+            <span className="text-gold/80 text-[10.5px] font-bold tracking-[0.22em] uppercase">Strategic · Relentless · Results</span>
+          </span>
+        </a>
+
+        <nav className="hidden lg:flex items-center" onMouseLeave=${() => { setHover(null); setMega(false); }} aria-label="Primary">
+          ${g.nav.map((item, i) => html`
+            <div key=${item.label} className="relative" onMouseEnter=${() => { setHover(i); setMega(!!item.mega); }}>
+              <a href=${item.href} className="relative z-10 flex items-center gap-1 px-3.5 h-10 whitespace-nowrap text-[14.5px] font-medium text-white/80 hover:text-white transition-colors"
+                 aria-haspopup=${item.mega ? 'true' : undefined} aria-expanded=${item.mega ? mega : undefined}>
+                ${item.label}${item.mega && html`<${Icon} name="chevron" className=${`w-3.5 h-3.5 transition-transform ${mega ? 'rotate-180' : ''}`} sw=${2.2} />`}
+              </a>
+              ${hover === i && html`<${motion.span} layoutId="nav-pill" className="absolute inset-0 rounded-full bg-white/[0.08]" transition=${{ type: 'spring', stiffness: 400, damping: 34 }} />`}
+            </div>`)}
+          <${AnimatePresence}>
+            ${mega && html`
+              <${motion.div} key="mega" initial=${{ opacity: 0, y: 10, scale: 0.98 }} animate=${{ opacity: 1, y: 0, scale: 1 }} exit=${{ opacity: 0, y: 6, transition: { duration: 0.15 } }}
+                transition=${{ duration: 0.25, ease }}
+                className="absolute left-1/2 -translate-x-1/2 top-full mt-3 w-[760px] rounded-3xl bg-white shadow-[0_40px_80px_-20px_rgba(6,10,20,.35)] ring-1 ring-black/5 overflow-hidden grid grid-cols-[1fr_1fr_240px]">
+                ${g.nav[0].mega.map((col) => html`
+                  <div key=${col.heading} className="p-7">
+                    <div className="text-[11px] font-bold tracking-[0.2em] uppercase text-gold-dark mb-4">${col.heading}</div>
+                    <ul className="space-y-1">
+                      ${col.links.map((l) => html`<li key=${l}><a href="#services" className="group flex items-center justify-between rounded-xl px-3 py-2 -mx-3 text-[14.5px] text-ink/80 hover:bg-mist hover:text-ink transition-colors">${l}<${Icon} name="arrow" className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-royal" /></a></li>`)}
+                    </ul>
+                  </div>`)}
+                <div className="relative bg-navy-900 p-6 flex flex-col justify-end text-white overflow-hidden">
+                  <img src=${img('photo-1505664194779-8beaceb93744', 500)} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
+                  <div className="relative">
+                    <div className="text-gold text-[11px] font-bold tracking-[0.2em] uppercase">Rapid Response</div>
+                    <div className="font-display text-xl mt-2 leading-snug">Been sued? Talk to an attorney today.</div>
+                    <a href="#consultation" className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-gold-light">Free consultation <${Icon} name="arrow" className="w-4 h-4" /></a>
+                  </div>
+                </div>
+              <//>`}
+          <//>
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <a href=${`tel:${g.phone.replace(/\D/g, '')}`} aria-label=${`Call ${g.phone}`} className="hidden md:flex items-center gap-2 whitespace-nowrap text-white/85 hover:text-white text-[14.5px] font-semibold px-1">
+            <span className="grid place-items-center w-10 h-10 rounded-full bg-white/[0.08] text-gold"><${Icon} name="phone" className="w-4 h-4" /></span><span className="hidden 2xl:inline">${g.phone}</span>
+          </a>
+          <${Button} href=${g.ctaButton.href} className="hidden sm:inline-flex h-11 px-5 text-[14px] whitespace-nowrap" icon=${null}>${g.ctaButton.label}<//>
+          <button onClick=${() => setOpen(true)} className="lg:hidden grid place-items-center w-11 h-11 rounded-full bg-white/[0.08] text-white" aria-label="Open menu"><${Icon} name="menu" /></button>
+        </div>
+      </div>
+    </div>
+
+    <${AnimatePresence}>
+      ${open && html`
+        <${motion.div} key="drawer" className="fixed inset-0 z-[60] bg-navy-950 text-white flex flex-col"
+          initial=${{ opacity: 0 }} animate=${{ opacity: 1 }} exit=${{ opacity: 0 }}>
+          <div className="flex items-center justify-between px-5 h-[84px]">
+            <img src=${g.logo.url} alt=${g.logo.alt} className="h-12 w-[72px] rounded-lg object-cover" />
+            <button onClick=${() => setOpen(false)} className="grid place-items-center w-11 h-11 rounded-full bg-white/10" aria-label="Close menu"><${Icon} name="x" /></button>
+          </div>
+          <${motion.nav} className="px-6 pt-6 flex-1" variants=${stagger(0.06, 0.1)} initial="hidden" animate="show">
+            ${g.nav.map((n) => html`<${motion.a} key=${n.label} variants=${fadeUp} href=${n.href} onClick=${() => setOpen(false)} className="flex items-center justify-between py-5 border-b border-white/10 font-display text-3xl">${n.label}<${Icon} name="arrow" className="w-5 h-5 text-gold" /><//>`)}
+          <//>
+          <div className="p-6 space-y-3">
+            <${Button} href="#consultation" className="w-full">Free Consultation<//>
+            <${Button} href=${`tel:${g.phone.replace(/\D/g, '')}`} variant="ghost" icon="phone" className="w-full">${g.phone}<//>
+          </div>
+        <//>`}
+    <//>
+  </header>`;
+};
+
+/* ============================== Sections ============================== */
+const Hero = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
+  const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0.2]);
+  return html`
+  <section ref=${ref} className="relative bg-navy-950 text-white overflow-hidden grain">
+    <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute -top-40 -left-40 w-[640px] h-[640px] rounded-full bg-royal/30 blur-[140px]"></div>
+      <div className="absolute top-1/3 right-[-200px] w-[520px] h-[520px] rounded-full bg-gold/15 blur-[140px]"></div>
+      <div className="absolute inset-0 opacity-[0.07]" style=${{ backgroundImage: 'linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)', backgroundSize: '72px 72px', maskImage: 'radial-gradient(ellipse at 30% 40%, black 20%, transparent 70%)', WebkitMaskImage: 'radial-gradient(ellipse at 30% 40%, black 20%, transparent 70%)' }}></div>
+    </div>
+
+    <div className="relative max-w-site mx-auto px-5 lg:px-8 pt-16 lg:pt-24 pb-16 grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+      <${motion.div} className="lg:col-span-7" variants=${stagger(0.12, 0.15)} initial="hidden" animate="show">
+        <${motion.div} variants=${fadeUp} className="inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.04] pl-2 pr-4 py-1.5 text-[13px] text-white/80 backdrop-blur">
+          <span className="grid place-items-center w-6 h-6 rounded-full bg-gold/15 text-gold"><${Icon} name="shield" className="w-3.5 h-3.5" sw=${2} /></span>${d.eyebrow}
+        <//>
+        <h1 className="mt-7 font-display font-semibold tracking-[-0.02em] leading-[0.98] text-[52px] sm:text-[72px] lg:text-[92px]">
+          ${d.titleLines.map((line, i) => html`
+            <span key=${i} className="block overflow-hidden pb-2">
+              <${motion.span} className=${`block ${i === 1 ? 'gold-text italic' : ''}`}
+                initial=${{ y: '105%' }} animate=${{ y: 0 }} transition=${{ duration: 1, ease, delay: 0.25 + i * 0.14 }}>${line}<//>
+            </span>`)}
+        </h1>
+        <${motion.p} variants=${fadeUp} className="mt-7 max-w-[560px] text-[17px] lg:text-[18px] leading-relaxed text-white/70">${d.subtitle}<//>
+        <${motion.div} variants=${fadeUp} className="mt-10 flex flex-wrap gap-3">
+          <${Button} href=${d.primaryCta.href}>${d.primaryCta.label}<//>
+          <${Button} href=${d.secondaryCta.href} variant="ghost" icon="shield">${d.secondaryCta.label}<//>
+        <//>
+      <//>
+
+      <div className="lg:col-span-5 relative">
+        <${motion.div} initial=${{ opacity: 0, scale: 0.94, rotate: -1.5 }} animate=${{ opacity: 1, scale: 1, rotate: 0 }} transition=${{ duration: 1.2, ease, delay: 0.3 }}
+          className="relative aspect-[4/5] rounded-[32px] overflow-hidden ring-1 ring-white/10 shadow-[0_60px_120px_-30px_rgba(0,0,0,.8)]">
+          <${motion.img} style=${{ y, opacity: fade }} src=${d.image.url} alt=${d.image.alt} className="absolute inset-0 w-full h-[118%] object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/20 to-transparent"></div>
+          <div className="absolute top-5 left-5 right-5 flex justify-between items-start">
+            <span className="rounded-full bg-black/40 backdrop-blur px-3 py-1.5 text-[12px] font-semibold text-white/90 ring-1 ring-white/15">Austin · Dallas · Houston · Midland · Lubbock</span>
+          </div>
+        <//>
+        <${motion.div} initial=${{ opacity: 0, y: 40 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 0.9, ease, delay: 0.85 }}
+          className="absolute -bottom-8 -left-4 sm:-left-10 right-6 sm:right-auto sm:w-[340px] rounded-3xl bg-white/[0.08] backdrop-blur-2xl ring-1 ring-white/15 p-6 shadow-2xl">
+          <div className="flex items-center gap-2 text-gold text-[11px] font-bold tracking-[0.2em] uppercase"><${Icon} name="zap" className="w-4 h-4" sw=${2} />${d.floatingCard.kicker}</div>
+          <div className="font-display text-2xl mt-3">${d.floatingCard.title}</div>
+          <p className="text-[14px] text-white/70 mt-2 leading-relaxed">${d.floatingCard.body}</p>
+          <a href="#consultation" className="mt-4 inline-flex items-center gap-2 text-[14px] font-semibold text-gold-light hover:gap-3 transition-all">Get help now <${Icon} name="arrow" className="w-4 h-4" /></a>
+        <//>
+      </div>
+    </div>
+
+    <div className="relative max-w-site mx-auto px-5 lg:px-8 pt-14 pb-14">
+      <div className="hairline mb-10"></div>
+      <${motion.dl} className="grid grid-cols-2 lg:grid-cols-4 gap-y-8" variants=${stagger(0.1)} initial="hidden" whileInView="show" viewport=${{ once: true }}>
+        ${d.stats.map((s, i) => html`
+          <${motion.div} key=${s.label} variants=${fadeUp} className=${`px-0 lg:px-8 ${i ? 'lg:border-l lg:border-white/10' : ''} ${i === 0 ? 'lg:pl-0' : ''}`}>
+            <dd className="font-display text-5xl lg:text-6xl text-white"><${Counter} value=${s.value} suffix=${s.suffix} /></dd>
+            <dt className="mt-2 text-[14px] text-white/55 max-w-[200px]">${s.label}</dt>
+          <//>`)}
+      <//>
+    </div>
+  </section>`;
+};
+
+const PressStrip = ({ d }) => html`
+  <section className="bg-white border-b border-ink/5 overflow-hidden" aria-label=${d.label}>
+    <div className="max-w-site mx-auto px-5 lg:px-8 py-7 flex items-center gap-10">
+      <span className="shrink-0 text-[12px] font-bold tracking-[0.2em] uppercase text-ink/45">${d.label}</span>
+      <div className="relative flex-1 overflow-hidden" style=${{ maskImage: 'linear-gradient(90deg,transparent,black 10%,black 90%,transparent)', WebkitMaskImage: 'linear-gradient(90deg,transparent,black 10%,black 90%,transparent)' }}>
+        <${motion.div} className="flex gap-16 w-max" animate=${{ x: ['0%', '-50%'] }} transition=${{ duration: 30, ease: 'linear', repeat: Infinity }}>
+          ${[...d.items, ...d.items].map((t, i) => html`<span key=${i} className="font-display text-[22px] text-ink/35 whitespace-nowrap">${t}</span>`)}
+        <//>
+      </div>
+    </div>
+  </section>`;
+
+const ServiceCard = ({ s, className = '' }) => html`
+  <${motion.a} href="#" variants=${fadeUp} whileHover="hover"
+    className=${`group relative overflow-hidden rounded-[28px] bg-navy-900 text-white flex flex-col justify-end ${className}`}>
+    <${motion.img} src=${s.image} alt="" loading="lazy" variants=${{ hover: { scale: 1.06 } }} transition=${{ duration: 0.8, ease }}
+      className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-45 transition-opacity duration-500" />
+    <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/60 to-navy-950/10"></div>
+    <div className=${`relative ${s.featured ? 'p-8 lg:p-10' : 'p-6'}`}>
+      <div className="grid place-items-center w-12 h-12 rounded-2xl bg-white/10 backdrop-blur ring-1 ring-white/15 text-gold mb-5"><${Icon} name=${s.icon} className="w-6 h-6" /></div>
+      <h3 className=${`font-display leading-tight ${s.featured ? 'text-3xl lg:text-[40px]' : 'text-[22px]'}`}>${s.title}</h3>
+      <p className=${`mt-3 text-white/70 leading-relaxed ${s.featured ? 'text-[16px] max-w-md' : 'text-[14px]'}`}>${s.body}</p>
+      <div className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-gold-light">
+        Learn more <${motion.span} variants=${{ hover: { x: 4 } }}><${Icon} name="arrow" className="w-4 h-4" /><//>
+      </div>
+    </div>
+  <//>`;
+
+const Services = ({ d }) => {
+  const [first, ...rest] = d.items;
+  return html`
+  <section id="services" className="bg-paper py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-8">
+      <div className="grid lg:grid-cols-12 gap-8 items-end mb-14">
+        <${Reveal} className="lg:col-span-7">
+          <${Eyebrow}>${d.eyebrow}<//>
+          <h2 className="mt-5 font-display text-[40px] lg:text-[60px] leading-[1.04] tracking-[-0.015em]">${d.title}</h2>
+        <//>
+        <${Reveal} className="lg:col-span-5" delay=${0.1}><p className="text-[17px] leading-relaxed text-ink/65">${d.intro}</p><//>
+      </div>
+      <${motion.div} className="grid sm:grid-cols-2 xl:grid-cols-4 auto-rows-[340px] gap-5"
+        variants=${stagger(0.07)} initial="hidden" whileInView="show" viewport=${{ once: true, margin: '-60px' }}>
+        <${ServiceCard} s=${first} className="sm:col-span-2 sm:row-span-2" />
+        ${rest.map((s) => html`<${ServiceCard} key=${s.title} s=${s} />`)}
+        <${motion.a} href=${d.allLink.href} variants=${fadeUp} whileHover=${{ y: -4 }}
+          className="group rounded-[28px] bg-white ring-1 ring-ink/10 p-6 flex flex-col justify-between hover:ring-gold/60 hover:shadow-[0_30px_60px_-30px_rgba(6,10,20,.3)] transition-all">
+          <div className="grid grid-cols-3 gap-2 w-fit">${['gavel', 'shield', 'briefcase', 'home', 'sun', 'building'].map((n, i) => html`<span key=${i} className="grid place-items-center w-10 h-10 rounded-xl bg-mist text-navy-700"><${Icon} name=${ICONS[n] ? n : 'shield'} className="w-4 h-4" /></span>`)}</div>
+          <div>
+            <div className="font-display text-[26px] leading-tight">${d.allLink.label}</div>
+            <div className="mt-4 grid place-items-center w-12 h-12 rounded-full bg-ink text-white group-hover:bg-gold group-hover:text-ink transition-colors"><${Icon} name="arrow" /></div>
+          </div>
+        <//>
+      <//>
+    </div>
+  </section>`;
+};
+
+const Approach = ({ d }) => html`
+  <section id="approach" className="relative bg-navy-950 text-white py-24 lg:py-32 overflow-hidden grain scroll-mt-20">
+    <div className="absolute -right-40 top-20 w-[600px] h-[600px] rounded-full bg-royal/25 blur-[150px] pointer-events-none"></div>
+    <div className="relative max-w-site mx-auto px-5 lg:px-8 grid lg:grid-cols-12 gap-14 items-center">
+      <${Reveal} className="lg:col-span-5 relative">
+        <div className="relative aspect-[4/5] rounded-[32px] overflow-hidden ring-1 ring-white/10">
+          <img src=${d.image.url} alt=${d.image.alt} loading="lazy" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-navy-950/80 to-transparent"></div>
+        </div>
+        <div className="absolute -bottom-6 -right-4 lg:-right-8 rounded-3xl bg-gold text-ink p-6 w-[220px] shadow-2xl">
+          <div className="font-display text-5xl">40+</div>
+          <div className="text-[13px] font-semibold mt-1 leading-snug">years of Texas construction law experience</div>
+        </div>
+      <//>
+      <div className="lg:col-span-7 lg:pl-8">
+        <${Reveal}>
+          <${Eyebrow} dark>${d.eyebrow}<//>
+          <h2 className="mt-5 font-display text-[40px] lg:text-[60px] leading-[1.04] tracking-[-0.015em]">${d.title.split(' ').map((w, i) => html`<span key=${i} className=${i === 2 ? 'gold-text italic' : ''}>${w} </span>`)}</h2>
+          <p className="mt-6 text-[17px] text-white/65 max-w-xl leading-relaxed">${d.body}</p>
+        <//>
+        <${motion.div} className="mt-12 grid gap-4" variants=${stagger(0.12)} initial="hidden" whileInView="show" viewport=${{ once: true, margin: '-60px' }}>
+          ${d.pillars.map((p, i) => html`
+            <${motion.div} key=${p.title} variants=${fadeUp} whileHover=${{ x: 6 }}
+              className="group flex gap-6 items-start rounded-3xl p-6 lg:p-7 bg-white/[0.04] ring-1 ring-white/10 hover:bg-white/[0.07] hover:ring-gold/40 transition-colors">
+              <div className="font-display text-gold/60 text-xl w-8 shrink-0 pt-1">0${i + 1}</div>
+              <div className="flex-1">
+                <h3 className="font-display text-2xl">${p.title}</h3>
+                <p className="mt-2 text-[15px] text-white/65 leading-relaxed">${p.body}</p>
+              </div>
+              <div className="hidden sm:grid place-items-center w-12 h-12 rounded-2xl bg-gold/10 text-gold shrink-0"><${Icon} name=${p.icon} className="w-6 h-6" /></div>
+            <//>`)}
+        <//>
+      </div>
+    </div>
+  </section>`;
+
+const Field = ({ label, id, type = 'text', placeholder, required, autoComplete }) => html`
+  <div>
+    <label htmlFor=${id} className="block text-[13px] font-semibold text-ink/80 mb-2">${label}${required && html`<span className="text-gold-dark"> *</span>`}</label>
+    <input id=${id} name=${id} type=${type} placeholder=${placeholder} required=${required} autoComplete=${autoComplete}
+      className="w-full h-12 rounded-xl bg-mist/70 border border-transparent px-4 text-[15px] placeholder:text-ink/35 focus:bg-white focus:border-royal/40 focus:outline-none focus:ring-4 focus:ring-royal/10 transition" />
+  </div>`;
+
+const Consultation = ({ d }) => {
+  const [topic, setTopic] = useState(d.practiceOptions[0]);
+  const [state, setState] = useState('idle');
+  const submit = (e) => { e.preventDefault(); setState('loading'); setTimeout(() => setState('done'), 1100); };
+  return html`
+  <section id="consultation" className="bg-white py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-8 grid lg:grid-cols-12 gap-14 lg:gap-16">
+      <div className="lg:col-span-5">
+        <${Reveal}>
+          <${Eyebrow}>${d.eyebrow}<//>
+          <h2 className="mt-5 font-display text-[40px] lg:text-[54px] leading-[1.05] tracking-[-0.015em]">${d.title}</h2>
+          <p className="mt-6 text-[17px] text-ink/65 leading-relaxed">${d.body}</p>
+        <//>
+        <${motion.ol} className="mt-10 relative" variants=${stagger(0.12)} initial="hidden" whileInView="show" viewport=${{ once: true }}>
+          <span className="absolute left-[19px] top-4 bottom-4 w-px bg-gradient-to-b from-gold via-gold/40 to-transparent"></span>
+          ${d.steps.map((s, i) => html`
+            <${motion.li} key=${s.title} variants=${fadeUp} className="relative flex gap-5 pb-7 last:pb-0">
+              <span className="relative z-10 grid place-items-center w-10 h-10 rounded-full bg-ink text-gold font-display text-[15px] shrink-0">${i + 1}</span>
+              <div className="pt-1.5"><div className="font-semibold text-[16px]">${s.title}</div><div className="text-[14.5px] text-ink/60 mt-1">${s.body}</div></div>
+            <//>`)}
+        <//>
+        <${Reveal} className="mt-10 rounded-3xl bg-paper p-6 flex items-center gap-5">
+          <span className="grid place-items-center w-12 h-12 rounded-2xl bg-gold/15 text-gold-dark shrink-0"><${Icon} name="phone" /></span>
+          <div><div className="text-[13px] text-ink/55">Prefer to talk now?</div><a href="tel:5128874708" className="font-display text-2xl hover:text-royal transition-colors">(512) 887-4708</a></div>
+        <//>
+      </div>
+
+      <${Reveal} className="lg:col-span-7" delay=${0.1}>
+        <div className="relative rounded-[32px] bg-white ring-1 ring-ink/[0.08] shadow-[0_50px_100px_-40px_rgba(10,22,54,.35)] p-7 sm:p-10 overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-gold/10 blur-3xl pointer-events-none"></div>
+          <${AnimatePresence} mode="wait">
+          ${state === 'done' ? html`
+            <${motion.div} key="ok" initial=${{ opacity: 0, scale: 0.96 }} animate=${{ opacity: 1, scale: 1 }} className="relative py-16 text-center">
+              <${motion.div} initial=${{ scale: 0 }} animate=${{ scale: 1 }} transition=${{ type: 'spring', stiffness: 260, damping: 18, delay: 0.1 }}
+                className="mx-auto grid place-items-center w-20 h-20 rounded-full bg-gold text-ink"><${Icon} name="check" className="w-9 h-9" sw=${2.5} /><//>
+              <h3 className="mt-7 font-display text-3xl">Thank you — we’re on it.</h3>
+              <p className="mt-3 text-ink/60 max-w-sm mx-auto">An attorney will review your matter and contact you shortly. For urgent matters, call (512) 887-4708.</p>
+              <button onClick=${() => setState('idle')} className="mt-8 text-[14px] font-semibold text-royal hover:underline">Submit another request</button>
+            <//>` : html`
+            <${motion.form} key="form" onSubmit=${submit} exit=${{ opacity: 0, y: -10 }} className="relative space-y-6" noValidate=${false}>
+              <div className="flex items-start justify-between gap-4">
+                <div><h3 className="font-display text-[28px]">Request your free case review</h3><p className="text-[14.5px] text-ink/55 mt-1">Takes about 60 seconds.</p></div>
+                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-mist px-3 py-1.5 text-[12px] font-semibold text-navy-700"><${Icon} name="lock" className="w-3.5 h-3.5" sw=${2} />Confidential</span>
+              </div>
+              <fieldset>
+                <legend className="block text-[13px] font-semibold text-ink/80 mb-3">What do you need help with?</legend>
+                <div className="flex flex-wrap gap-2">
+                  ${d.practiceOptions.map((o) => html`
+                    <label key=${o} className="relative cursor-pointer">
+                      <input type="radio" name="topic" value=${o} checked=${topic === o} onChange=${() => setTopic(o)} className="peer sr-only" />
+                      <span className=${`relative z-10 block rounded-full px-4 h-10 leading-10 text-[14px] font-medium transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-gold ${topic === o ? 'text-white' : 'text-ink/70 hover:text-ink'}`}>${o}</span>
+                      ${topic === o ? html`<${motion.span} layoutId="topic-pill" className="absolute inset-0 rounded-full bg-ink" transition=${{ type: 'spring', stiffness: 450, damping: 35 }} />`
+                        : html`<span className="absolute inset-0 rounded-full ring-1 ring-ink/15"></span>`}
+                    </label>`)}
+                </div>
+              </fieldset>
+              <div className="grid sm:grid-cols-2 gap-5">
+                <${Field} id="name" label="Full name" placeholder="Jane Smith" required autoComplete="name" />
+                <${Field} id="phone" type="tel" label="Phone" placeholder="(512) 555-0100" required autoComplete="tel" />
+                <${Field} id="email" type="email" label="Email" placeholder="jane@email.com" required autoComplete="email" />
+                <div>
+                  <label htmlFor="city" className="block text-[13px] font-semibold text-ink/80 mb-2">Nearest office</label>
+                  <select id="city" className="w-full h-12 rounded-xl bg-mist/70 border border-transparent px-4 text-[15px] focus:bg-white focus:border-royal/40 focus:outline-none focus:ring-4 focus:ring-royal/10 transition">
+                    ${['Austin', 'Dallas', 'Houston', 'Midland & Odessa', 'Lubbock'].map((c) => html`<option key=${c}>${c}</option>`)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="msg" className="block text-[13px] font-semibold text-ink/80 mb-2">Briefly describe your situation</label>
+                <textarea id="msg" rows="4" placeholder="e.g. Our builder left the job unfinished and the foundation is cracking…"
+                  className="w-full rounded-xl bg-mist/70 border border-transparent px-4 py-3 text-[15px] placeholder:text-ink/35 focus:bg-white focus:border-royal/40 focus:outline-none focus:ring-4 focus:ring-royal/10 transition resize-none"></textarea>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-5 justify-between pt-2">
+                <p className="text-[12.5px] text-ink/50 max-w-xs leading-relaxed">${d.privacyNote}</p>
+                <${motion.button} type="submit" whileHover=${{ y: -2 }} whileTap=${{ scale: 0.98 }} disabled=${state === 'loading'}
+                  className="inline-flex items-center justify-center gap-2.5 rounded-full h-14 px-8 bg-ink text-white font-semibold text-[15px] hover:bg-navy-800 transition-colors disabled:opacity-70 shrink-0">
+                  ${state === 'loading' ? html`<${motion.span} className="w-4 h-4 rounded-full border-2 border-white/30 border-t-gold" animate=${{ rotate: 360 }} transition=${{ repeat: Infinity, duration: 0.8, ease: 'linear' }} />Sending…`
+                    : html`Request free consultation <${Icon} name="arrow" className="w-4 h-4 text-gold" sw=${2} />`}
+                <//>
+              </div>
+            <//>`}
+          <//>
+        </div>
+      <//>
+    </div>
+  </section>`;
+};
+
+const PostMeta = ({ p, dark }) => html`
+  <div className=${`flex items-center gap-3 text-[12.5px] ${dark ? 'text-white/70' : 'text-ink/50'}`}>
+    <span className=${`rounded-full px-2.5 py-1 font-semibold ${dark ? 'bg-white/15 text-white' : 'bg-gold/15 text-gold-dark'}`}>${p.category}</span>
+    <span>${p.date}</span><span className="w-1 h-1 rounded-full bg-current opacity-50"></span><span>${p.read}</span>
+  </div>`;
+
+const Insights = ({ d }) => {
+  const [feat, ...list] = d.posts;
+  return html`
+  <section id="insights" className="bg-paper py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-8">
+      <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}<//><h2 className="mt-5 font-display text-[40px] lg:text-[60px] leading-[1.04] tracking-[-0.015em] max-w-2xl">${d.title}</h2><//>
+        <${Button} href=${d.link.href} variant="outline">${d.link.label}<//>
+      </div>
+      <div className="grid lg:grid-cols-12 gap-6">
+        <${Reveal} className="lg:col-span-7">
+          <${motion.a} href="#" whileHover="hover" className="group relative block h-full min-h-[480px] rounded-[32px] overflow-hidden bg-navy-900">
+            <${motion.img} src=${feat.image} alt="" loading="lazy" variants=${{ hover: { scale: 1.05 } }} transition=${{ duration: 0.9, ease }} className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/40 to-transparent"></div>
+            <div className="absolute inset-x-0 bottom-0 p-8 lg:p-10 text-white">
+              <${PostMeta} p=${feat} dark />
+              <h3 className="mt-4 font-display text-3xl lg:text-[40px] leading-[1.1] max-w-xl">${feat.title}</h3>
+              <p className="mt-4 text-white/70 max-w-lg">${feat.excerpt}</p>
+              <span className="mt-6 inline-flex items-center gap-2 font-semibold text-gold-light">Read article <${motion.span} variants=${{ hover: { x: 5 } }}><${Icon} name="arrow" className="w-4 h-4" /><//></span>
+            </div>
+          <//>
+        <//>
+        <${motion.div} className="lg:col-span-5 grid gap-6" variants=${stagger(0.1)} initial="hidden" whileInView="show" viewport=${{ once: true, margin: '-60px' }}>
+          ${list.map((p) => html`
+            <${motion.a} key=${p.title} href="#" variants=${fadeUp} whileHover=${{ y: -3 }}
+              className="group flex gap-5 rounded-[24px] bg-white p-4 ring-1 ring-ink/[0.06] hover:shadow-[0_30px_60px_-30px_rgba(10,22,54,.35)] transition-shadow">
+              <div className="relative w-32 sm:w-40 shrink-0 aspect-square rounded-2xl overflow-hidden bg-mist">
+                <img src=${p.image} alt="" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                ${p.video && html`<span className="absolute inset-0 grid place-items-center bg-navy-950/30"><span className="grid place-items-center w-11 h-11 rounded-full bg-white/95 text-ink"><${Icon} name="play" className="w-4 h-4 ml-0.5" sw=${2} /></span></span>`}
+              </div>
+              <div className="py-2 pr-2 flex flex-col">
+                <${PostMeta} p=${p} />
+                <h3 className="mt-3 font-display text-[19px] leading-snug group-hover:text-royal transition-colors">${p.title}</h3>
+                <span className="mt-auto pt-3 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-ink/70">${p.video ? 'Watch' : 'Read'} <${Icon} name="arrow" className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" /></span>
+              </div>
+            <//>`)}
+        <//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const CtaBanner = ({ d, phone }) => html`
+  <section id="cta" className="bg-paper pb-24 lg:pb-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-8">
+      <${Reveal}>
+        <div className="relative overflow-hidden rounded-[40px] bg-navy-950 text-white px-8 py-16 sm:px-14 lg:px-20 lg:py-24 grain">
+          <${motion.div} className="absolute -top-1/2 left-1/2 w-[900px] h-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(201,163,90,.28),transparent_60%)] pointer-events-none"
+            animate=${{ scale: [1, 1.08, 1] }} transition=${{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(31,76,196,.35),transparent_55%)] pointer-events-none"></div>
+          <div className="relative grid lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-8">
+              <h2 className="font-display text-[42px] sm:text-[56px] lg:text-[72px] leading-[1.02] tracking-[-0.02em]">${d.title}<br /><span className="gold-text italic">${d.accent}</span></h2>
+              <p className="mt-6 text-[17px] text-white/70 max-w-xl leading-relaxed">${d.body}</p>
+            </div>
+            <div className="lg:col-span-4 flex flex-col gap-3 lg:items-end">
+              <${Button} href=${d.primaryCta.href} className="h-14 px-8">${d.primaryCta.label}<//>
+              <${Button} href=${`tel:${phone.replace(/\D/g, '')}`} variant="ghost" icon="phone" className="h-14 px-8">Call ${phone}<//>
+            </div>
+          </div>
+        </div>
+      <//>
+    </div>
+  </section>`;
+
+const Footer = ({ g }) => html`
+  <footer id="footer" className="bg-ink text-white/70 pt-20 pb-10">
+    <div className="max-w-site mx-auto px-5 lg:px-8">
+      <div className="grid lg:grid-cols-12 gap-12 pb-14 border-b border-white/10">
+        <div className="lg:col-span-4">
+          <img src=${g.logo.url} alt=${g.logo.alt} className="h-24 w-36 rounded-2xl object-cover ring-1 ring-white/10" loading="lazy" />
+          <p className="mt-6 text-[15px] leading-relaxed max-w-sm">${g.footer.blurb}</p>
+          <div className="mt-6 flex gap-2">
+            ${['Facebook', 'YouTube', 'Instagram', 'LinkedIn'].map((s) => html`<a key=${s} href="#" aria-label=${s} className="grid place-items-center w-11 h-11 rounded-full ring-1 ring-white/15 text-[12px] font-bold text-white/70 hover:bg-gold hover:text-ink hover:ring-gold transition-colors">${s.slice(0, 2)}</a>`)}
+          </div>
+        </div>
+        ${g.footer.columns.map((c) => html`
+          <div key=${c.title} className="lg:col-span-2">
+            <div className="text-white font-semibold text-[14px] mb-5">${c.title}</div>
+            <ul className="space-y-3 text-[14.5px]">${c.links.map((l) => html`<li key=${l}><a href="#" className="hover:text-gold transition-colors">${l}</a></li>`)}</ul>
+          </div>`)}
+        <div className="lg:col-span-4">
+          <div className="text-white font-semibold text-[14px] mb-5">Offices</div>
+          <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-5 text-[14px]">
+            ${g.footer.offices.map((o) => html`
+              <li key=${o.city} className="flex gap-3">
+                <${Icon} name="pin" className="w-4 h-4 text-gold mt-0.5 shrink-0" />
+                <div><div className="text-white font-medium">${o.city}</div><div className="text-white/50">${o.zip}</div><a href=${`tel:${o.phone.replace(/\D/g, '')}`} className="hover:text-gold transition-colors">${o.phone}</a></div>
+              </li>`)}
+          </ul>
+        </div>
+      </div>
+      <div className="pt-8 flex flex-col md:flex-row gap-4 justify-between text-[13px] text-white/45">
+        <p>© 2026 The Moster Law Firm, P.C. All rights reserved. Attorney advertising. Prior results do not guarantee a similar outcome.</p>
+        <div className="flex flex-wrap gap-5">${g.footer.legal.map((l) => html`<a key=${l} href="#" className="hover:text-white transition-colors">${l}</a>`)}</div>
+      </div>
+    </div>
+  </footer>`;
+
+/* =========================== Section renderer =========================== */
+const REGISTRY = {
+  'sections.hero': Hero,
+  'sections.press-strip': PressStrip,
+  'sections.services': Services,
+  'sections.approach': Approach,
+  'sections.consultation': Consultation,
+  'sections.insights': Insights,
+  'sections.cta-banner': CtaBanner,
+};
+
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-gold focus:text-ink focus:px-4 focus:py-2 focus:rounded-full">Skip to content</a>
+    <${Announcement} data=${CMS.global.announcement} />
+    <${Header} g=${CMS.global} />
+    <main id="main">
+      ${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} phone=${CMS.global.phone} />` : null; })}
+    </main>
+    <${Footer} g=${CMS.global} />
+  <//>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+document.getElementById('boot').remove();
+</script>
+</body>
+</html>
