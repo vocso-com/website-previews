@@ -114,9 +114,9 @@ const CMS = {
         secondaryCta: { label: 'Shop treatments', href: '#bestsellers' },
         image: { url: img(P.f, 1400), alt: 'Woman with natural, refreshed skin' },
         hotspots: [
-          { x: 52, y: 20, label: 'Forehead TOX', price: '$69', href: '#bestsellers' },
-          { x: 62, y: 63, label: 'Naked Lips', price: 'from $149', href: '#bestsellers' },
-          { x: 38, y: 50, label: 'Cheek Filler', price: '$299', href: '#bestsellers' },
+          { x: 0.455, y: 0.285, label: 'Forehead TOX', price: '$69', href: '#bestsellers' },
+          { x: 0.455, y: 0.538, label: 'Naked Lips', price: 'from $149', href: '#bestsellers' },
+          { x: 0.39, y: 0.468, label: 'Cheek Filler', price: '$299', href: '#bestsellers' },
         ],
         rating: { value: '4.9', label: '1,343 lip filler reviews' },
       },
@@ -167,11 +167,11 @@ const CMS = {
         title: 'Tap where you want to refresh.',
         image: { url: img(P.d, 1200), alt: 'Close-up portrait of a woman’s face' },
         areas: [
-          { x: 50, y: 22, name: 'Forehead', items: ['Forehead TOX — $69', 'Non-Surgical Brow Lift — $79'] },
-          { x: 64, y: 34, name: 'Eyes', items: ['Crows Feet — $158', 'Undereye Filler — $849', 'Jelly Roll — $99'] },
-          { x: 33, y: 47, name: 'Cheeks', items: ['Cheek Filler — $299', 'Smile Lines Filler — $299'] },
-          { x: 50, y: 64, name: 'Lips', items: ['Naked Lips | Lip Filler — from $149', 'Lip Flip — $69', 'Gummy Smile — $99'] },
-          { x: 55, y: 82, name: 'Jaw & chin', items: ['Jawline Contour Filler — $399', 'Chin Filler — $299', 'Masseter Reduction | TMJ — from $239.70'] },
+          { x: 0.547, y: 0.262, name: 'Forehead', items: ['Forehead TOX — $69', 'Non-Surgical Brow Lift — $79'] },
+          { x: 0.665, y: 0.375, name: 'Eyes', items: ['Crows Feet — $158', 'Undereye Filler — $849', 'Jelly Roll — $99'] },
+          { x: 0.44, y: 0.43, name: 'Cheeks', items: ['Cheek Filler — $299', 'Smile Lines Filler — $299'] },
+          { x: 0.562, y: 0.50, name: 'Lips', items: ['Naked Lips | Lip Filler — from $149', 'Lip Flip — $69', 'Gummy Smile — $99'] },
+          { x: 0.556, y: 0.562, name: 'Jaw & chin', items: ['Jawline Contour Filler — $399', 'Chin Filler — $299', 'Masseter Reduction | TMJ — from $239.70'] },
         ],
       },
       {
@@ -247,6 +247,27 @@ const stagger = (s = 0.08, d = 0) => ({ hidden: {}, show: { transition: { stagge
 const inView = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-70px' } };
 const Reveal = ({ children, className = '', delay = 0 }) => html`
   <${motion.div} className=${className} ...${inView} variants=${{ hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease, delay } } }}>${children}<//>`;
+
+/* Pins points to spots on an object-cover image (fx/fy = fraction of the
+   photo itself), so markers stay on the face at every container size. */
+const useCoverMap = () => {
+  const ref = useRef(null);
+  const [box, setBox] = useState({ w: 0, h: 0 });
+  const [nat, setNat] = useState(null);
+  useEffect(() => {
+    const ro = new ResizeObserver(([e]) => setBox({ w: e.contentRect.width, h: e.contentRect.height }));
+    ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, []);
+  const onLoad = (e) => setNat({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight });
+  const pos = (fx, fy) => {
+    if (!nat || !box.w) return { display: 'none' };
+    const s = Math.max(box.w / nat.w, box.h / nat.h);
+    const rw = nat.w * s, rh = nat.h * s;
+    return { left: (box.w - rw) / 2 + fx * rw, top: (box.h - rh) / 2 + fy * rh };
+  };
+  return { ref, onLoad, pos };
+};
 
 const Eyebrow = ({ children, className = '' }) => html`<div className=${`text-[12px] font-medium tracking-[0.3em] uppercase ${className}`}>${children}</div>`;
 const H2 = ({ children, className = '' }) => html`<h2 className=${`font-display uppercase tracking-[0.01em] text-[52px] sm:text-[72px] lg:text-[96px] leading-[0.9] ${className}`}>${children}</h2>`;
@@ -366,6 +387,7 @@ const Hero = ({ d }) => {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
   const [hot, setHot] = useState(null);
+  const cover = useCoverMap();
   return html`
   <section ref=${ref} className="relative">
     <div className="max-w-site mx-auto px-5 lg:px-10 pt-8 lg:pt-10 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
@@ -389,11 +411,11 @@ const Hero = ({ d }) => {
       </div>
       <div className="lg:col-span-6 order-1 lg:order-2 relative h-[520px] sm:h-[640px] lg:h-auto lg:min-h-[720px]">
         <${motion.div} className="absolute inset-0 overflow-hidden bg-nude" initial=${{ clipPath: 'inset(100% 0 0 0)' }} animate=${{ clipPath: 'inset(0% 0 0 0)' }} transition=${{ duration: 1.3, ease }}>
-          <${motion.img} style=${{ y }} src=${d.image.url} alt=${d.image.alt} className="absolute inset-0 w-full h-[114%] object-cover" />
+          <${motion.div} ref=${cover.ref} style=${{ y }} className="absolute inset-x-0 top-0 h-[114%]">
+          <img src=${d.image.url} alt=${d.image.alt} onLoad=${cover.onLoad} className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent"></div>
-        <//>
         ${d.hotspots.map((h, i) => html`
-          <${motion.div} key=${h.label} className="absolute z-10" style=${{ left: `${h.x}%`, top: `${h.y}%` }}
+          <${motion.div} key=${h.label} className="absolute z-10" style=${cover.pos(h.x, h.y)}
             initial=${{ opacity: 0, scale: 0 }} animate=${{ opacity: 1, scale: 1 }} transition=${{ type: 'spring', stiffness: 260, damping: 18, delay: 1.1 + i * 0.15 }}
             onMouseEnter=${() => setHot(i)} onMouseLeave=${() => setHot(null)}>
             <a href=${h.href} onFocus=${() => setHot(i)} onBlur=${() => setHot(null)} aria-label=${`${h.label}, ${h.price}`} className="relative -translate-x-1/2 -translate-y-1/2 grid place-items-center w-9 h-9 rounded-full bg-cream/90 backdrop-blur text-ink shadow-lg">
@@ -405,6 +427,8 @@ const Hero = ({ d }) => {
                 <div className="text-[13px] tracking-[0.12em] uppercase">${h.label}</div><div className="text-[13px] text-rose font-medium">${h.price}</div>
               <//>`}<//>
           <//>`)}
+          <//>
+        <//>
         <${motion.div} initial=${{ opacity: 0, y: 24 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 0.8, ease, delay: 1.5 }}
           className="absolute right-4 bottom-4 sm:right-6 sm:bottom-6 bg-cream/95 backdrop-blur px-5 py-4 max-w-[220px]">
           <div className="text-[11px] tracking-[0.24em] uppercase text-rose">Black Friday</div>
@@ -506,15 +530,16 @@ const Offers = ({ d }) => {
 const AreaExplorer = ({ d }) => {
   const [a, setA] = useState(3);
   const area = d.areas[a];
+  const cover = useCoverMap();
   return html`
   <section className="max-w-site mx-auto px-5 lg:px-10 py-24 lg:py-32">
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
       <${Reveal} className="lg:col-span-6 relative">
-        <div className="relative aspect-[4/5] overflow-hidden bg-nude">
-          <img src=${d.image.url} alt=${d.image.alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+        <div ref=${cover.ref} className="relative aspect-[4/5] overflow-hidden bg-nude">
+          <img src=${d.image.url} alt=${d.image.alt} onLoad=${cover.onLoad} className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-ink/10"></div>
           ${d.areas.map((x, i) => html`
-            <button key=${x.name} onClick=${() => setA(i)} aria-pressed=${a === i} aria-label=${`Show ${x.name} treatments`} className="absolute -translate-x-1/2 -translate-y-1/2" style=${{ left: `${x.x}%`, top: `${x.y}%` }}>
+            <button key=${x.name} onClick=${() => setA(i)} aria-pressed=${a === i} aria-label=${`Show ${x.name} treatments`} className="absolute -translate-x-1/2 -translate-y-1/2" style=${cover.pos(x.x, x.y)}>
               <span className=${`relative grid place-items-center w-10 h-10 rounded-full transition-colors duration-300 ${a === i ? 'bg-ink text-cream' : 'bg-cream/85 text-ink backdrop-blur'}`}>
                 ${a === i && html`<${motion.span} layoutId="area-ring" className="absolute -inset-2 rounded-full ring-1 ring-cream" transition=${{ type: 'spring', stiffness: 380, damping: 30 }} />`}
                 <span className="text-[11px] font-medium">${String(i + 1).padStart(2, '0')}</span>
