@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NakedMD — Botox & Fillers Med Spa | 40+ Locations</title>
+<meta name="description" content="Botox, lip filler and skin health from providers trained by board-certified plastic surgeons. 40+ NakedMD studios nationwide." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Jost:wght@300;400;500;600&family=Parisienne&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: { DEFAULT: '#262735', 900: '#1A1B25', 700: '#3A3B4C' },
+          cream: { DEFAULT: '#F4F1EA', 200: '#EAE5DA' },
+          mist: '#EFF1F7',
+          nude: { DEFAULT: '#E9D5C9', 300: '#D9B8A6' },
+          rose: { DEFAULT: '#B4584A', 50: '#F8ECE8' },
+        },
+        fontFamily: {
+          display: ['"League Gothic"', 'Impact', 'sans-serif'],
+          sans: ['Jost', 'futura-pt', 'Futura', 'system-ui', 'sans-serif'],
+          script: ['Parisienne', 'cursive'],
+        },
+        maxWidth: { site: '1360px' },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: Jost, futura-pt, Futura, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid #262735; outline-offset: 3px; border-radius: 6px; }
+  .on-dark :focus-visible { outline-color: #E9D5C9; }
+  .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  .logo-light { filter: invert(1) brightness(2); }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#F4F1EA; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-cream text-ink">
+<div id="boot"><img src="assets/logo.png" alt="" width="220" /></div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (promo bar, header, footer) + Collection
+   "page" with a Dynamic Zone `sections`. Treatments come from the commerce
+   catalog (Shopify today) and are referenced by handle in production.
+   ========================================================================== */
+const img = (id, w = 1200) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+const P = {
+  a: 'photo-1534528741775-53994a69daeb', b: 'photo-1531746020798-e6953c6e8e04', c: 'photo-1487412947147-5cebf100ffc2',
+  d: 'photo-1544005313-94ddf0286df2', e: 'photo-1524504388940-b1c1722653e1', f: 'photo-1508214751196-bcfd4ca60f91',
+  g: 'photo-1529626455594-4ff0802cfb7e', h: 'photo-1560750588-73207b1ef5b8', i: 'photo-1570172619644-dfd03ed5d881',
+  j: 'photo-1616394584738-fc6e612e71b9', k: 'photo-1515377905703-c4788e51af15', l: 'photo-1512290923902-8a9f81dc236c',
+};
+
+const CMS = {
+  global: {
+    logo: { url: 'assets/logo.png', alt: 'NakedMD' },
+    promo: { text: 'Black Friday early access is live', link: 'Shop now', href: '#bestsellers' },
+    nav: [
+      { label: 'Shop', mega: [
+        { heading: 'Shop by', links: ['Black Friday Early Access', 'New Client Offers', 'Neurotoxins', 'Fillers', 'Skin Health', 'Skincare', 'Gift Cards'] },
+        { heading: 'Popular', links: ['Naked Lips | Lip Filler', 'Naked TOX', 'Lip Flip', 'Cheek Filler', 'SkinPen® Microneedling', 'Naked Nose'] },
+      ]},
+      { label: 'New Client Offers', href: '#offers' },
+      { label: 'Studios', href: '#studios' },
+      { label: 'Financing', href: '#perks' },
+      { label: 'The Naked Truth', href: '#' },
+    ],
+    cta: { label: 'Book Now', href: '#studios' },
+    footer: {
+      columns: [
+        { title: 'Shop', links: ['New Client Offers', 'Neurotoxins', 'Fillers', 'Skin Health', 'Skincare', 'Gift Cards'] },
+        { title: 'NakedMD', links: ['Studios', 'Financing', 'Refer a Friend', 'Careers', 'Influencer Collabs', 'Blog'] },
+        { title: 'Help', links: ['Contact us', 'Terms and Conditions', 'Rewards Club Terms', 'Refund policy', 'Privacy', 'Web Accessibility Statement'] },
+      ],
+    },
+  },
+
+  page: {
+    sections: [
+      {
+        __component: 'sections.hero',
+        kicker: 'Botox & fillers med spa · 40+ studios',
+        title: ['Nothing', 'to hide.'],
+        script: 'just you, refreshed',
+        subtitle: 'Natural-looking injectables and skin health from providers trained by board-certified plastic surgeons — booked in minutes, priced up front.',
+        primaryCta: { label: 'Book your appointment', href: '#studios' },
+        secondaryCta: { label: 'Shop treatments', href: '#bestsellers' },
+        image: { url: img(P.f, 1400), alt: 'Woman with natural, refreshed skin' },
+        hotspots: [
+          { x: 52, y: 20, label: 'Forehead TOX', price: '$69', href: '#bestsellers' },
+          { x: 62, y: 63, label: 'Naked Lips', price: 'from $149', href: '#bestsellers' },
+          { x: 38, y: 50, label: 'Cheek Filler', price: '$299', href: '#bestsellers' },
+        ],
+        rating: { value: '4.9', label: '1,343 lip filler reviews' },
+      },
+      {
+        __component: 'sections.pillars',
+        items: [
+          { n: '01', title: 'Board certified plastic surgeon trained', body: 'Our providers are trained by board-certified plastic surgeons and follow physician-led protocols for safe, thoughtful care.' },
+          { n: '02', title: 'Reliable results, proven daily nationwide', body: 'With hundreds of thousands of treatments performed, our results are natural, consistent, and trusted by clients nationwide.' },
+          { n: '03', title: 'Consistent quality wherever you go', body: 'With 40+ locations across the U.S., you’ll receive the same high standard of care wherever you visit NakedMD.' },
+        ],
+      },
+      {
+        __component: 'sections.product-grid',
+        id: 'bestsellers',
+        eyebrow: 'Best sellers',
+        title: 'The treatments our clients request most.',
+        body: 'From immediate refreshment to long-term rejuvenation — the essentials for ageless confidence.',
+        filters: ['All', 'Neurotoxins', 'Fillers', 'Skin Health'],
+        items: [
+          { name: 'Naked Lips | Lip Filler', cat: 'Fillers', price: 'From $149', was: '$299', off: '-50%', reviews: 1343, image: img(P.b, 700) },
+          { name: 'Naked TOX | Neurotoxins', cat: 'Neurotoxins', price: 'From $69.90', was: '$89.90', off: '-22%', reviews: 536, image: img(P.c, 700) },
+          { name: 'Lip Flip', cat: 'Neurotoxins', price: '$69', was: '$135', off: '-48%', reviews: 212, image: img(P.d, 700) },
+          { name: 'Forehead TOX', cat: 'Neurotoxins', price: '$69', was: '$135', off: '-48%', reviews: 131, image: img(P.e, 700) },
+          { name: 'SkinPen® Microneedling', cat: 'Skin Health', price: 'From $249', was: '$399', off: '-37%', reviews: 83, image: img(P.i, 700) },
+          { name: 'Chin Filler', cat: 'Fillers', price: '$299', was: '$499', off: '-40%', reviews: 65, image: img(P.f, 700) },
+          { name: 'Naked Glow', cat: 'Skin Health', price: 'From $599', was: '$699', off: '-14%', reviews: 12, image: img(P.k, 700) },
+          { name: 'Cheek Filler', cat: 'Fillers', price: '$299', was: '$499', off: '-40%', reviews: 30, image: img(P.g, 700) },
+        ],
+      },
+      {
+        __component: 'sections.offers',
+        id: 'offers',
+        eyebrow: 'New client offers',
+        title: 'Your first visit, on us (almost).',
+        body: 'The perfect entry point to a lasting relationship — signature experiences selected to welcome you.',
+        items: [
+          { name: 'Forehead TOX', price: '$49', was: '$135', off: '63%' },
+          { name: 'Lip Flip', price: '$49', was: '$135', off: '63%' },
+          { name: 'Lip Filler', price: 'From $149', was: '$399', off: '62%' },
+          { name: 'Chin Filler', price: '$199', was: '$499', off: '60%' },
+          { name: 'Cheek Filler', price: '$199', was: '$499', off: '60%' },
+          { name: 'Smile Lines Filler', price: '$199', was: '$499', off: '60%' },
+        ],
+      },
+      {
+        __component: 'sections.area-explorer',
+        eyebrow: 'Shop by area',
+        title: 'Tap where you want to refresh.',
+        image: { url: img(P.d, 1200), alt: 'Close-up portrait of a woman’s face' },
+        areas: [
+          { x: 50, y: 22, name: 'Forehead', items: ['Forehead TOX — $69', 'Non-Surgical Brow Lift — $79'] },
+          { x: 64, y: 34, name: 'Eyes', items: ['Crows Feet — $158', 'Undereye Filler — $849', 'Jelly Roll — $99'] },
+          { x: 33, y: 47, name: 'Cheeks', items: ['Cheek Filler — $299', 'Smile Lines Filler — $299'] },
+          { x: 50, y: 64, name: 'Lips', items: ['Naked Lips | Lip Filler — from $149', 'Lip Flip — $69', 'Gummy Smile — $99'] },
+          { x: 55, y: 82, name: 'Jaw & chin', items: ['Jawline Contour Filler — $399', 'Chin Filler — $299', 'Masseter Reduction | TMJ — from $239.70'] },
+        ],
+      },
+      {
+        __component: 'sections.studios',
+        id: 'studios',
+        eyebrow: 'Studios',
+        big: '40+',
+        title: 'studios across the U.S.',
+        body: 'Same high standard of care, wherever you book.',
+        cities: ['Los Angeles', 'Scottsdale', 'Miami', 'Dallas', 'Houston', 'Las Vegas', 'Atlanta', 'Denver', 'Chicago', 'Nashville', 'San Diego', 'Austin'],
+        image: img(P.h, 1400),
+      },
+      {
+        __component: 'sections.perks',
+        id: 'perks',
+        items: [
+          { icon: 'card', title: 'Financing', body: 'Flexible monthly payments on treatments.', cta: 'Learn more' },
+          { icon: 'crown', title: 'Rewards Club', body: 'Earn on every visit. Redeem on your next.', cta: 'Join free' },
+          { icon: 'users', title: 'Refer a Friend', body: 'Share the glow — you both get rewarded.', cta: 'Refer now' },
+          { icon: 'gift', title: 'Gift Cards', body: 'The gift of confidence, delivered instantly.', cta: 'Shop gift cards' },
+        ],
+      },
+      {
+        __component: 'sections.reviews',
+        eyebrow: 'Real clients, real results',
+        title: 'Loved by thousands.',
+        stats: [{ value: '1,343', label: 'Lip filler reviews' }, { value: '536', label: 'Naked TOX reviews' }, { value: '212', label: 'Lip Flip reviews' }],
+        items: [
+          { text: 'Exactly the subtle lip I wanted. My injector listened to everything and it looks like me — just better.', who: 'Lip Filler client', image: img(P.b, 500) },
+          { text: 'In and out on my lunch break. Booking online with the price up front made it so easy.', who: 'Naked TOX client', image: img(P.e, 500) },
+          { text: 'Cleanest, calmest studio. I’ve visited two locations and the care was identical.', who: 'Cheek Filler client', image: img(P.g, 500) },
+        ],
+        note: 'Sample reviews for layout — replaced by verified product reviews via Strapi.',
+      },
+      {
+        __component: 'sections.book-cta',
+        title: 'Ready to book your appointment?',
+        script: 'see you soon',
+        cta: { label: 'Book now', href: '#studios' },
+        image: img(P.j, 1400),
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M12 5l7 7-7 7',
+  arrowUR: 'M7 17 17 7M8 7h9v9',
+  search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3',
+  user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+  bag: 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0',
+  menu: 'M4 8h16M4 16h16',
+  x: 'M18 6 6 18M6 6l12 12',
+  chevron: 'M6 9l6 6 6-6',
+  check: 'M20 6 9 17l-5-5',
+  plus: 'M12 5v14M5 12h14',
+  pin: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  card: 'M2 6h20v12H2zM2 10h20M6 15h4',
+  crown: 'M3 18h18M4 8l4 4 4-7 4 7 4-4-2 10H6z',
+  users: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  gift: 'M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z',
+  left: 'M15 18l-6-6 6-6',
+  right: 'M9 18l6-6-6-6',
+};
+const Icon = ({ name, className = 'w-5 h-5', sw = 1.5 }) => html`
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth=${sw} strokeLinecap="round" strokeLinejoin="round" className=${className} aria-hidden="true"><path d=${ICONS[name]} /></svg>`;
+const Stars = ({ className = 'w-3.5 h-3.5' }) => html`<span className="inline-flex gap-0.5 text-ink" aria-hidden="true">${[0, 1, 2, 3, 4].map((i) => html`<svg key=${i} viewBox="0 0 24 24" className=${className} fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" /></svg>`)}</span>`;
+
+const ease = [0.22, 1, 0.36, 1];
+const fadeUp = { hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease } } };
+const stagger = (s = 0.08, d = 0) => ({ hidden: {}, show: { transition: { staggerChildren: s, delayChildren: d } } });
+const inView = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-70px' } };
+const Reveal = ({ children, className = '', delay = 0 }) => html`
+  <${motion.div} className=${className} ...${inView} variants=${{ hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease, delay } } }}>${children}<//>`;
+
+const Eyebrow = ({ children, className = '' }) => html`<div className=${`text-[12px] font-medium tracking-[0.3em] uppercase ${className}`}>${children}</div>`;
+const H2 = ({ children, className = '' }) => html`<h2 className=${`font-display uppercase tracking-[0.01em] text-[52px] sm:text-[72px] lg:text-[96px] leading-[0.9] ${className}`}>${children}</h2>`;
+
+const Button = ({ href, children, variant = 'ink', className = '', icon = 'arrow', type, onClick }) => {
+  const styles = {
+    ink: 'bg-ink text-cream hover:bg-ink-700',
+    cream: 'bg-cream text-ink hover:bg-white',
+    nude: 'bg-nude text-ink hover:bg-nude-300',
+    outline: 'ring-1 ring-ink/30 text-ink hover:bg-ink hover:text-cream',
+    ghost: 'ring-1 ring-cream/40 text-cream hover:bg-cream hover:text-ink',
+  };
+  const Tag = href ? motion.a : motion.button;
+  return html`<${Tag} href=${href} type=${type} onClick=${onClick} whileTap=${{ scale: 0.97 }}
+    className=${`group relative inline-flex items-center justify-center gap-3 overflow-hidden px-7 h-[52px] text-[13px] font-medium tracking-[0.2em] uppercase whitespace-nowrap transition-colors duration-300 ${styles[variant]} ${className}`}>
+    <span className="relative">${children}</span>${icon && html`<${Icon} name=${icon} className="relative w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" sw=${1.6} />`}
+  <//>`;
+};
+
+/* ============================== Cart (demo) ============================== */
+const CartCtx = createContext({ count: 0, add: () => {} });
+const CartProvider = ({ children }) => {
+  const [count, setCount] = useState(0);
+  const [toast, setToast] = useState(null);
+  const add = (name) => { setCount((c) => c + 1); setToast({ name, id: Date.now() }); };
+  useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 2600); return () => clearTimeout(t); }, [toast]);
+  return html`<${CartCtx.Provider} value=${{ count, add }}>
+    ${children}
+    <${AnimatePresence}>${toast && html`
+      <${motion.div} key=${toast.id} role="status" initial=${{ opacity: 0, y: 40, scale: 0.96 }} animate=${{ opacity: 1, y: 0, scale: 1 }} exit=${{ opacity: 0, y: 20 }} transition=${{ type: 'spring', stiffness: 300, damping: 26 }}
+        className="fixed z-[70] bottom-5 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 flex items-center gap-3 bg-ink text-cream pl-3 pr-5 py-3 shadow-2xl">
+        <span className="grid place-items-center w-9 h-9 bg-nude text-ink"><${Icon} name="check" className="w-4 h-4" sw=${2.2} /></span>
+        <span className="text-[14px]"><span className="opacity-70">Added</span> ${toast.name}</span>
+      <//>`}<//>
+  <//>`;
+};
+
+/* ============================== Header ============================== */
+const PromoBar = ({ d }) => html`
+  <div className="bg-ink text-cream text-[12px] tracking-[0.22em] uppercase">
+    <div className="h-10 flex items-center justify-center gap-3 px-4 text-center">
+      <span>${d.text}</span><a href=${d.href} className="underline underline-offset-4 decoration-nude hover:text-nude">${d.link}</a>
+    </div>
+  </div>`;
+
+const Header = ({ g }) => {
+  const { count } = useContext(CartCtx);
+  const [scrolled, setScrolled] = useState(false);
+  const [mega, setMega] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 30));
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+  return html`
+  <header className="sticky top-0 z-50" onMouseLeave=${() => setMega(false)}>
+    <div className=${`relative border-b transition-all duration-300 ${scrolled || mega ? 'bg-cream/90 backdrop-blur-xl border-ink/10' : 'bg-cream border-transparent'}`}>
+      <div className=${`max-w-site mx-auto px-5 lg:px-10 grid grid-cols-[1fr_auto_1fr] items-center transition-all duration-300 ${scrolled ? 'h-[64px]' : 'h-[80px]'}`}>
+        <nav className="hidden xl:flex items-center gap-7" aria-label="Primary">
+          ${g.nav.slice(0, 3).map((n) => html`
+            <a key=${n.label} href=${n.href || '#bestsellers'} onMouseEnter=${() => setMega(!!n.mega)} aria-haspopup=${n.mega ? 'true' : undefined} aria-expanded=${n.mega ? mega : undefined}
+              className="group relative flex items-center gap-1 h-10 text-[12.5px] tracking-[0.2em] uppercase whitespace-nowrap">
+              ${n.label}${n.mega && html`<${Icon} name="chevron" className=${`w-3.5 h-3.5 transition-transform ${mega ? 'rotate-180' : ''}`} />`}
+              <span className="absolute left-0 right-0 bottom-1.5 h-px bg-ink origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+            </a>`)}
+        </nav>
+        <button onClick=${() => setOpen(true)} className="xl:hidden justify-self-start grid place-items-center w-11 h-11" aria-label="Open menu"><${Icon} name="menu" className="w-6 h-6" /></button>
+        <a href="#" className="justify-self-center" aria-label="NakedMD home"><img src=${g.logo.url} alt=${g.logo.alt} className=${`w-auto transition-all duration-300 ${scrolled ? 'h-6' : 'h-7 sm:h-8'}`} /></a>
+        <div className="justify-self-end flex items-center gap-1 sm:gap-2">
+          ${g.nav.slice(3).map((n) => html`<a key=${n.label} href=${n.href} className="hidden xl:inline-flex group relative items-center h-10 px-3 text-[12.5px] tracking-[0.2em] uppercase whitespace-nowrap">${n.label}<span className="absolute left-3 right-3 bottom-1.5 h-px bg-ink origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span></a>`)}
+          <a href="#" className="hidden md:grid place-items-center w-10 h-10" aria-label="Search"><${Icon} name="search" /></a>
+          <a href="#" className="hidden md:grid place-items-center w-10 h-10" aria-label="Account"><${Icon} name="user" /></a>
+          <a href="#" className="relative grid place-items-center w-10 h-10" aria-label=${`Cart, ${count} items`}>
+            <${Icon} name="bag" />
+            <${AnimatePresence}>${count > 0 && html`<${motion.span} key=${count} initial=${{ scale: 0 }} animate=${{ scale: 1 }} transition=${{ type: 'spring', stiffness: 500, damping: 18 }} className="absolute top-0.5 right-0 grid place-items-center min-w-[18px] h-[18px] px-1 rounded-full bg-rose text-white text-[10.5px] font-semibold">${count}<//>`}<//>
+          </a>
+          <${Button} href=${g.cta.href} className="hidden sm:inline-flex h-10 px-5 text-[12px] ml-2" icon=${null}>${g.cta.label}<//>
+        </div>
+      </div>
+      <${AnimatePresence}>
+        ${mega && html`
+          <${motion.div} key="mega" initial=${{ opacity: 0, y: -6 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, transition: { duration: 0.15 } }} transition=${{ duration: 0.3, ease }}
+            className="hidden xl:block absolute inset-x-0 top-full bg-cream border-b border-ink/10 shadow-[0_40px_60px_-40px_rgba(38,39,53,.35)]">
+            <div className="max-w-site mx-auto px-10 py-10 grid grid-cols-[1fr_1fr_1.3fr_1.3fr] gap-10">
+              ${g.nav[0].mega.map((c) => html`
+                <div key=${c.heading}><${Eyebrow} className="text-ink/45 mb-5">${c.heading}<//>
+                  <ul className="space-y-2.5">${c.links.map((l) => html`<li key=${l}><a href="#bestsellers" className="text-[15.5px] hover:pl-1.5 transition-all">${l}</a></li>`)}</ul>
+                </div>`)}
+              ${[{ t: 'New Client Offers', s: 'From $49', i: P.e }, { t: 'Black Friday', s: 'Early access is live', i: P.c }].map((c) => html`
+                <a key=${c.t} href="#offers" className="group relative h-[240px] overflow-hidden">
+                  <img src=${img(c.i, 600)} alt="" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent"></div>
+                  <div className="absolute left-5 bottom-5 text-cream"><div className="font-display uppercase text-[34px] leading-none">${c.t}</div><div className="text-[13px] tracking-[0.18em] uppercase mt-2 opacity-85">${c.s}</div></div>
+                </a>`)}
+            </div>
+          <//>`}
+      <//>
+    </div>
+    <${AnimatePresence}>
+      ${open && html`
+        <${motion.div} key="drawer" className="fixed inset-0 z-[60] bg-ink text-cream flex flex-col on-dark" initial=${{ x: '-100%' }} animate=${{ x: 0 }} exit=${{ x: '-100%' }} transition=${{ duration: 0.5, ease }}>
+          <div className="flex items-center justify-between px-5 h-[80px]">
+            <img src=${g.logo.url} alt=${g.logo.alt} className="h-7 logo-light" />
+            <button onClick=${() => setOpen(false)} className="grid place-items-center w-11 h-11" aria-label="Close menu"><${Icon} name="x" className="w-6 h-6" /></button>
+          </div>
+          <${motion.nav} className="px-6 pt-4 flex-1 overflow-y-auto" variants=${stagger(0.06, 0.2)} initial="hidden" animate="show">
+            ${g.nav.map((n) => html`<${motion.a} key=${n.label} variants=${fadeUp} href=${n.href || '#bestsellers'} onClick=${() => setOpen(false)} className="flex items-center justify-between py-4 border-b border-cream/10 font-display uppercase text-[44px] leading-none">${n.label}<${Icon} name="arrowUR" className="w-6 h-6 text-nude" /><//>`)}
+          <//>
+          <div className="p-6"><${Button} href="#studios" variant="nude" className="w-full" onClick=${() => setOpen(false)}>Book Now<//></div>
+        <//>`}
+    <//>
+  </header>`;
+};
+
+/* ============================== Sections ============================== */
+const Hero = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
+  const [hot, setHot] = useState(null);
+  return html`
+  <section ref=${ref} className="relative">
+    <div className="max-w-site mx-auto px-5 lg:px-10 pt-8 lg:pt-10 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
+      <div className="lg:col-span-6 flex flex-col justify-center order-2 lg:order-1">
+        <${motion.div} variants=${stagger(0.12, 0.1)} initial="hidden" animate="show">
+          <${motion.div} variants=${fadeUp}><${Eyebrow} className="text-ink/55">${d.kicker}<//><//>
+          <h1 className="mt-6 font-display uppercase leading-[0.84] text-[100px] sm:text-[150px] lg:text-[172px] xl:text-[196px] tracking-[0.005em]">
+            ${d.title.map((t, i) => html`<span key=${i} className="block overflow-hidden"><${motion.span} className="block" initial=${{ y: '100%' }} animate=${{ y: 0 }} transition=${{ duration: 1.1, ease, delay: 0.15 + i * 0.12 }}>${t}<//></span>`)}
+          </h1>
+          <${motion.div} className="font-script text-[40px] sm:text-[52px] text-rose -mt-3 sm:-mt-5 ml-1" initial=${{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }} animate=${{ opacity: 1, clipPath: 'inset(0 0% 0 0)' }} transition=${{ duration: 1.3, ease, delay: 0.7 }}>${d.script}<//>
+          <${motion.p} variants=${fadeUp} className="mt-6 text-[17px] leading-relaxed text-ink/70 max-w-[480px] font-light">${d.subtitle}<//>
+          <${motion.div} variants=${fadeUp} className="mt-9 flex flex-wrap gap-3">
+            <${Button} href=${d.primaryCta.href}>${d.primaryCta.label}<//>
+            <${Button} href=${d.secondaryCta.href} variant="outline" icon=${null}>${d.secondaryCta.label}<//>
+          <//>
+          <${motion.div} variants=${fadeUp} className="mt-10 flex items-center gap-4">
+            <div className="flex -space-x-3">${[P.b, P.e, P.g].map((p) => html`<img key=${p} src=${img(p, 120)} alt="" className="w-11 h-11 rounded-full object-cover ring-2 ring-cream" />`)}</div>
+            <div><div className="flex items-center gap-2"><${Stars} /><span className="font-medium">${d.rating.value}</span></div><div className="text-[13px] text-ink/55">${d.rating.label}</div></div>
+          <//>
+        <//>
+      </div>
+      <div className="lg:col-span-6 order-1 lg:order-2 relative h-[520px] sm:h-[640px] lg:h-auto lg:min-h-[720px]">
+        <${motion.div} className="absolute inset-0 overflow-hidden bg-nude" initial=${{ clipPath: 'inset(100% 0 0 0)' }} animate=${{ clipPath: 'inset(0% 0 0 0)' }} transition=${{ duration: 1.3, ease }}>
+          <${motion.img} style=${{ y }} src=${d.image.url} alt=${d.image.alt} className="absolute inset-0 w-full h-[114%] object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent"></div>
+        <//>
+        ${d.hotspots.map((h, i) => html`
+          <${motion.div} key=${h.label} className="absolute z-10" style=${{ left: `${h.x}%`, top: `${h.y}%` }}
+            initial=${{ opacity: 0, scale: 0 }} animate=${{ opacity: 1, scale: 1 }} transition=${{ type: 'spring', stiffness: 260, damping: 18, delay: 1.1 + i * 0.15 }}
+            onMouseEnter=${() => setHot(i)} onMouseLeave=${() => setHot(null)}>
+            <a href=${h.href} onFocus=${() => setHot(i)} onBlur=${() => setHot(null)} aria-label=${`${h.label}, ${h.price}`} className="relative -translate-x-1/2 -translate-y-1/2 grid place-items-center w-9 h-9 rounded-full bg-cream/90 backdrop-blur text-ink shadow-lg">
+              <span className="absolute inset-0 rounded-full bg-cream/60 animate-ping"></span><${Icon} name="plus" className="relative w-4 h-4" sw=${2} />
+            </a>
+            <${AnimatePresence}>${hot === i && html`
+              <${motion.div} initial=${{ opacity: 0, y: 6 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: 4 }} transition=${{ duration: 0.2 }}
+                className="absolute left-6 -top-3 whitespace-nowrap bg-cream px-4 py-2.5 shadow-xl pointer-events-none">
+                <div className="text-[13px] tracking-[0.12em] uppercase">${h.label}</div><div className="text-[13px] text-rose font-medium">${h.price}</div>
+              <//>`}<//>
+          <//>`)}
+        <${motion.div} initial=${{ opacity: 0, y: 24 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 0.8, ease, delay: 1.5 }}
+          className="absolute right-4 bottom-4 sm:right-6 sm:bottom-6 bg-cream/95 backdrop-blur px-5 py-4 max-w-[220px]">
+          <div className="text-[11px] tracking-[0.24em] uppercase text-rose">Black Friday</div>
+          <div className="font-display uppercase text-[34px] leading-[0.95] mt-1">Up to 50% off</div>
+          <a href="#bestsellers" className="mt-2 inline-flex items-center gap-2 text-[12px] tracking-[0.18em] uppercase">Shop <${Icon} name="arrow" className="w-3.5 h-3.5" /></a>
+        <//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Pillars = ({ d }) => html`
+  <section className="border-y border-ink/10 bg-white">
+    <${motion.div} className="max-w-site mx-auto grid grid-cols-1 md:grid-cols-3" variants=${stagger(0.12)} ...${inView}>
+      ${d.items.map((p, i) => html`
+        <${motion.div} key=${p.n} variants=${fadeUp} className=${`group px-5 lg:px-10 py-10 lg:py-12 ${i ? 'border-t md:border-t-0 md:border-l border-ink/10' : ''} hover:bg-cream transition-colors duration-500`}>
+          <div className="flex items-baseline gap-4"><span className="font-display text-[44px] leading-none text-nude-300 group-hover:text-rose transition-colors">${p.n}</span><h3 className="text-[14px] tracking-[0.18em] uppercase font-medium leading-snug">${p.title}</h3></div>
+          <p className="mt-4 text-[15px] font-light text-ink/65 leading-relaxed">${p.body}</p>
+        <//>`)}
+    <//>
+  </section>`;
+
+const ProductCard = ({ p }) => {
+  const { add } = useContext(CartCtx);
+  const [added, setAdded] = useState(false);
+  const onAdd = (e) => { e.preventDefault(); add(p.name); setAdded(true); setTimeout(() => setAdded(false), 1600); };
+  return html`
+  <${motion.article} layout variants=${fadeUp} initial="hidden" animate="show" exit=${{ opacity: 0, scale: 0.96 }} whileHover="hover" className="group">
+    <div className="block relative aspect-[4/5] overflow-hidden bg-nude">
+      <${motion.img} src=${p.image} alt=${p.name} loading="lazy" variants=${{ hover: { scale: 1.06 } }} transition=${{ duration: 0.8, ease }} className="absolute inset-0 w-full h-full object-cover" />
+      <span className="absolute top-3 left-3 bg-rose text-white text-[12px] font-medium px-2.5 py-1">${p.off}</span>
+      <span className="absolute top-3 right-3 bg-cream/90 text-[11px] tracking-[0.16em] uppercase px-2.5 py-1">${p.cat}</span>
+      <${motion.button} onClick=${onAdd} variants=${{ hover: { y: 0, opacity: 1 } }} initial=${{ y: 20, opacity: 0 }}
+        className="absolute inset-x-3 bottom-3 h-12 bg-ink text-cream text-[12px] tracking-[0.2em] uppercase flex items-center justify-center gap-2 max-sm:!opacity-100 max-sm:!translate-y-0">
+        <${AnimatePresence} mode="wait" initial=${false}>
+          ${added ? html`<${motion.span} key="ok" initial=${{ y: 10, opacity: 0 }} animate=${{ y: 0, opacity: 1 }} exit=${{ y: -10, opacity: 0 }} className="flex items-center gap-2"><${Icon} name="check" className="w-4 h-4" sw=${2} />Added<//>`
+            : html`<${motion.span} key="add" initial=${{ y: 10, opacity: 0 }} animate=${{ y: 0, opacity: 1 }} exit=${{ y: -10, opacity: 0 }} className="flex items-center gap-2"><${Icon} name="plus" className="w-4 h-4" sw=${2} />Add to cart<//>`}
+        <//>
+      <//>
+    </div>
+    <div className="mt-4">
+      <div className="flex items-center gap-2 text-[12.5px] text-ink/55"><${Stars} className="w-3 h-3" />(${p.reviews.toLocaleString('en-US')})</div>
+      <h3 className="mt-1.5 text-[16px] font-medium leading-snug">${p.name}</h3>
+      <div className="mt-1.5 flex items-baseline gap-2.5"><span className="text-[16px] text-rose font-medium">${p.price}</span><s className="text-[14px] text-ink/40">${p.was}</s></div>
+    </div>
+  <//>`;
+};
+
+const ProductGrid = ({ d }) => {
+  const [f, setF] = useState('All');
+  const items = f === 'All' ? d.items : d.items.filter((p) => p.cat === f);
+  return html`
+  <section id=${d.id} className="max-w-site mx-auto px-5 lg:px-10 py-24 lg:py-32 scroll-mt-20">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+      <${Reveal} className="lg:col-span-7"><${Eyebrow} className="text-rose">${d.eyebrow}<//><${H2} className="mt-4">${d.title}<//><//>
+      <${Reveal} className="lg:col-span-5" delay=${0.1}><p className="text-[16.5px] font-light text-ink/65 max-w-md lg:ml-auto">${d.body}</p><//>
+    </div>
+    <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-b border-ink/10">
+      <div role="tablist" aria-label="Filter treatments" className="flex gap-1 -mb-px overflow-x-auto no-scrollbar">
+        ${d.filters.map((x) => html`
+          <button key=${x} role="tab" aria-selected=${f === x} onClick=${() => setF(x)} className=${`relative h-12 px-4 text-[12.5px] tracking-[0.2em] uppercase whitespace-nowrap transition-colors ${f === x ? 'text-ink' : 'text-ink/45 hover:text-ink'}`}>
+            ${x}${f === x && html`<${motion.span} layoutId="filter-line" className="absolute left-0 right-0 bottom-0 h-0.5 bg-ink" transition=${{ type: 'spring', stiffness: 420, damping: 34 }} />`}
+          </button>`)}
+      </div>
+      <a href="#" className="hidden sm:inline-flex items-center gap-2 pb-3 text-[12.5px] tracking-[0.2em] uppercase hover:text-rose transition-colors">View all treatments <${Icon} name="arrow" className="w-4 h-4" /></a>
+    </div>
+    <${motion.div} layout className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-12">
+      <${AnimatePresence} mode="popLayout">${items.map((p) => html`<${ProductCard} key=${p.name} p=${p} />`)}<//>
+    <//>
+  </section>`;
+};
+
+const Offers = ({ d }) => {
+  const rail = useRef(null);
+  const scroll = (dir) => rail.current && rail.current.scrollBy({ left: dir * 340, behavior: 'smooth' });
+  const { add } = useContext(CartCtx);
+  return html`
+  <section id=${d.id} className="bg-ink text-cream py-24 lg:py-32 overflow-hidden on-dark scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-10 flex flex-wrap items-end justify-between gap-8">
+      <${Reveal}><${Eyebrow} className="text-nude">${d.eyebrow}<//><${H2} className="mt-4 max-w-3xl">${d.title}<//><p className="mt-5 text-[16.5px] font-light text-cream/65 max-w-lg">${d.body}</p><//>
+      <div className="flex gap-2">
+        <button onClick=${() => scroll(-1)} className="grid place-items-center w-12 h-12 ring-1 ring-cream/25 hover:bg-cream hover:text-ink transition-colors" aria-label="Previous offers"><${Icon} name="left" /></button>
+        <button onClick=${() => scroll(1)} className="grid place-items-center w-12 h-12 bg-cream text-ink hover:bg-nude transition-colors" aria-label="Next offers"><${Icon} name="right" /></button>
+      </div>
+    </div>
+    <${motion.div} ref=${rail} className="no-scrollbar mt-12 flex gap-4 overflow-x-auto snap-x snap-mandatory px-5 lg:px-[max(2.5rem,calc((100vw-1360px)/2+2.5rem))]" variants=${stagger(0.07)} ...${inView}>
+      ${d.items.map((o, i) => html`
+        <${motion.div} key=${o.name} variants=${fadeUp} whileHover=${{ y: -6 }} className=${`snap-start shrink-0 w-[280px] sm:w-[320px] p-7 flex flex-col min-h-[340px] ${i % 3 === 0 ? 'bg-nude text-ink' : i % 3 === 1 ? 'bg-cream text-ink' : 'bg-ink-700 text-cream'}`}>
+          <div className="flex items-start justify-between"><span className="text-[11.5px] tracking-[0.24em] uppercase opacity-60">New client</span><span className="text-[12px] tracking-[0.14em] uppercase opacity-60">${String(i + 1).padStart(2, '0')}</span></div>
+          <div className="mt-6 font-display text-[110px] leading-[0.8]">${o.off}<span className="text-[40px] align-top ml-1">off</span></div>
+          <h3 className="mt-6 text-[19px] font-medium">${o.name}</h3>
+          <div className="mt-1 flex items-baseline gap-2.5"><span className="text-[18px]">${o.price}</span><s className="text-[14px] opacity-50">${o.was}</s></div>
+          <button onClick=${() => add(`${o.name} | New Client Offer`)} className="mt-auto pt-6 inline-flex items-center gap-2 text-[12px] tracking-[0.2em] uppercase hover:gap-3 transition-all">Claim offer <${Icon} name="arrow" className="w-4 h-4" /></button>
+        <//>`)}
+    <//>
+  </section>`;
+};
+
+const AreaExplorer = ({ d }) => {
+  const [a, setA] = useState(3);
+  const area = d.areas[a];
+  return html`
+  <section className="max-w-site mx-auto px-5 lg:px-10 py-24 lg:py-32">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+      <${Reveal} className="lg:col-span-6 relative">
+        <div className="relative aspect-[4/5] overflow-hidden bg-nude">
+          <img src=${d.image.url} alt=${d.image.alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-ink/10"></div>
+          ${d.areas.map((x, i) => html`
+            <button key=${x.name} onClick=${() => setA(i)} aria-pressed=${a === i} aria-label=${`Show ${x.name} treatments`} className="absolute -translate-x-1/2 -translate-y-1/2" style=${{ left: `${x.x}%`, top: `${x.y}%` }}>
+              <span className=${`relative grid place-items-center w-10 h-10 rounded-full transition-colors duration-300 ${a === i ? 'bg-ink text-cream' : 'bg-cream/85 text-ink backdrop-blur'}`}>
+                ${a === i && html`<${motion.span} layoutId="area-ring" className="absolute -inset-2 rounded-full ring-1 ring-cream" transition=${{ type: 'spring', stiffness: 380, damping: 30 }} />`}
+                <span className="text-[11px] font-medium">${String(i + 1).padStart(2, '0')}</span>
+              </span>
+            </button>`)}
+        </div>
+      <//>
+      <div className="lg:col-span-6">
+        <${Reveal}><${Eyebrow} className="text-rose">${d.eyebrow}<//><${H2} className="mt-4">${d.title}<//><//>
+        <div className="mt-8 flex flex-wrap gap-2">
+          ${d.areas.map((x, i) => html`<button key=${x.name} onClick=${() => setA(i)} aria-pressed=${a === i} className=${`h-10 px-4 text-[12.5px] tracking-[0.16em] uppercase transition-colors ${a === i ? 'bg-ink text-cream' : 'ring-1 ring-ink/20 hover:ring-ink/50'}`}>${x.name}</button>`)}
+        </div>
+        <div className="mt-8 min-h-[220px]">
+          <${AnimatePresence} mode="wait">
+            <${motion.div} key=${area.name} initial=${{ opacity: 0, y: 14 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -10 }} transition=${{ duration: 0.35, ease }}>
+              <div className="font-script text-[44px] text-rose leading-none">${area.name.toLowerCase()}</div>
+              <ul className="mt-5 border-t border-ink/10">
+                ${area.items.map((t, i) => { const [n, pr] = t.split(' — '); return html`
+                  <${motion.li} key=${t} initial=${{ opacity: 0, x: -10 }} animate=${{ opacity: 1, x: 0 }} transition=${{ delay: 0.08 * i }}>
+                    <a href="#bestsellers" className="group flex items-center justify-between gap-4 py-4 border-b border-ink/10">
+                      <span className="text-[17px] group-hover:translate-x-1.5 transition-transform">${n}</span>
+                      <span className="flex items-center gap-4"><span className="text-[15px] text-ink/60">${pr}</span><${Icon} name="arrowUR" className="w-4 h-4 opacity-40 group-hover:opacity-100 transition-opacity" /></span>
+                    </a>
+                  <//>`; })}
+              </ul>
+            <//>
+          <//>
+        </div>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Studios = ({ d }) => {
+  const [q, setQ] = useState('');
+  const [done, setDone] = useState(false);
+  return html`
+  <section id=${d.id} className="relative bg-nude overflow-hidden scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-10 py-24 lg:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      <div className="lg:col-span-7">
+        <${Reveal}>
+          <${Eyebrow} className="text-ink/60">${d.eyebrow}<//>
+          <div className="mt-2 flex items-end gap-5 flex-wrap">
+            <span className="font-display text-[170px] sm:text-[240px] leading-[0.78]">${d.big}</span>
+            <span className="font-display uppercase text-[44px] sm:text-[64px] leading-[0.9] pb-3 max-w-[300px]">${d.title}</span>
+          </div>
+          <p className="mt-6 text-[17px] font-light text-ink/70">${d.body}</p>
+        <//>
+        <${Reveal} delay=${0.1}>
+          <form onSubmit=${(e) => { e.preventDefault(); setDone(true); }} className="mt-8 flex max-w-lg bg-cream">
+            <span className="grid place-items-center pl-5 text-ink/50"><${Icon} name="pin" /></span>
+            <label htmlFor="studio" className="sr-only">City or ZIP code</label>
+            <input id="studio" value=${q} onChange=${(e) => { setQ(e.target.value); setDone(false); }} autoComplete="postal-code" placeholder="City or ZIP code" className="flex-1 min-w-0 h-[56px] px-4 bg-transparent text-[16px] placeholder:text-ink/40 focus:outline-none" />
+            <${Button} type="submit" className="h-[56px]" icon="arrow">Find a studio<//>
+          </form>
+          <${AnimatePresence}>${done && html`<${motion.p} initial=${{ opacity: 0, y: -6 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0 }} className="mt-3 text-[14px] text-ink/70">Showing studios near <strong className="font-medium">${q || 'you'}</strong> — connected to live studio data in production.<//>`}<//>
+        <//>
+      </div>
+      <${Reveal} className="lg:col-span-5" delay=${0.15}>
+        <div className="relative aspect-[4/5] overflow-hidden"><img src=${d.image} alt="Client receiving an injectable treatment at a NakedMD studio" loading="lazy" className="w-full h-full object-cover" /></div>
+      <//>
+    </div>
+    <div className="border-t border-ink/15 py-5 overflow-hidden">
+      <${motion.div} className="flex gap-10 w-max" animate=${{ x: ['0%', '-50%'] }} transition=${{ duration: 35, ease: 'linear', repeat: Infinity }}>
+        ${[...d.cities, ...d.cities].map((c, i) => html`<span key=${i} className="flex items-center gap-10 font-display uppercase text-[34px] whitespace-nowrap">${c}<span className="w-2 h-2 rounded-full bg-rose"></span></span>`)}
+      <//>
+    </div>
+  </section>`;
+};
+
+const Perks = ({ d }) => html`
+  <section id=${d.id} className="max-w-site mx-auto px-5 lg:px-10 py-20 scroll-mt-20">
+    <${motion.div} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-ink/10" variants=${stagger(0.08)} ...${inView}>
+      ${d.items.map((p) => html`
+        <${motion.a} key=${p.title} href="#" variants=${fadeUp} className="group relative overflow-hidden border-r border-b border-ink/10 p-8 min-h-[250px] flex flex-col">
+          <span className="absolute inset-0 bg-ink origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-500 ease-out"></span>
+          <span className="relative grid place-items-center w-12 h-12 rounded-full ring-1 ring-ink/20 group-hover:ring-cream/30 group-hover:text-nude transition-colors"><${Icon} name=${p.icon} /></span>
+          <h3 className="relative mt-8 font-display uppercase text-[36px] leading-none group-hover:text-cream transition-colors">${p.title}</h3>
+          <p className="relative mt-3 text-[15px] font-light text-ink/65 group-hover:text-cream/70 transition-colors">${p.body}</p>
+          <span className="relative mt-auto pt-6 inline-flex items-center gap-2 text-[12px] tracking-[0.2em] uppercase group-hover:text-nude transition-colors">${p.cta}<${Icon} name="arrow" className="w-4 h-4" /></span>
+        <//>`)}
+    <//>
+  </section>`;
+
+const Reviews = ({ d }) => html`
+  <section className="bg-white py-24 lg:py-32">
+    <div className="max-w-site mx-auto px-5 lg:px-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <${Reveal} className="lg:col-span-6"><${Eyebrow} className="text-rose">${d.eyebrow}<//><${H2} className="mt-4">${d.title}<//><//>
+        <${motion.div} className="lg:col-span-6 grid grid-cols-3 gap-4" variants=${stagger(0.1)} ...${inView}>
+          ${d.stats.map((s) => html`<${motion.div} key=${s.label} variants=${fadeUp} className="border-l border-ink/15 pl-4"><div className="font-display text-[52px] sm:text-[64px] leading-none">${s.value}</div><div className="mt-2 text-[12px] tracking-[0.14em] uppercase text-ink/55">${s.label}</div><//>`)}
+        <//>
+      </div>
+      <${motion.div} className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-5" variants=${stagger(0.1)} ...${inView}>
+        ${d.items.map((r) => html`
+          <${motion.figure} key=${r.who} variants=${fadeUp} whileHover=${{ y: -6 }} className="bg-cream p-7 flex flex-col">
+            <${Stars} />
+            <blockquote className="mt-5 text-[18px] leading-relaxed font-light">“${r.text}”</blockquote>
+            <figcaption className="mt-auto pt-7 flex items-center gap-3"><img src=${r.image} alt="" loading="lazy" className="w-11 h-11 rounded-full object-cover" /><span className="text-[12.5px] tracking-[0.16em] uppercase">${r.who}<span className="block normal-case tracking-normal text-ink/50 text-[12.5px]">Verified client</span></span></figcaption>
+          <//>`)}
+      <//>
+      <p className="mt-6 text-[12.5px] text-ink/40">${d.note}</p>
+    </div>
+  </section>`;
+
+const BookCta = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const y = useTransform(scrollYProgress, [0, 1], ['-12%', '12%']);
+  return html`
+  <section ref=${ref} className="relative h-[560px] lg:h-[680px] overflow-hidden on-dark">
+    <${motion.img} style=${{ y }} src=${d.image} alt="" loading="lazy" className="absolute inset-0 w-full h-[124%] -top-[12%] object-cover" />
+    <div className="absolute inset-0 bg-ink/55"></div>
+    <div className="relative h-full max-w-site mx-auto px-5 lg:px-10 flex flex-col items-center justify-center text-center text-cream">
+      <${Reveal}>
+        <div className="font-script text-[44px] sm:text-[56px] text-nude leading-none">${d.script}</div>
+        <h2 className="mt-2 font-display uppercase text-[64px] sm:text-[100px] lg:text-[136px] leading-[0.86] max-w-5xl">${d.title}</h2>
+        <div className="mt-10"><${Button} href=${d.cta.href} variant="cream" className="h-14 px-10">${d.cta.label}<//></div>
+      <//>
+    </div>
+  </section>`;
+};
+
+const Footer = ({ g }) => {
+  const [sent, setSent] = useState(false);
+  return html`
+  <footer className="bg-ink text-cream/70 on-dark">
+    <div className="max-w-site mx-auto px-5 lg:px-10 pt-20 pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-14 border-b border-cream/10">
+        <div className="lg:col-span-5">
+          <img src=${g.logo.url} alt=${g.logo.alt} className="h-8 w-auto logo-light" loading="lazy" />
+          <p className="mt-8 font-display uppercase text-[40px] leading-[0.95] text-cream">Join the club.<br />Get offers first.</p>
+          <${AnimatePresence} mode="wait">
+            ${sent ? html`<${motion.p} key="ok" initial=${{ opacity: 0 }} animate=${{ opacity: 1 }} className="mt-6 inline-flex items-center gap-2 text-nude"><${Icon} name="check" className="w-4 h-4" sw=${2} />You’re on the list.<//>`
+            : html`<${motion.form} key="f" exit=${{ opacity: 0 }} onSubmit=${(e) => { e.preventDefault(); setSent(true); }} className="mt-6 flex max-w-md border-b border-cream/30 focus-within:border-nude transition-colors">
+                <label htmlFor="fem" className="sr-only">Email</label>
+                <input id="fem" type="email" required autoComplete="email" placeholder="Email address" className="flex-1 min-w-0 h-12 bg-transparent text-[15px] text-cream placeholder:text-cream/40 focus:outline-none" />
+                <button type="submit" className="px-2 text-[12px] tracking-[0.2em] uppercase text-cream hover:text-nude">Subscribe →</button>
+              <//>`}
+          <//>
+        </div>
+        <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+          ${g.footer.columns.map((c) => html`
+            <div key=${c.title}>
+              <div className="text-[11.5px] tracking-[0.26em] uppercase text-nude mb-5">${c.title}</div>
+              <ul className="space-y-3 text-[14.5px] font-light">${c.links.map((l) => html`<li key=${l}><a href="#" className="hover:text-cream transition-colors">${l}</a></li>`)}</ul>
+            </div>`)}
+        </div>
+      </div>
+      <div className="pt-8 flex flex-col md:flex-row gap-4 justify-between text-[12.5px] text-cream/45">
+        <p>© 2026 NakedMD <span className="mx-2 text-cream/20">|</span>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" className="text-cream/75 font-medium hover:text-cream underline-offset-4 hover:underline">VOCSO</a></p>
+        <div className="flex flex-wrap gap-5">${['Instagram', 'TikTok', 'Facebook', 'YouTube'].map((s) => html`<a key=${s} href="#" className="hover:text-cream transition-colors">${s}</a>`)}</div>
+      </div>
+    </div>
+  </footer>`;
+};
+
+/* =========================== Section renderer =========================== */
+const REGISTRY = {
+  'sections.hero': Hero,
+  'sections.pillars': Pillars,
+  'sections.product-grid': ProductGrid,
+  'sections.offers': Offers,
+  'sections.area-explorer': AreaExplorer,
+  'sections.studios': Studios,
+  'sections.perks': Perks,
+  'sections.reviews': Reviews,
+  'sections.book-cta': BookCta,
+};
+
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <${CartProvider}>
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-ink focus:text-cream focus:px-4 focus:py-2">Skip to content</a>
+      <${PromoBar} d=${CMS.global.promo} />
+      <${Header} g=${CMS.global} />
+      <main id="main">${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} />` : null; })}</main>
+      <${Footer} g=${CMS.global} />
+    <//>
+  <//>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+document.getElementById('boot').remove();
+</script>
+</body>
+</html>
