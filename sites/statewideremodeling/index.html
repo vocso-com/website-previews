@@ -731,7 +731,7 @@ const Footer = ({ g }) => html`
         </div>
       </div>
       <div className="pt-8 flex flex-col md:flex-row gap-4 justify-between text-[13px] text-white/40">
-        <p>© 2026 Statewide Remodeling. All rights reserved.</p>
+        <p>© 2026 Statewide Remodeling. All rights reserved. <span className="mx-2 text-white/20">|</span>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" className="text-white/70 font-semibold hover:text-white underline-offset-4 hover:underline">VOCSO</a></p>
         <div className="flex flex-wrap gap-5">${g.footer.legal.map((l) => html`<a key=${l} href="#" className="hover:text-white transition-colors">${l}</a>`)}</div>
       </div>
     </div>
