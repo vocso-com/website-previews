@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Austin Home Remodeling Contractor | Statewide Remodeling</title>
+<meta name="description" content="Bathrooms, kitchens, replacement windows and custom doors in Austin, TX. 30 years, 80,000+ projects, A+ BBB. 75% off installation — free in-home estimate." />
+<link rel="icon" href="assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: { DEFAULT: '#004AB3', 600: '#003F99', 50: '#EEF4FF', 100: '#DCE8FF' },
+          navy: { DEFAULT: '#003057', 900: '#021E38', 950: '#011427' },
+          flame: { DEFAULT: '#FF5200', 600: '#E64A00', 50: '#FFF1EA' },
+          star: '#FFC221',
+          canvas: '#F5F7FA',
+          ink: '#0B1B2B',
+        },
+        fontFamily: {
+          display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          sans: ['"Open Sans"', 'system-ui', 'sans-serif'],
+        },
+        maxWidth: { site: '1280px' },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: "Open Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid #FF5200; outline-offset: 3px; border-radius: 8px; }
+  .dots { background-image: radial-gradient(rgba(0,74,179,.18) 1px, transparent 1px); background-size: 22px 22px; }
+  input[type=range].ba { -webkit-appearance:none; appearance:none; background:transparent; }
+  input[type=range].ba::-webkit-slider-thumb { -webkit-appearance:none; width:56px; height:100vh; cursor:ew-resize; }
+  input[type=range].ba::-moz-range-thumb { width:56px; height:1000px; border:0; background:transparent; cursor:ew-resize; }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#fff; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-white text-ink">
+<div id="boot"><img src="assets/logo.svg" alt="" width="180" /></div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, useInView, animate, useMotionValueEvent } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (utility bar, header, footer) + Collection
+   "location-page" (this page = Austin) with a Dynamic Zone `sections`.
+   Each object below is one Strapi component (`__component`). Duplicate the
+   entry per city (Dallas, Houston, San Antonio…) and only the content changes.
+   ========================================================================== */
+const img = (id, w = 1400) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+
+const CMS = {
+  global: {
+    logo: { url: 'assets/logo.svg', urlLight: 'assets/logo-white.svg', alt: 'Statewide Remodeling' },
+    phone: '(512) 937-1529',
+    utility: ['Careers', 'Contact Us', 'Warranty', 'Request Customer Service'],
+    nav: [
+      { label: 'Windows', mega: ['Energy Efficient Windows', 'Replacement Windows', 'Vinyl Windows', 'Bow & Bay Windows', 'Casement Windows'], image: img('photo-1513694203232-719a280e022f', 600) },
+      { label: 'Bathrooms', mega: ['Bathtub Replacement', 'Kohler Walk-In Tubs', 'Shower Enclosures', 'Tub to Shower Conversions', 'Kohler LuxStone Showers'], image: img('photo-1552321554-5fefe8c9ef14', 600) },
+      { label: 'Kitchens', mega: ['Cabinet Refacing', 'Kitchen Cabinets', 'Countertop Replacement'], image: img('photo-1556911220-bff31c812dba', 600) },
+      { label: 'Doors', mega: ['Entry Doors', 'Fiberglass Doors', 'Steel Doors', 'Patio Doors', 'Custom Doors'], image: img('photo-1600047509807-ba8f99d2cdde', 600) },
+      { label: 'Our Work', href: '#work' },
+      { label: 'Reviews', href: '#reviews' },
+      { label: 'Specials', href: '#specials' },
+    ],
+    cta: { label: 'Free In-Home Estimate', href: '#estimate' },
+    footer: {
+      address: ['Statewide Remodeling', 'Austin, TX 78758'],
+      columns: [
+        { title: 'Services', links: ['Replacement Windows', 'Bathroom Remodeling', 'Walk-In Tubs', 'Kitchen Remodeling', 'Custom Doors'] },
+        { title: 'Company', links: ['About Us', 'Our Work', 'Reviews', 'FAQ', 'Blog', 'Refer a Friend', 'Careers'] },
+      ],
+      legal: ['Terms and Conditions', 'Privacy Policy', 'Accessibility'],
+    },
+  },
+
+  page: {
+    city: 'Austin',
+    sections: [
+      {
+        __component: 'sections.hero',
+        eyebrow: 'Home Remodeling in Austin, TX',
+        title: ['Remodel your Austin home', 'without the hassle.'],
+        subtitle: 'Bathrooms, kitchens, windows and doors — designed, installed and warrantied by one local team with 30 years and 80,000+ projects behind it.',
+        offer: { badge: 'Limited-time offer', headline: '75% Off Installation', sub: 'Low down payment and low monthly payments.' },
+        rating: { score: '4.9', count: 945, source: 'Google' },
+        images: [
+          { url: img('photo-1552321554-5fefe8c9ef14', 1100), alt: 'Bright, modern remodeled bathroom with walk-in shower' },
+          { url: img('photo-1556911220-bff31c812dba', 700), alt: 'Remodeled white kitchen with new cabinets' },
+          { url: img('photo-1513694203232-719a280e022f', 700), alt: 'Living room with large energy-efficient windows' },
+        ],
+        projects: ['Windows', 'Bathroom', 'Kitchen', 'Doors'],
+      },
+      {
+        __component: 'sections.trust-bar',
+        items: [
+          { value: 30, suffix: '', label: 'Years in business' },
+          { value: 80000, suffix: '+', label: 'Projects completed' },
+          { value: 'A+', suffix: '', label: 'BBB rating' },
+          { value: 500, prefix: 'Top ', suffix: '', label: 'Remodelers in the US' },
+        ],
+        brands: ['KOHLER', 'LuxStone', 'BBB Accredited', 'Qualified Remodeler Top 500', 'Google 4.9★'],
+      },
+      {
+        __component: 'sections.service-tabs',
+        eyebrow: 'What we do',
+        title: 'One team for every room that matters.',
+        tabs: [
+          { key: 'windows', icon: 'window', label: 'Windows', title: 'Replacement Windows', body: 'Special glass and frames that act as a shield against the Texas heat — your home stays cooler naturally, so your A/C doesn’t work overtime.', points: ['Single-hung', 'Double-hung', 'Picture', 'Slider', 'Bow', 'Casement'], image: img('photo-1600566753190-17f0baa2a6c3', 1300), stat: { value: 'Cooler', label: 'rooms, lower energy bills' } },
+          { key: 'bath', icon: 'bath', label: 'Bathrooms', title: 'Bathroom Remodels', body: 'Replace an old bathtub, step into a Kohler walk-in tub for easier access, convert your tub to a spacious shower, or install a premium Kohler LuxStone shower.', points: ['Bathtub replacement', 'Kohler walk-in tubs', 'Tub-to-shower', 'LuxStone showers', 'Shower enclosures'], image: img('photo-1584622650111-993a426fbf0a', 1300), stat: { value: 'Kohler', label: 'premium products, certified installers' } },
+          { key: 'kitchen', icon: 'kitchen', label: 'Kitchens', title: 'Kitchen Remodeling', body: 'A quick, efficient upgrade with cabinet refacing and countertop replacement — new life for your kitchen in just several days, without a major investment.', points: ['Cabinet refacing', 'New cabinets', 'Countertops', 'Hardware & finishes'], image: img('photo-1556909114-f6e7ad7d3136', 1300), stat: { value: 'Days', label: 'not months, for most kitchens' } },
+          { key: 'doors', icon: 'door', label: 'Doors', title: 'Custom Doors', body: 'Boost curb appeal and help lower energy bills. Fiberglass and strong steel doors offer great security at a reasonable price — or let our craftsmen build one just for you.', points: ['Fiberglass', 'Steel', 'Entry & patio', 'Fully custom'], image: img('photo-1600047509807-ba8f99d2cdde', 1300), stat: { value: 'Secure', label: 'and energy efficient by design' } },
+        ],
+      },
+      {
+        __component: 'sections.before-after',
+        eyebrow: 'Our Work',
+        title: 'See the difference in a single drag.',
+        body: 'Real Austin projects, managed from your CMS gallery. Drag the handle to compare.',
+        before: { url: img('photo-1484154218962-a197022b5858', 1600), label: 'Before' },
+        after: { url: img('photo-1600585154340-be6161a56a0c', 1600), label: 'After' },
+        caption: 'Sample project · Kitchen refresh · North Austin',
+        chips: ['Kitchen', 'Bathroom', 'Windows', 'Doors'],
+      },
+      {
+        __component: 'sections.why-us',
+        eyebrow: 'Why Statewide',
+        title: 'A leading home remodeling contractor in Austin.',
+        items: [
+          { icon: 'heart', title: 'Customer-endorsed', body: 'For 30 years the most recommended remodeler — our customers spread the word.', span: 2 },
+          { icon: 'pin', title: 'Locally owned', body: 'Deeply connected to Austin and its unique needs.' },
+          { icon: 'shield', title: 'A+ with the BBB', body: 'Quality work, fair price and customer satisfaction.' },
+          { icon: 'layers', title: '80,000+ projects', body: 'An extensive portfolio — our experience speaks for itself.' },
+          { icon: 'award', title: 'Top 500 Remodelers', body: 'Recognized in the elite group of US remodelers.' },
+          { icon: 'tool', title: 'Certified installers', body: 'Teams trained and certified by the manufacturers.', span: 2 },
+        ],
+      },
+      {
+        __component: 'sections.process',
+        eyebrow: 'How it works',
+        title: 'Stress-free from first visit to final walkthrough.',
+        steps: [
+          { title: 'Free in-home estimate', body: 'A design consultant measures, listens and prices your project on the spot.' },
+          { title: 'Design & choose', body: 'Pick styles, finishes and products from leading manufacturers.' },
+          { title: 'Certified installation', body: 'Manufacturer-trained crews handle the entire process smoothly.' },
+          { title: 'Warranty & service', body: 'Unmatched warranty coverage for your peace of mind.' },
+        ],
+      },
+      {
+        __component: 'sections.reviews',
+        eyebrow: 'Reviews',
+        title: 'Austin homeowners rate us 4.9 out of 5.',
+        rating: { score: '4.9', count: 945 },
+        note: 'Sample reviews for layout — replaced by live Google reviews via Strapi.',
+        items: [
+          { name: 'Homeowner, Round Rock', project: 'Bathroom', text: 'The crew was on time, tidy and finished our tub-to-shower conversion faster than promised.' },
+          { name: 'Homeowner, Cedar Park', project: 'Windows', text: 'Our upstairs finally stays cool in August. You can feel the difference immediately.' },
+          { name: 'Homeowner, South Austin', project: 'Kitchen', text: 'Cabinet refacing gave us a brand-new kitchen in days. Great value and zero stress.' },
+          { name: 'Homeowner, Pflugerville', project: 'Doors', text: 'Beautiful fiberglass entry door. The consultant never pressured us — just great advice.' },
+          { name: 'Homeowner, Georgetown', project: 'Walk-in tub', text: 'The Kohler walk-in tub changed my mom’s daily routine. Installation was seamless.' },
+        ],
+      },
+      {
+        __component: 'sections.offer-cta',
+        id: 'specials',
+        badge: 'Austin special',
+        title: '75% Off Installation',
+        body: 'Low down payment and low monthly payments. See if you qualify in under a minute.',
+        cta: { label: 'Check my ZIP code', href: '#estimate' },
+        fine: 'Terms and conditions apply. Offer subject to change.',
+      },
+      {
+        __component: 'sections.faq',
+        eyebrow: 'FAQ',
+        title: 'Questions, answered.',
+        items: [
+          { q: 'Is the in-home estimate really free?', a: 'Yes. A design consultant visits your Austin home, measures, walks you through options and gives you a price — with no obligation.' },
+          { q: 'Do you offer financing?', a: 'Yes. We offer low down payment and low monthly payment options for qualified homeowners. Enter your ZIP code to see if you qualify.' },
+          { q: 'How long does a bathroom or kitchen remodel take?', a: 'Many tub-to-shower conversions and cabinet refacing projects are completed in just a few days. Your consultant will give you a timeline for your specific project.' },
+          { q: 'Who installs the products?', a: 'Our own installation teams, trained and certified by the product manufacturers and up to date with the latest techniques.' },
+          { q: 'What warranty do I get?', a: 'Every project includes our warranty coverage. Your consultant will explain exactly what is covered for the products you choose.' },
+        ],
+        areas: ['Austin', 'Dallas', 'Arlington', 'Fort Worth', 'Plano', 'East Texas', 'Houston', 'San Antonio'],
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M12 5l7 7-7 7',
+  phone: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z',
+  window: 'M4 3h16v18H4zM12 3v18M4 12h16',
+  bath: 'M4 12h16v3a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM6 12V5a2 2 0 0 1 4 0M7 20l-1 2M17 20l1 2',
+  kitchen: 'M4 3h16v18H4zM4 10h16M8 6.5h.01M12 6.5h.01M8 14v3M16 14v3',
+  door: 'M6 21V3h12v18M3 21h18M14.5 12h.01',
+  heart: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z',
+  pin: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',
+  layers: 'M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
+  award: 'M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM8.2 13.9 7 23l5-3 5 3-1.2-9.1',
+  tool: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z',
+  check: 'M20 6 9 17l-5-5',
+  plus: 'M12 5v14M5 12h14',
+  menu: 'M4 7h16M4 12h16M4 17h10',
+  x: 'M18 6 6 18M6 6l12 12',
+  chevron: 'M6 9l6 6 6-6',
+  tag: 'M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8zM7 7h.01',
+  quote: 'M7 7h4v4c0 3-2 5-4 6M15 7h4v4c0 3-2 5-4 6',
+  left: 'M15 18l-6-6 6-6',
+};
+const Icon = ({ name, className = 'w-5 h-5', sw = 1.8 }) => html`
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth=${sw} strokeLinecap="round" strokeLinejoin="round" className=${className} aria-hidden="true"><path d=${ICONS[name]} /></svg>`;
+const Star = ({ className = 'w-4 h-4' }) => html`<svg viewBox="0 0 24 24" className=${className} fill="#FFC221" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" /></svg>`;
+const Stars = ({ n = 5, className }) => html`<span className="inline-flex gap-0.5" aria-label=${`${n} out of 5 stars`}>${Array.from({ length: n }, (_, i) => html`<${Star} key=${i} className=${className} />`)}</span>`;
+
+const ease = [0.22, 1, 0.36, 1];
+const fadeUp = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease } } };
+const stagger = (s = 0.08, d = 0) => ({ hidden: {}, show: { transition: { staggerChildren: s, delayChildren: d } } });
+const inViewProps = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-70px' } };
+
+const Reveal = ({ children, className = '', delay = 0 }) => html`
+  <${motion.div} className=${className} ...${inViewProps}
+    variants=${{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease, delay } } }}>${children}<//>`;
+
+const Eyebrow = ({ children, light }) => html`
+  <div className=${`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12.5px] font-bold tracking-wide font-display ${light ? 'bg-white/10 text-white' : 'bg-brand-50 text-brand'}`}>
+    <span className=${`w-1.5 h-1.5 rounded-full ${light ? 'bg-flame' : 'bg-flame'}`}></span>${children}
+  </div>`;
+
+const H2 = ({ children, className = '' }) => html`<h2 className=${`font-display font-extrabold tracking-[-0.025em] text-[34px] sm:text-[44px] lg:text-[54px] leading-[1.05] ${className}`}>${children}</h2>`;
+
+const Button = ({ href, children, variant = 'flame', className = '', icon = 'arrow', onClick, type }) => {
+  const styles = {
+    flame: 'bg-flame text-white hover:bg-flame-600 shadow-[0_12px_30px_-10px_rgba(255,82,0,.55)]',
+    brand: 'bg-brand text-white hover:bg-brand-600 shadow-[0_12px_30px_-12px_rgba(0,74,179,.6)]',
+    light: 'bg-white text-ink hover:bg-brand-50 ring-1 ring-ink/10',
+    ghost: 'text-white ring-1 ring-white/30 hover:bg-white/10',
+  };
+  const Tag = href ? motion.a : motion.button;
+  return html`<${Tag} href=${href} onClick=${onClick} type=${type} whileHover=${{ y: -2 }} whileTap=${{ scale: 0.97 }}
+    className=${`group inline-flex items-center justify-center gap-2 rounded-2xl px-6 h-12 font-display font-bold text-[15px] transition-colors duration-200 whitespace-nowrap ${styles[variant]} ${className}`}>
+    ${children}${icon && html`<${Icon} name=${icon} className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" sw=${2.2} />`}
+  <//>`;
+};
+
+const Counter = ({ value, prefix = '', suffix = '' }) => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+  const [n, setN] = useState(typeof value === 'number' ? 0 : value);
+  useEffect(() => {
+    if (!inView || typeof value !== 'number') return;
+    const c = animate(0, value, { duration: 1.8, ease, onUpdate: (v) => setN(Math.round(v).toLocaleString('en-US')) });
+    return () => c.stop();
+  }, [inView]);
+  return html`<span ref=${ref}>${prefix}${n}${suffix}</span>`;
+};
+
+/* ============================== Header ============================== */
+const UtilityBar = ({ g }) => html`
+  <div className="bg-navy text-white/75 text-[12.5px]">
+    <div className="max-w-site mx-auto px-5 lg:px-8 h-9 flex items-center justify-between">
+      <div className="flex items-center gap-2"><${Icon} name="pin" className="w-3.5 h-3.5 text-flame" />Serving Austin & Central Texas</div>
+      <nav className="hidden md:flex gap-6" aria-label="Utility">${g.utility.map((u) => html`<a key=${u} href="#" className="hover:text-white transition-colors">${u}</a>`)}</nav>
+    </div>
+  </div>`;
+
+const Header = ({ g }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState(null);
+  const [open, setOpen] = useState(false);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 30));
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+  const item = active !== null ? g.nav[active] : null;
+  const tel = `tel:${g.phone.replace(/\D/g, '')}`;
+
+  return html`
+  <header className="sticky top-0 z-50" onMouseLeave=${() => setActive(null)}>
+    <div className=${`relative bg-white/90 backdrop-blur-xl transition-shadow duration-300 ${scrolled ? 'shadow-[0_8px_30px_-12px_rgba(2,30,56,.18)]' : 'border-b border-ink/[0.06]'}`}>
+      <div className=${`max-w-site mx-auto px-5 lg:px-8 flex items-center justify-between gap-6 transition-all duration-300 ${scrolled ? 'h-[68px]' : 'h-[80px]'}`}>
+        <a href="#" aria-label="Statewide Remodeling home" className="shrink-0"><img src=${g.logo.url} alt=${g.logo.alt} className="h-9 lg:h-10 w-auto" /></a>
+        <nav className="hidden xl:flex items-center" aria-label="Primary">
+          ${g.nav.map((n, i) => html`
+            <div key=${n.label} className="relative" onMouseEnter=${() => setActive(n.mega ? i : null)}>
+              <a href=${n.href || '#services'} className=${`relative z-10 flex items-center gap-1 px-3.5 h-10 rounded-xl font-display font-semibold text-[14.5px] whitespace-nowrap transition-colors ${active === i ? 'text-brand' : 'text-ink/75 hover:text-ink'}`}
+                aria-haspopup=${n.mega ? 'true' : undefined} aria-expanded=${n.mega ? active === i : undefined}>
+                ${n.label}${n.mega && html`<${Icon} name="chevron" className=${`w-3.5 h-3.5 transition-transform ${active === i ? 'rotate-180' : ''}`} sw=${2.4} />`}
+              </a>
+              ${active === i && html`<${motion.span} layoutId="nav-bg" className="absolute inset-0 rounded-xl bg-brand-50" transition=${{ type: 'spring', stiffness: 420, damping: 34 }} />`}
+            </div>`)}
+        </nav>
+        <div className="flex items-center gap-2.5">
+          <a href=${tel} className="hidden md:flex items-center gap-2.5 font-display font-bold text-[15px] text-ink whitespace-nowrap px-1" aria-label=${`Call ${g.phone}`}>
+            <span className="relative grid place-items-center w-10 h-10 rounded-xl bg-brand-50 text-brand"><${Icon} name="phone" className="w-4 h-4" /><span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span></span>
+            <span className="hidden xl:inline">${g.phone}</span>
+          </a>
+          <${Button} href=${g.cta.href} className="hidden sm:inline-flex h-11 px-5 text-[14px]" icon=${null}>${g.cta.label}<//>
+          <button onClick=${() => setOpen(true)} className="xl:hidden grid place-items-center w-11 h-11 rounded-xl bg-canvas text-ink" aria-label="Open menu"><${Icon} name="menu" /></button>
+        </div>
+      </div>
+
+      <${AnimatePresence}>
+        ${item && html`
+          <${motion.div} key="mega" initial=${{ opacity: 0, y: -8 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -6, transition: { duration: 0.15 } }} transition=${{ duration: 0.25, ease }}
+            className="hidden xl:block absolute inset-x-0 top-full bg-white border-t border-ink/[0.06] shadow-[0_30px_60px_-30px_rgba(2,30,56,.35)]">
+            <div className="max-w-site mx-auto px-8 py-8 grid grid-cols-12 gap-10">
+              <div className="col-span-3">
+                <div className="font-display font-extrabold text-2xl">${item.label}</div>
+                <p className="text-[14px] text-ink/60 mt-2">Premium products, certified installation and a free in-home estimate in Austin.</p>
+                <a href="#estimate" className="mt-5 inline-flex items-center gap-2 font-display font-bold text-[14px] text-flame">Get pricing <${Icon} name="arrow" className="w-4 h-4" /></a>
+              </div>
+              <${motion.ul} key=${item.label} className="col-span-5 grid grid-cols-2 gap-2 content-start" variants=${stagger(0.03)} initial="hidden" animate="show">
+                ${item.mega.map((m) => html`<${motion.li} key=${m} variants=${fadeUp}><a href="#services" className="group flex items-center justify-between gap-3 rounded-xl px-4 py-3 bg-canvas hover:bg-brand-50 font-display font-semibold text-[14.5px] text-ink/80 hover:text-brand transition-colors">${m}<${Icon} name="arrow" className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /></a><//>`)}
+              <//>
+              <div className="col-span-4 relative rounded-2xl overflow-hidden h-44">
+                <${AnimatePresence} mode="popLayout"><${motion.img} key=${item.image} src=${item.image} alt="" initial=${{ opacity: 0, scale: 1.05 }} animate=${{ opacity: 1, scale: 1 }} exit=${{ opacity: 0 }} transition=${{ duration: 0.4 }} className="absolute inset-0 w-full h-full object-cover" /><//>
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/70 to-transparent"></div>
+                <div className="absolute left-4 bottom-4 inline-flex items-center gap-2 rounded-lg bg-flame px-3 py-1.5 text-white text-[12.5px] font-bold font-display"><${Icon} name="tag" className="w-3.5 h-3.5" />75% off installation</div>
+              </div>
+            </div>
+          <//>`}
+      <//>
+    </div>
+
+    <${AnimatePresence}>
+      ${open && html`
+        <${motion.div} key="drawer" className="fixed inset-0 z-[60] bg-white flex flex-col" initial=${{ opacity: 0, y: -12 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -12 }} transition=${{ duration: 0.25, ease }}>
+          <div className="flex items-center justify-between px-5 h-[80px] border-b border-ink/[0.06]">
+            <img src=${g.logo.url} alt=${g.logo.alt} className="h-9" />
+            <button onClick=${() => setOpen(false)} className="grid place-items-center w-11 h-11 rounded-xl bg-canvas" aria-label="Close menu"><${Icon} name="x" /></button>
+          </div>
+          <${motion.nav} className="px-5 py-4 flex-1 overflow-y-auto" variants=${stagger(0.05, 0.08)} initial="hidden" animate="show">
+            ${g.nav.map((n) => html`<${motion.a} key=${n.label} variants=${fadeUp} href=${n.href || '#services'} onClick=${() => setOpen(false)} className="flex items-center justify-between py-4 border-b border-ink/[0.06] font-display font-bold text-[22px]">${n.label}<${Icon} name="arrow" className="w-5 h-5 text-brand" /><//>`)}
+          <//>
+          <div className="p-5 grid gap-3">
+            <${Button} href="#estimate" className="w-full" onClick=${() => setOpen(false)}>Free In-Home Estimate<//>
+            <${Button} href=${tel} variant="light" icon="phone" className="w-full">${g.phone}<//>
+          </div>
+        <//>`}
+    <//>
+  </header>`;
+};
+
+/* ============================== Sections ============================== */
+const ZipQualifier = ({ projects }) => {
+  const [step, setStep] = useState(0);
+  const [zip, setZip] = useState('');
+  const [proj, setProj] = useState(null);
+  const [err, setErr] = useState('');
+  const next = (e) => {
+    e && e.preventDefault();
+    if (step === 0) { if (!/^\d{5}$/.test(zip)) return setErr('Please enter a valid 5-digit ZIP code.'); setErr(''); }
+    if (step === 1 && !proj) return setErr('Choose a project to continue.');
+    setErr(''); setStep((s) => s + 1);
+  };
+  const steps = ['ZIP code', 'Project', 'Contact'];
+  return html`
+  <div id="estimate" className="scroll-mt-28 rounded-3xl bg-white p-6 sm:p-7 shadow-[0_40px_80px_-30px_rgba(2,30,56,.35)] ring-1 ring-ink/[0.06]">
+    <div className="flex items-center justify-between">
+      <div className="font-display font-extrabold text-[19px]">See if you qualify today</div>
+      <span className="text-[12px] font-semibold text-ink/50">${Math.min(step + 1, 3)} / 3</span>
+    </div>
+    <div className="mt-4 h-1.5 rounded-full bg-canvas overflow-hidden">
+      <${motion.div} className="h-full rounded-full bg-gradient-to-r from-brand to-flame" animate=${{ width: `${((Math.min(step, 3) + 1) / 4) * 100}%` }} transition=${{ duration: 0.5, ease }} />
+    </div>
+    <div className="mt-2 flex justify-between text-[11.5px] font-semibold text-ink/45">${steps.map((s, i) => html`<span key=${s} className=${i <= step ? 'text-brand' : ''}>${s}</span>`)}</div>
+
+    <form onSubmit=${next} className="mt-5 min-h-[150px]" noValidate>
+      <${AnimatePresence} mode="wait" initial=${false}>
+        <${motion.div} key=${step} initial=${{ opacity: 0, x: 24 }} animate=${{ opacity: 1, x: 0 }} exit=${{ opacity: 0, x: -24 }} transition=${{ duration: 0.3, ease }}>
+          ${step === 0 && html`
+            <label htmlFor="zip" className="block text-[13px] font-semibold text-ink/75 mb-2">What is your ZIP code?</label>
+            <div className="flex gap-2.5">
+              <input id="zip" inputMode="numeric" autoComplete="postal-code" maxLength="5" value=${zip} onChange=${(e) => setZip(e.target.value.replace(/\D/g, ''))} placeholder="78758"
+                aria-invalid=${!!err} aria-describedby="zip-err"
+                className="flex-1 min-w-0 h-14 rounded-2xl bg-canvas px-5 font-display font-bold text-xl tracking-[0.2em] placeholder:text-ink/25 placeholder:tracking-[0.2em] focus:outline-none focus:ring-4 focus:ring-brand/15 focus:bg-white border border-transparent focus:border-brand/40 transition" />
+              <${Button} type="submit" className="h-14 px-6">Continue<//>
+            </div>`}
+          ${step === 1 && html`
+            <div className="text-[13px] font-semibold text-ink/75 mb-3">Which project are you planning?</div>
+            <div className="grid grid-cols-2 gap-2.5">
+              ${projects.map((p, i) => html`
+                <button key=${p} type="button" onClick=${() => { setProj(p); setErr(''); }} aria-pressed=${proj === p}
+                  className=${`relative h-14 rounded-2xl font-display font-bold text-[15px] transition-colors ${proj === p ? 'text-white' : 'bg-canvas text-ink/75 hover:text-ink'}`}>
+                  ${proj === p && html`<${motion.span} layoutId="proj" className="absolute inset-0 rounded-2xl bg-brand" transition=${{ type: 'spring', stiffness: 450, damping: 35 }} />`}
+                  <span className="relative inline-flex items-center gap-2"><${Icon} name=${['window', 'bath', 'kitchen', 'door'][i]} className="w-4 h-4" />${p}</span>
+                </button>`)}
+            </div>
+            <div className="mt-3 flex justify-between"><button type="button" onClick=${() => setStep(0)} className="text-[13px] font-semibold text-ink/55 hover:text-ink inline-flex items-center gap-1"><${Icon} name="left" className="w-4 h-4" />Back</button><${Button} type="submit" variant="brand" className="h-11 px-5 text-[14px]">Next<//></div>`}
+          ${step === 2 && html`
+            <div className="grid sm:grid-cols-2 gap-2.5">
+              <div><label htmlFor="nm" className="sr-only">Full name</label><input id="nm" autoComplete="name" placeholder="Full name" className="w-full h-12 rounded-xl bg-canvas px-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-brand/15 focus:bg-white" /></div>
+              <div><label htmlFor="ph" className="sr-only">Phone</label><input id="ph" type="tel" autoComplete="tel" placeholder="Phone" className="w-full h-12 rounded-xl bg-canvas px-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-brand/15 focus:bg-white" /></div>
+            </div>
+            <${Button} type="submit" className="w-full mt-3 h-13">Book my free estimate<//>`}
+          ${step === 3 && html`
+            <div className="flex items-center gap-4 py-4">
+              <${motion.span} initial=${{ scale: 0 }} animate=${{ scale: 1 }} transition=${{ type: 'spring', stiffness: 300, damping: 16 }} className="grid place-items-center w-14 h-14 rounded-2xl bg-emerald-500 text-white shrink-0"><${Icon} name="check" className="w-7 h-7" sw=${2.6} /><//>
+              <div><div className="font-display font-extrabold text-lg">Great news — you’re in our area!</div><div className="text-[14px] text-ink/60">A design consultant will call to schedule your free ${proj ? proj.toLowerCase() : ''} estimate.</div></div>
+            </div>`}
+        <//>
+      <//>
+      <p id="zip-err" role="alert" className="mt-2 text-[13px] font-semibold text-flame-600 min-h-[20px]">${err}</p>
+    </form>
+    <p className="text-[11.5px] text-ink/45">By continuing you agree to our <a href="#" className="underline">Terms and Conditions</a> and <a href="#" className="underline">Privacy Policy</a>.</p>
+  </div>`;
+};
+
+const Hero = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  return html`
+  <section ref=${ref} className="relative bg-canvas overflow-hidden">
+    <div className="absolute inset-0 dots opacity-60 [mask-image:radial-gradient(ellipse_at_top_left,black,transparent_65%)] pointer-events-none"></div>
+    <div className="absolute -top-32 right-0 w-[620px] h-[620px] rounded-full bg-brand/10 blur-[120px] pointer-events-none"></div>
+    <div className="relative max-w-site mx-auto px-5 lg:px-8 pt-12 lg:pt-16 pb-20 grid lg:grid-cols-12 gap-12 items-center">
+      <${motion.div} className="lg:col-span-6" variants=${stagger(0.1, 0.1)} initial="hidden" animate="show">
+        <${motion.div} variants=${fadeUp}><${Eyebrow}>${d.eyebrow}<//><//>
+        <h1 className="mt-6 font-display font-extrabold tracking-[-0.035em] leading-[1.02] text-[44px] sm:text-[60px] lg:text-[68px]">
+          ${d.title.map((t, i) => html`<span key=${i} className="block overflow-hidden pb-1"><${motion.span} className=${`block ${i === 1 ? 'text-brand' : ''}`} initial=${{ y: '100%' }} animate=${{ y: 0 }} transition=${{ duration: 0.9, ease, delay: 0.15 + i * 0.12 }}>${t}<//></span>`)}
+        </h1>
+        <${motion.p} variants=${fadeUp} className="mt-6 text-[17.5px] leading-relaxed text-ink/65 max-w-[540px]">${d.subtitle}<//>
+        <${motion.div} variants=${fadeUp} className="mt-8 max-w-[540px]"><${ZipQualifier} projects=${d.projects} /><//>
+        <${motion.div} variants=${fadeUp} className="mt-6 flex items-center gap-4">
+          <div className="flex -space-x-2">${['B', 'G', 'Y', 'R'].map((c, i) => html`<span key=${i} className=${`grid place-items-center w-9 h-9 rounded-full ring-2 ring-canvas font-display font-bold text-[13px] text-white ${['bg-brand', 'bg-emerald-500', 'bg-amber-500', 'bg-flame'][i]}`}>${['JM', 'AL', 'RK', 'TS'][i]}</span>`)}</div>
+          <div>
+            <div className="flex items-center gap-2"><${Stars} /><span className="font-display font-extrabold">${d.rating.score}</span></div>
+            <div className="text-[13px] text-ink/55">Based on ${d.rating.count} ${d.rating.source} reviews</div>
+          </div>
+        <//>
+      <//>
+
+      <div className="lg:col-span-6 relative h-[520px] sm:h-[600px]">
+        <${motion.div} style=${{ y: y1 }} initial=${{ opacity: 0, scale: 0.95 }} animate=${{ opacity: 1, scale: 1 }} transition=${{ duration: 1, ease, delay: 0.2 }}
+          className="absolute right-0 top-0 w-[78%] h-[78%] rounded-[32px] overflow-hidden shadow-[0_50px_100px_-40px_rgba(2,30,56,.5)]">
+          <img src=${d.images[0].url} alt=${d.images[0].alt} className="w-full h-full object-cover" />
+        <//>
+        <${motion.div} style=${{ y: y2 }} initial=${{ opacity: 0, y: 40 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 1, ease, delay: 0.45 }}
+          className="absolute left-0 bottom-0 w-[52%] h-[46%] rounded-[28px] overflow-hidden ring-[6px] ring-canvas shadow-2xl">
+          <img src=${d.images[1].url} alt=${d.images[1].alt} className="w-full h-full object-cover" />
+        <//>
+        <${motion.div} initial=${{ opacity: 0, scale: 0.8, rotate: -6 }} animate=${{ opacity: 1, scale: 1, rotate: -4 }} transition=${{ type: 'spring', stiffness: 200, damping: 16, delay: 0.8 }}
+          className="absolute left-[4%] top-[12%] rounded-3xl bg-flame text-white p-5 w-[210px] shadow-[0_30px_60px_-20px_rgba(255,82,0,.6)]">
+          <div className="text-[11px] font-bold tracking-[0.14em] uppercase opacity-85">${d.offer.badge}</div>
+          <div className="font-display font-extrabold text-[30px] leading-[1.02] mt-1">${d.offer.headline}</div>
+          <div className="text-[12.5px] mt-2 opacity-90 leading-snug">${d.offer.sub}</div>
+        <//>
+        <${motion.div} initial=${{ opacity: 0, x: 30 }} animate=${{ opacity: 1, x: 0 }} transition=${{ duration: 0.8, ease, delay: 1 }}
+          className="absolute right-[4%] bottom-[8%] rounded-2xl bg-white/95 backdrop-blur p-4 pr-5 shadow-xl flex items-center gap-3">
+          <span className="grid place-items-center w-11 h-11 rounded-xl bg-brand-50 text-brand"><${Icon} name="shield" /></span>
+          <div><div className="font-display font-extrabold text-[15px]">A+ BBB Rating</div><div className="text-[12.5px] text-ink/55">30 years · 80,000+ projects</div></div>
+        <//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const TrustBar = ({ d }) => html`
+  <section className="bg-navy text-white relative overflow-hidden">
+    <div className="max-w-site mx-auto px-5 lg:px-8 py-12 grid grid-cols-2 lg:grid-cols-4 gap-8">
+      ${d.items.map((s, i) => html`
+        <${Reveal} key=${s.label} delay=${i * 0.08} className=${`${i ? 'lg:border-l lg:border-white/10 lg:pl-8' : ''}`}>
+          <div className="font-display font-extrabold text-[40px] lg:text-[48px] leading-none"><${Counter} value=${s.value} prefix=${s.prefix} suffix=${s.suffix} /></div>
+          <div className="mt-2 text-[14px] text-white/60">${s.label}</div>
+        <//>`)}
+    </div>
+    <div className="border-t border-white/10 py-5 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
+      <${motion.div} className="flex gap-16 w-max" animate=${{ x: ['0%', '-50%'] }} transition=${{ duration: 28, ease: 'linear', repeat: Infinity }}>
+        ${[...d.brands, ...d.brands, ...d.brands, ...d.brands].map((b, i) => html`<span key=${i} className="font-display font-extrabold text-[18px] tracking-wide text-white/35 whitespace-nowrap">${b}</span>`)}
+      <//>
+    </div>
+  </section>`;
+
+const ServiceTabs = ({ d }) => {
+  const [tab, setTab] = useState(0);
+  const t = d.tabs[tab];
+  return html`
+  <section id="services" className="py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-8">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5 max-w-2xl">${d.title}<//><//>
+        <${Reveal} delay=${0.1}>
+          <div role="tablist" aria-label="Services" className="inline-flex flex-wrap gap-1 p-1.5 rounded-2xl bg-canvas">
+            ${d.tabs.map((x, i) => html`
+              <button key=${x.key} role="tab" aria-selected=${tab === i} aria-controls="svc-panel" onClick=${() => setTab(i)}
+                className=${`relative h-11 px-4 sm:px-5 rounded-xl font-display font-bold text-[14.5px] transition-colors ${tab === i ? 'text-white' : 'text-ink/60 hover:text-ink'}`}>
+                ${tab === i && html`<${motion.span} layoutId="svc-tab" className="absolute inset-0 rounded-xl bg-brand shadow-lg shadow-brand/25" transition=${{ type: 'spring', stiffness: 420, damping: 34 }} />`}
+                <span className="relative inline-flex items-center gap-2"><${Icon} name=${x.icon} className="w-4 h-4" />${x.label}</span>
+              </button>`)}
+          </div>
+        <//>
+      </div>
+      <div id="svc-panel" role="tabpanel" className="grid lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="lg:col-span-7 relative h-[360px] sm:h-[480px] rounded-[32px] overflow-hidden bg-canvas">
+          <${AnimatePresence} mode="popLayout" initial=${false}>
+            <${motion.img} key=${t.key} src=${t.image} alt=${t.title} initial=${{ opacity: 0, scale: 1.08 }} animate=${{ opacity: 1, scale: 1 }} exit=${{ opacity: 0 }} transition=${{ duration: 0.7, ease }} className="absolute inset-0 w-full h-full object-cover" />
+          <//>
+          <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>
+          <${AnimatePresence} mode="wait">
+            <${motion.div} key=${t.key} initial=${{ opacity: 0, y: 16 }} animate=${{ opacity: 1, y: 0, transition: { delay: 0.25 } }} exit=${{ opacity: 0 }}
+              className="absolute left-5 bottom-5 rounded-2xl bg-white/95 backdrop-blur px-5 py-4 shadow-xl">
+              <div className="font-display font-extrabold text-[22px] text-brand">${t.stat.value}</div><div className="text-[13px] text-ink/60">${t.stat.label}</div>
+            <//>
+          <//>
+        </div>
+        <div className="lg:col-span-5 rounded-[32px] bg-canvas p-8 lg:p-10 flex flex-col">
+          <${AnimatePresence} mode="wait">
+            <${motion.div} key=${t.key} initial=${{ opacity: 0, y: 14 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -10 }} transition=${{ duration: 0.35, ease }} className="flex flex-col h-full">
+              <span className="grid place-items-center w-14 h-14 rounded-2xl bg-white text-brand shadow-sm"><${Icon} name=${t.icon} className="w-6 h-6" /></span>
+              <h3 className="mt-6 font-display font-extrabold text-[30px] tracking-tight">${t.title}</h3>
+              <p className="mt-3 text-[16px] leading-relaxed text-ink/65">${t.body}</p>
+              <${motion.ul} className="mt-6 flex flex-wrap gap-2" variants=${stagger(0.04, 0.1)} initial="hidden" animate="show">
+                ${t.points.map((p) => html`<${motion.li} key=${p} variants=${fadeUp} className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-[13.5px] font-semibold text-ink/75 ring-1 ring-ink/[0.06]"><${Icon} name="check" className="w-3.5 h-3.5 text-brand" sw=${2.6} />${p}<//>`)}
+              <//>
+              <div className="mt-auto pt-8 flex flex-wrap gap-3">
+                <${Button} href="#estimate">Get pricing<//>
+                <${Button} href="#" variant="light" icon=${null}>Learn more<//>
+              </div>
+            <//>
+          <//>
+        </div>
+      </div>
+    </div>
+  </section>`;
+};
+
+const BeforeAfter = ({ d }) => {
+  const [pos, setPos] = useState(50);
+  return html`
+  <section id="work" className="bg-canvas py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-8">
+      <div className="grid lg:grid-cols-12 gap-8 items-end mb-10">
+        <${Reveal} className="lg:col-span-7"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+        <${Reveal} className="lg:col-span-5" delay=${0.1}><p className="text-[17px] text-ink/65">${d.body}</p>
+          <div className="mt-5 flex flex-wrap gap-2">${d.chips.map((c, i) => html`<span key=${c} className=${`rounded-full px-4 py-2 text-[13.5px] font-display font-bold ${i === 0 ? 'bg-ink text-white' : 'bg-white text-ink/65 ring-1 ring-ink/[0.08]'}`}>${c}</span>`)}</div>
+        <//>
+      </div>
+      <${Reveal}>
+        <div className="relative h-[380px] sm:h-[560px] rounded-[32px] overflow-hidden select-none shadow-[0_50px_100px_-50px_rgba(2,30,56,.5)]">
+          <img src=${d.after.url} alt="After the remodel" className="absolute inset-0 w-full h-full object-cover" draggable="false" />
+          <div className="absolute inset-0" style=${{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
+            <img src=${d.before.url} alt="Before the remodel" className="absolute inset-0 w-full h-full object-cover" draggable="false" />
+          </div>
+          <span className="absolute top-5 left-5 rounded-full bg-ink/70 backdrop-blur text-white px-3.5 py-1.5 text-[12.5px] font-bold font-display">${d.before.label}</span>
+          <span className="absolute top-5 right-5 rounded-full bg-flame text-white px-3.5 py-1.5 text-[12.5px] font-bold font-display">${d.after.label}</span>
+          <div className="absolute inset-y-0 w-0.5 bg-white shadow-[0_0_20px_rgba(0,0,0,.4)] pointer-events-none" style=${{ left: `${pos}%` }}>
+            <${motion.span} animate=${{ scale: [1, 1.08, 1] }} transition=${{ duration: 2, repeat: Infinity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid place-items-center w-14 h-14 rounded-full bg-white text-brand shadow-xl">
+              <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" /></svg>
+            <//>
+          </div>
+          <input type="range" min="0" max="100" value=${pos} onInput=${(e) => setPos(+e.target.value)} onChange=${(e) => setPos(+e.target.value)}
+            aria-label="Drag to compare before and after" className="ba absolute inset-0 w-full h-full opacity-0 cursor-ew-resize" />
+          <span className="absolute bottom-5 left-5 rounded-xl bg-white/90 backdrop-blur px-4 py-2 text-[13px] font-semibold text-ink/75">${d.caption}</span>
+        </div>
+      <//>
+    </div>
+  </section>`;
+};
+
+const WhyUs = ({ d }) => html`
+  <section className="py-24 lg:py-32">
+    <div className="max-w-site mx-auto px-5 lg:px-8">
+      <${Reveal} className="max-w-3xl"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+      <${motion.div} className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-4" variants=${stagger(0.07)} ...${inViewProps}>
+        ${d.items.map((it, i) => html`
+          <${motion.div} key=${it.title} variants=${fadeUp} whileHover=${{ y: -4 }}
+            className=${`group relative overflow-hidden rounded-[28px] p-7 ${it.span === 2 ? 'lg:col-span-2' : ''} ${i === 0 ? 'bg-brand text-white' : i === d.items.length - 1 ? 'bg-navy text-white' : 'bg-canvas'} transition-shadow hover:shadow-[0_30px_60px_-30px_rgba(2,30,56,.4)]`}>
+            ${it.span === 2 && html`<div className="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-white/10 group-hover:scale-125 transition-transform duration-700"></div>`}
+            <span className=${`relative grid place-items-center w-12 h-12 rounded-2xl ${i === 0 || i === d.items.length - 1 ? 'bg-white/15 text-white' : 'bg-white text-brand shadow-sm'}`}><${Icon} name=${it.icon} /></span>
+            <h3 className="relative mt-10 font-display font-extrabold text-[21px]">${it.title}</h3>
+            <p className=${`relative mt-2 text-[14.5px] leading-relaxed ${i === 0 || i === d.items.length - 1 ? 'text-white/75' : 'text-ink/60'}`}>${it.body}</p>
+          <//>`)}
+      <//>
+    </div>
+  </section>`;
+
+const Process = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 75%', 'end 60%'] });
+  const w = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  return html`
+  <section ref=${ref} className="bg-navy-950 text-white py-24 lg:py-32 relative overflow-hidden">
+    <div className="absolute inset-0 opacity-[0.08] [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+    <div className="absolute -left-40 top-0 w-[500px] h-[500px] rounded-full bg-brand/40 blur-[140px] pointer-events-none"></div>
+    <div className="relative max-w-site mx-auto px-5 lg:px-8">
+      <div className="flex flex-col lg:flex-row justify-between lg:items-end gap-6">
+        <${Reveal}><${Eyebrow} light>${d.eyebrow}<//><${H2} className="mt-5 max-w-2xl">${d.title}<//><//>
+        <${Reveal} delay=${0.1}><${Button} href="#estimate">Schedule my free estimate<//><//>
+      </div>
+      <div className="relative mt-16">
+        <div className="hidden lg:block absolute top-7 left-0 right-0 h-0.5 bg-white/10"><${motion.div} style=${{ width: w }} className="h-full bg-gradient-to-r from-brand via-flame to-star" /></div>
+        <${motion.ol} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8" variants=${stagger(0.12)} ...${inViewProps}>
+          ${d.steps.map((s, i) => html`
+            <${motion.li} key=${s.title} variants=${fadeUp} className="relative">
+              <span className="relative grid place-items-center w-14 h-14 rounded-2xl bg-white text-navy font-display font-extrabold text-xl shadow-lg">${String(i + 1).padStart(2, '0')}</span>
+              <h3 className="mt-6 font-display font-extrabold text-[21px]">${s.title}</h3>
+              <p className="mt-2 text-[15px] text-white/65 leading-relaxed">${s.body}</p>
+            <//>`)}
+        <//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Reviews = ({ d }) => html`
+  <section id="reviews" className="py-24 lg:py-32 overflow-hidden scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-8 grid lg:grid-cols-12 gap-10 items-end">
+      <${Reveal} className="lg:col-span-7"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+      <${Reveal} className="lg:col-span-5 lg:justify-self-end" delay=${0.1}>
+        <div className="flex items-center gap-5 rounded-3xl bg-canvas p-5 pr-7">
+          <div className="font-display font-extrabold text-[56px] leading-none text-brand">${d.rating.score}</div>
+          <div><${Stars} className="w-5 h-5" /><div className="text-[14px] text-ink/60 mt-1">${d.rating.count} Google reviews · Austin</div></div>
+        </div>
+      <//>
+    </div>
+    <div className="mt-14 [mask-image:linear-gradient(90deg,transparent,black_6%,black_94%,transparent)]">
+      <${motion.div} className="flex gap-5 w-max px-5" animate=${{ x: ['0%', '-50%'] }} transition=${{ duration: 45, ease: 'linear', repeat: Infinity }}>
+        ${[...d.items, ...d.items].map((r, i) => html`
+          <figure key=${i} className="w-[340px] shrink-0 rounded-[28px] bg-white ring-1 ring-ink/[0.07] p-7 shadow-[0_20px_40px_-30px_rgba(2,30,56,.4)]">
+            <div className="flex items-center justify-between"><${Stars} /><span className="rounded-full bg-brand-50 text-brand px-3 py-1 text-[12px] font-bold font-display">${r.project}</span></div>
+            <blockquote className="mt-5 text-[16px] leading-relaxed text-ink/80">“${r.text}”</blockquote>
+            <figcaption className="mt-6 flex items-center gap-3"><span className="grid place-items-center w-10 h-10 rounded-full bg-canvas text-brand"><${Icon} name="quote" className="w-4 h-4" sw=${2.2} /></span><span className="text-[14px] font-semibold text-ink/70">${r.name}</span></figcaption>
+          </figure>`)}
+      <//>
+    </div>
+    <p className="max-w-site mx-auto px-5 lg:px-8 mt-6 text-[12.5px] text-ink/40">${d.note}</p>
+  </section>`;
+
+const OfferCta = ({ d }) => html`
+  <section id=${d.id} className="px-5 lg:px-8 scroll-mt-24">
+    <${Reveal} className="max-w-site mx-auto">
+      <div className="relative overflow-hidden rounded-[40px] bg-flame text-white px-8 py-14 sm:px-14 lg:px-20 lg:py-20">
+        <${motion.div} className="absolute -right-24 -top-24 w-[420px] h-[420px] rounded-full border-[60px] border-white/10" animate=${{ rotate: 360 }} transition=${{ duration: 60, repeat: Infinity, ease: 'linear' }} />
+        <div className="absolute -left-20 -bottom-32 w-[380px] h-[380px] rounded-full bg-[#FF7A33] blur-2xl opacity-60"></div>
+        <div className="relative grid lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-8">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[12.5px] font-bold font-display"><${Icon} name="tag" className="w-3.5 h-3.5" />${d.badge}</span>
+            <h2 className="mt-5 font-display font-extrabold tracking-[-0.035em] text-[48px] sm:text-[72px] lg:text-[88px] leading-[0.95]">${d.title}</h2>
+            <p className="mt-5 text-[18px] text-white/90 max-w-xl">${d.body}</p>
+          </div>
+          <div className="lg:col-span-4 lg:justify-self-end flex flex-col gap-3">
+            <${Button} href=${d.cta.href} variant="light" className="h-14 px-8 text-[16px]">${d.cta.label}<//>
+            <p className="text-[12.5px] text-white/75">${d.fine}</p>
+          </div>
+        </div>
+      </div>
+    <//>
+  </section>`;
+
+const Faq = ({ d }) => {
+  const [open, setOpen] = useState(0);
+  return html`
+  <section className="py-24 lg:py-32">
+    <div className="max-w-site mx-auto px-5 lg:px-8 grid lg:grid-cols-12 gap-12">
+      <div className="lg:col-span-4">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//>
+          <p className="mt-5 text-[16px] text-ink/60">Still have questions? Our Austin team is happy to help.</p>
+          <div className="mt-6"><${Button} href="tel:5129371529" variant="brand" icon="phone">Call (512) 937-1529<//></div>
+        <//>
+        <${Reveal} delay=${0.1} className="mt-10 rounded-3xl bg-canvas p-6">
+          <div className="font-display font-extrabold text-[15px]">Also serving</div>
+          <div className="mt-4 flex flex-wrap gap-2">${d.areas.map((a, i) => html`<a key=${a} href="#" className=${`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${i === 0 ? 'bg-brand text-white' : 'bg-white text-ink/70 hover:text-brand ring-1 ring-ink/[0.07]'}`}>${a}</a>`)}</div>
+        <//>
+      </div>
+      <${motion.div} className="lg:col-span-8 divide-y divide-ink/[0.08] border-y border-ink/[0.08]" variants=${stagger(0.06)} ...${inViewProps}>
+        ${d.items.map((f, i) => html`
+          <${motion.div} key=${f.q} variants=${fadeUp}>
+            <h3><button onClick=${() => setOpen(open === i ? -1 : i)} aria-expanded=${open === i} aria-controls=${`faq-${i}`}
+              className="w-full flex items-center justify-between gap-6 py-6 text-left font-display font-bold text-[18px] sm:text-[20px] hover:text-brand transition-colors">
+              ${f.q}
+              <${motion.span} animate=${{ rotate: open === i ? 45 : 0 }} transition=${{ duration: 0.25 }} className=${`grid place-items-center w-10 h-10 rounded-xl shrink-0 ${open === i ? 'bg-brand text-white' : 'bg-canvas text-ink'}`}><${Icon} name="plus" className="w-5 h-5" sw=${2.2} /><//>
+            </button></h3>
+            <${AnimatePresence} initial=${false}>
+              ${open === i && html`<${motion.div} id=${`faq-${i}`} key="a" initial=${{ height: 0, opacity: 0 }} animate=${{ height: 'auto', opacity: 1 }} exit=${{ height: 0, opacity: 0 }} transition=${{ duration: 0.3, ease }} className="overflow-hidden">
+                <p className="pb-6 pr-16 text-[16px] leading-relaxed text-ink/65">${f.a}</p><//>`}
+            <//>
+          <//>`)}
+      <//>
+    </div>
+  </section>`;
+};
+
+const Footer = ({ g }) => html`
+  <footer className="bg-navy-950 text-white/65">
+    <div className="max-w-site mx-auto px-5 lg:px-8 pt-20 pb-10">
+      <div className="grid lg:grid-cols-12 gap-12 pb-14 border-b border-white/10">
+        <div className="lg:col-span-5">
+          <img src=${g.logo.urlLight} alt=${g.logo.alt} className="h-11 w-auto" loading="lazy" />
+          <p className="mt-6 text-[15px] leading-relaxed max-w-sm">Locally owned and operated. Kitchens, bathrooms, windows and doors for Austin homes — with 30 years and 80,000+ projects of experience.</p>
+          <div className="mt-6 flex items-center gap-3 text-white"><${Stars} /><span className="font-display font-bold">4.9</span><span className="text-white/50 text-[14px]">· A+ BBB · Top 500 Remodelers</span></div>
+        </div>
+        ${g.footer.columns.map((c) => html`
+          <div key=${c.title} className="lg:col-span-2">
+            <div className="text-white font-display font-bold text-[14px] mb-5">${c.title}</div>
+            <ul className="space-y-3 text-[14.5px]">${c.links.map((l) => html`<li key=${l}><a href="#" className="hover:text-white transition-colors">${l}</a></li>`)}</ul>
+          </div>`)}
+        <div className="lg:col-span-3">
+          <div className="text-white font-display font-bold text-[14px] mb-5">Austin office</div>
+          <div className="flex gap-3 text-[14.5px]"><${Icon} name="pin" className="w-4 h-4 text-flame mt-1 shrink-0" /><div>${g.footer.address.map((a) => html`<div key=${a}>${a}</div>`)}</div></div>
+          <a href=${`tel:${g.phone.replace(/\D/g, '')}`} className="mt-4 flex items-center gap-3 font-display font-bold text-white text-[18px] hover:text-flame transition-colors"><${Icon} name="phone" className="w-4 h-4 text-flame" />${g.phone}</a>
+          <${Button} href="#estimate" className="mt-6 h-11 text-[14px]">Free In-Home Estimate<//>
+        </div>
+      </div>
+      <div className="pt-8 flex flex-col md:flex-row gap-4 justify-between text-[13px] text-white/40">
+        <p>© 2026 Statewide Remodeling. All rights reserved.</p>
+        <div className="flex flex-wrap gap-5">${g.footer.legal.map((l) => html`<a key=${l} href="#" className="hover:text-white transition-colors">${l}</a>`)}</div>
+      </div>
+    </div>
+  </footer>`;
+
+/* =========================== Section renderer =========================== */
+const REGISTRY = {
+  'sections.hero': Hero,
+  'sections.trust-bar': TrustBar,
+  'sections.service-tabs': ServiceTabs,
+  'sections.before-after': BeforeAfter,
+  'sections.why-us': WhyUs,
+  'sections.process': Process,
+  'sections.reviews': Reviews,
+  'sections.offer-cta': OfferCta,
+  'sections.faq': Faq,
+};
+
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-flame focus:text-white focus:px-4 focus:py-2 focus:rounded-xl">Skip to content</a>
+    <${UtilityBar} g=${CMS.global} />
+    <${Header} g=${CMS.global} />
+    <main id="main">
+      ${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} />` : null; })}
+    </main>
+    <${Footer} g=${CMS.global} />
+    <${motion.a} href="#estimate" initial=${{ y: 100 }} animate=${{ y: 0 }} transition=${{ delay: 1.5, type: 'spring', stiffness: 200, damping: 20 }}
+      className="sm:hidden fixed bottom-4 inset-x-4 z-40 flex items-center justify-center gap-2 h-14 rounded-2xl bg-flame text-white font-display font-bold shadow-[0_20px_40px_-10px_rgba(255,82,0,.6)]">
+      <${Icon} name="tag" className="w-4 h-4" />75% off installation — check ZIP
+    <//>
+  <//>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+document.getElementById('boot').remove();
+</script>
+</body>
+</html>
