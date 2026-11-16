@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>King Stubb & Kasiva — Full-Service Corporate Law Firm in India</title>
+<meta name="description" content="King Stubb & Kasiva (KSK) is a leading full-service Indian law firm with offices in New Delhi, Bengaluru, Mumbai, Hyderabad and Chennai, and Japan, EU and USA desks." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: { DEFAULT: '#0E3453', 900: '#0A2338', 950: '#071827', 700: '#02436E' },
+          ksk: { blue: '#03568C', red: '#C5070A' },
+          coral: { DEFAULT: '#D25941', 50: '#FBEDE9' },
+          ivory: '#F7F5F1',
+          line: '#E3E0D9',
+        },
+        fontFamily: {
+          serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+          sans: ['Roboto', 'system-ui', 'sans-serif'],
+        },
+        maxWidth: { site: '1320px' },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: Roboto, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid #D25941; outline-offset: 3px; border-radius: 4px; }
+  .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#F7F5F1; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-ivory text-navy">
+<div id="boot"><img src="assets/logo.svg" alt="" width="220" /></div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (disclaimer, header, footer) + Collection
+   "page" with a Dynamic Zone `sections`. Practice areas, industries, desks,
+   insights and offices are their own Collection Types, referenced here.
+   ========================================================================== */
+const img = (id, w = 1400) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+
+const CMS = {
+  global: {
+    logo: { url: 'assets/logo.svg', urlLight: 'assets/logo-white.svg', alt: 'King Stubb & Kasiva' },
+    disclaimer: {
+      title: 'Disclaimer',
+      body: 'The information provided under this website is solely available at your request for informational purposes only and should not be interpreted as soliciting or advertisement. By clicking on “Accept”, you acknowledge that there has been no advertisement, solicitation, invitation or inducement of any sort whatsoever from us or any of our members to solicit any work through this website.',
+    },
+    nav: [
+      { label: 'Expertise', mega: true, href: '#expertise' },
+      { label: 'Industries', href: '#industries' },
+      { label: 'People', href: '#people' },
+      { label: 'Insights', href: '#insights' },
+      { label: 'Desks', href: '#desks' },
+      { label: 'About', href: '#about' },
+    ],
+    cta: { label: 'Contact', href: '#contact' },
+    footer: {
+      columns: [
+        { title: 'Firm', links: ['About', 'Awards & Recognition', 'Our Team', 'Local Counsels', 'Careers'] },
+        { title: 'Insights', links: ['Articles', 'News & Events', 'Lex Bytes'] },
+        { title: 'Practice Desks', links: ['Japan Desk', 'EU Desk', 'USA Desk', 'India–UK FTA'] },
+      ],
+      legal: ['Disclaimer', 'Privacy Policy', 'Cookie Settings', 'Sitemap'],
+    },
+  },
+
+  page: {
+    sections: [
+      {
+        __component: 'sections.hero',
+        kicker: 'Full-service corporate law firm in India',
+        lead: 'Counsel that moves',
+        rotating: ['M&A and PE/VC.', 'capital markets.', 'data privacy.', 'complex disputes.', 'cross-border deals.'],
+        subtitle: 'King Stubb & Kasiva blends local insight with global standards — trusted counsel across corporate, transactional, regulatory, real estate, employment and dispute resolution matters.',
+        primaryCta: { label: 'Explore our expertise', href: '#expertise' },
+        secondaryCta: { label: 'Speak to a partner', href: '#contact' },
+        image: { url: img('photo-1486406146926-c627a92ad1ab', 1400), alt: 'Glass office towers in a business district' },
+        card: { kicker: 'Latest insight', title: 'Cross-Border Data Processing in India: SaaS, Cloud and Outsourcing', href: '#insights' },
+        stats: [
+          { value: '5', label: 'Offices across India' },
+          { value: '3', label: 'International desks' },
+          { value: '15+', label: 'Practice areas' },
+          { value: 'Pan-India', label: 'Presence & local counsel network' },
+        ],
+      },
+      {
+        __component: 'sections.about',
+        id: 'about',
+        eyebrow: 'Working as a team',
+        quote: 'With established teams in every practice, our services meet the most exacting standards.',
+        body: 'With a pan-India presence and a significant international client base, KSK consistently aligns legal strategy with business vision — practical, high-quality legal solutions across a wide spectrum of industries and sectors.',
+        cta: { label: 'Learn more about us', href: '#' },
+      },
+      {
+        __component: 'sections.expertise',
+        id: 'expertise',
+        eyebrow: 'Expertise',
+        title: 'Every practice, one standard.',
+        areas: [
+          { name: 'Banking & Finance', group: 'Transactional' },
+          { name: 'Capital Markets', group: 'Transactional' },
+          { name: 'Competition & Anti-trust', group: 'Regulatory' },
+          { name: 'Corporate & Commercial', group: 'Transactional' },
+          { name: 'Data Privacy', group: 'Regulatory', tag: 'Featured' },
+          { name: 'Information Technology', group: 'Regulatory' },
+          { name: 'Infrastructure & Project Finance', group: 'Transactional' },
+          { name: 'Insolvency & Restructuring', group: 'Disputes' },
+          { name: 'Intellectual Property', group: 'Regulatory' },
+          { name: 'Labour & Employment', group: 'Regulatory' },
+          { name: 'Litigation & Arbitration', group: 'Disputes' },
+          { name: 'Media Law', group: 'Regulatory' },
+          { name: 'M&A — PE/VC', group: 'Transactional' },
+          { name: 'Real Estate', group: 'Transactional' },
+          { name: 'Regulatory', group: 'Regulatory' },
+          { name: 'Tax', group: 'Regulatory' },
+        ],
+        groups: ['All', 'Transactional', 'Regulatory', 'Disputes'],
+      },
+      {
+        __component: 'sections.industries',
+        id: 'industries',
+        eyebrow: 'Industries',
+        title: 'Sector fluency, not just legal expertise.',
+        items: [
+          { name: 'Technology', body: 'SaaS, platforms and data-driven businesses.', image: img('photo-1518770660439-4636190af475', 900) },
+          { name: 'Banking & Financial Services', body: 'Lenders, NBFCs, funds and fintech.', image: img('photo-1554224155-6726b3ff858f', 900) },
+          { name: 'Infrastructure & Energy', body: 'Projects, renewables and concessions.', image: img('photo-1509391366360-2e959784a276', 900) },
+          { name: 'Real Estate', body: 'Development, leasing and REIT structures.', image: img('photo-1497366811353-6870744d04b2', 900) },
+          { name: 'Healthcare & Life Sciences', body: 'Hospitals, pharma and medtech.', image: img('photo-1576091160399-112ba8d25d1d', 900) },
+          { name: 'Media & Entertainment', body: 'Content, licensing and broadcasting.', image: img('photo-1492724441997-5dc865305da7', 900) },
+        ],
+      },
+      {
+        __component: 'sections.desks',
+        id: 'desks',
+        eyebrow: 'Practice desks',
+        title: 'India counsel for global businesses.',
+        desks: [
+          { code: 'JP', name: 'Japan Desk', body: 'Dedicated support for Japanese corporations entering and expanding in India.' },
+          { code: 'EU', name: 'EU Desk', body: 'Market entry, compliance and transactions for European businesses.' },
+          { code: 'US', name: 'USA Desk', body: 'Cross-border structuring and counsel for US investors and companies.' },
+        ],
+        feature: { kicker: 'Focus', title: 'India–UK Free Trade Agreement', body: 'What the India–UK FTA means for market access, services, investment and compliance — and how to prepare.', cta: 'Read the analysis', image: img('photo-1513635269975-59663e0ac1ad', 1000) },
+      },
+      {
+        __component: 'sections.insights',
+        id: 'insights',
+        eyebrow: 'Insights',
+        title: 'From the KSK desk.',
+        tabs: ['Articles', 'News & Events', 'Lex Bytes'],
+        posts: [
+          { tab: 'Articles', cat: 'Labour & Employment', title: 'Contract Labour Under India’s OSH Code: Licensing, Core Activity Restrictions and Principal Employer Liability', excerpt: 'The OSH Code, 2020 has restructured the regulatory framework governing contract labour in India.', image: img('photo-1504307651254-35680f356dfd', 900) },
+          { tab: 'Articles', cat: 'Intellectual Property', title: 'Moonlighting in India: IP Ownership, Confidentiality and Employment Restrictions', excerpt: 'Remote and hybrid working has made moonlighting a live issue for employers.', image: img('photo-1499951360447-b19be8fe80f5', 900) },
+          { tab: 'Articles', cat: 'Data Privacy', title: 'Marketing Consent in India: Navigating TRAI’s TCCCPR and the DPDP Act', excerpt: 'Promotional SMS and voice calls must navigate two distinct regulatory frameworks.', image: img('photo-1512941937669-90a1b58e7e9c', 900) },
+          { tab: 'Articles', cat: 'Data Privacy', title: 'Cross-Border Data Processing in India: Legal and Contractual Considerations for SaaS, Cloud and Outsourcing', excerpt: 'Most businesses now process personal data across borders through global cloud infrastructure.', image: img('photo-1451187580459-43490279c0fa', 900) },
+          { tab: 'News & Events', cat: 'Firm News', title: 'King Stubb & Kasiva Celebrates Diwali with Festive Cheer Across Its Offices', excerpt: 'Celebrations across New Delhi, Bengaluru, Mumbai, Hyderabad and Chennai.', image: img('photo-1605810230434-7631ac76ec81', 900) },
+          { tab: 'Lex Bytes', cat: 'Lex Bytes', title: 'DPDP Rules in 90 seconds: what changes for consent managers', excerpt: 'A short-form explainer from our data privacy team.', image: img('photo-1563986768609-322da13575f3', 900) },
+        ],
+      },
+      {
+        __component: 'sections.people',
+        id: 'people',
+        eyebrow: 'KSK’s team of experts',
+        title: 'Our people are our greatest asset.',
+        body: 'A diverse team of skilled professionals bringing a wealth of experience across legal disciplines — committed to exceptional service and innovative solutions tailored to every client’s needs.',
+        portraits: [img('photo-1560250097-0b93528c311a', 500), img('photo-1573496359142-b8d87734a5a2', 500), img('photo-1519085360753-af0119f7cbe7', 500), img('photo-1580489944761-15a19d654956', 500), img('photo-1507679799987-c73779587ccf', 500), img('photo-1494790108377-be9c29b29330', 500)],
+        cta: { label: 'Meet our team', href: '#' },
+        secondary: { label: 'Local counsels network', href: '#' },
+      },
+      {
+        __component: 'sections.offices',
+        id: 'contact',
+        eyebrow: 'Our offices',
+        title: 'Five cities. One firm.',
+        offices: [
+          { city: 'New Delhi', image: img('photo-1587474260584-136574528ed5', 800) },
+          { city: 'Bengaluru', image: img('photo-1497366216548-37526070297c', 800) },
+          { city: 'Mumbai', image: img('photo-1529253355930-ddbe423a2ac7', 800) },
+          { city: 'Hyderabad', image: img('photo-1497215842964-222b430dc094', 800) },
+          { city: 'Chennai', image: img('photo-1556761175-b413da4baf72', 800) },
+        ],
+        form: { title: 'Speak to our team', body: 'Tell us about your matter and the right partner will be in touch.' },
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M12 5l7 7-7 7',
+  arrowUR: 'M7 17 17 7M8 7h9v9',
+  search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3',
+  menu: 'M4 7h16M4 12h16M4 17h16',
+  x: 'M18 6 6 18M6 6l12 12',
+  chevron: 'M6 9l6 6 6-6',
+  check: 'M20 6 9 17l-5-5',
+  pin: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  globe: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20',
+  quote: 'M7 7h4v4c0 3-2 5-4 6M15 7h4v4c0 3-2 5-4 6',
+};
+const Icon = ({ name, className = 'w-5 h-5', sw = 1.6 }) => html`
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth=${sw} strokeLinecap="round" strokeLinejoin="round" className=${className} aria-hidden="true"><path d=${ICONS[name]} /></svg>`;
+
+const ease = [0.22, 1, 0.36, 1];
+const fadeUp = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease } } };
+const stagger = (s = 0.07, d = 0) => ({ hidden: {}, show: { transition: { staggerChildren: s, delayChildren: d } } });
+const inView = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-70px' } };
+const Reveal = ({ children, className = '', delay = 0 }) => html`
+  <${motion.div} className=${className} ...${inView} variants=${{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease, delay } } }}>${children}<//>`;
+
+const Eyebrow = ({ children, light }) => html`
+  <div className=${`flex items-center gap-3 text-[12px] font-medium tracking-[0.22em] uppercase ${light ? 'text-coral' : 'text-coral'}`}>
+    <span className="relative w-2 h-2"><span className="absolute inset-0 bg-ksk-red rotate-45"></span></span>${children}
+  </div>`;
+const H2 = ({ children, className = '' }) => html`<h2 className=${`font-serif tracking-[-0.01em] text-[44px] sm:text-[58px] lg:text-[76px] leading-[0.98] ${className}`}>${children}</h2>`;
+
+const Button = ({ href, children, variant = 'navy', className = '', icon = 'arrow', type, onClick }) => {
+  const styles = {
+    navy: 'bg-navy text-white hover:bg-navy-700',
+    coral: 'bg-coral text-white hover:brightness-95',
+    outline: 'ring-1 ring-navy/25 text-navy hover:ring-navy',
+    ghost: 'ring-1 ring-white/30 text-white hover:bg-white hover:text-navy',
+    white: 'bg-white text-navy hover:bg-ivory',
+  };
+  const Tag = href ? motion.a : motion.button;
+  return html`<${Tag} href=${href} type=${type} onClick=${onClick} whileTap=${{ scale: 0.98 }}
+    className=${`group inline-flex items-center justify-center gap-3 rounded-full pl-6 ${icon ? 'pr-2' : 'pr-6'} h-[52px] text-[14.5px] font-medium whitespace-nowrap transition-colors duration-300 ${styles[variant]} ${className}`}>
+    ${children}
+    ${icon && html`<span className=${`grid place-items-center w-9 h-9 rounded-full transition-transform duration-300 group-hover:rotate-[-45deg] ${variant === 'navy' ? 'bg-coral text-white' : variant === 'coral' ? 'bg-white/20' : variant === 'white' ? 'bg-navy text-white' : 'bg-navy text-white'}`}><${Icon} name=${icon} className="w-4 h-4" sw=${1.8} /></span>`}
+  <//>`;
+};
+
+/* ============================== Disclaimer ============================== */
+const Disclaimer = ({ d }) => {
+  const [open, setOpen] = useState(() => { try { return !sessionStorage.getItem('ksk-disclaimer'); } catch (e) { return true; } });
+  const close = (v) => { try { sessionStorage.setItem('ksk-disclaimer', v); } catch (e) {} setOpen(false); };
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+  return html`<${AnimatePresence}>${open && html`
+    <${motion.div} key="disc" className="fixed inset-0 z-[90] grid place-items-center p-4 bg-navy-950/60 backdrop-blur-sm" initial=${{ opacity: 0 }} animate=${{ opacity: 1 }} exit=${{ opacity: 0 }}>
+      <${motion.div} role="dialog" aria-modal="true" aria-labelledby="disc-t" initial=${{ y: 30, opacity: 0, scale: 0.97 }} animate=${{ y: 0, opacity: 1, scale: 1 }} exit=${{ y: 20, opacity: 0 }} transition=${{ duration: 0.5, ease }}
+        className="w-full max-w-[560px] bg-white rounded-[28px] p-8 sm:p-10 shadow-2xl">
+        <img src="assets/logo.svg" alt="" className="h-7" />
+        <h2 id="disc-t" className="mt-7 font-serif text-[36px] leading-none">${d.title}</h2>
+        <p className="mt-4 text-[14.5px] leading-relaxed text-navy/70">${d.body}</p>
+        <div className="mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+          <${Button} variant="outline" icon=${null} onClick=${() => close('rejected')}>Reject all<//>
+          <${Button} onClick=${() => close('accepted')} icon="check">Accept all<//>
+        </div>
+      <//>
+    <//>`}<//>`;
+};
+
+/* ============================== Header ============================== */
+const Header = ({ g, areas }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [mega, setMega] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 30));
+  return html`
+  <header className="sticky top-0 z-50" onMouseLeave=${() => setMega(false)}>
+    <div className=${`transition-all duration-300 ${scrolled || mega ? 'bg-ivory/90 backdrop-blur-xl border-b border-line' : 'bg-ivory border-b border-transparent'}`}>
+      <div className=${`max-w-site mx-auto px-5 lg:px-10 flex items-center justify-between gap-6 transition-all duration-300 ${scrolled ? 'h-[68px]' : 'h-[86px]'}`}>
+        <a href="#" aria-label="King Stubb & Kasiva home" className="shrink-0"><img src=${g.logo.url} alt=${g.logo.alt} className=${`w-auto transition-all duration-300 ${scrolled ? 'h-7' : 'h-8 sm:h-9'}`} /></a>
+        <nav className="hidden xl:flex items-center gap-1 rounded-full bg-white/70 ring-1 ring-line p-1" aria-label="Primary">
+          ${g.nav.map((n) => html`
+            <a key=${n.label} href=${n.href} onMouseEnter=${() => setMega(!!n.mega)} aria-haspopup=${n.mega ? 'true' : undefined} aria-expanded=${n.mega ? mega : undefined}
+              className="relative flex items-center gap-1 h-10 px-4 rounded-full text-[14.5px] text-navy/75 hover:text-navy transition-colors whitespace-nowrap">
+              ${n.label}${n.mega && html`<${Icon} name="chevron" className=${`w-3.5 h-3.5 transition-transform ${mega ? 'rotate-180' : ''}`} />`}
+            </a>`)}
+        </nav>
+        <div className="flex items-center gap-2">
+          <a href="#" className="hidden md:grid place-items-center w-11 h-11 rounded-full ring-1 ring-line hover:ring-navy/40 transition" aria-label="Search the site"><${Icon} name="search" className="w-[18px] h-[18px]" /></a>
+          <${Button} href=${g.cta.href} className="hidden sm:inline-flex h-11" icon="arrowUR">${g.cta.label}<//>
+          <button onClick=${() => setOpen(true)} className="xl:hidden grid place-items-center w-11 h-11 rounded-full bg-navy text-white" aria-label="Open menu"><${Icon} name="menu" /></button>
+        </div>
+      </div>
+    </div>
+    <${AnimatePresence}>
+      ${mega && html`
+        <${motion.div} key="mega" initial=${{ opacity: 0, y: -8 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, transition: { duration: 0.15 } }} transition=${{ duration: 0.3, ease }}
+          className="hidden xl:block absolute inset-x-0 top-full bg-white border-b border-line shadow-[0_40px_60px_-40px_rgba(14,52,83,.35)]">
+          <div className="max-w-site mx-auto px-10 py-10 grid grid-cols-[1fr_340px] gap-12">
+            <ul className="grid grid-cols-3 gap-x-10 gap-y-1">
+              ${areas.map((a, i) => html`<${motion.li} key=${a.name} initial=${{ opacity: 0, y: 8 }} animate=${{ opacity: 1, y: 0 }} transition=${{ delay: i * 0.015 }}><a href="#expertise" className="group flex items-center justify-between py-2.5 border-b border-line text-[15px] hover:text-coral transition-colors">${a.name}<${Icon} name="arrow" className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /></a><//>`)}
+            </ul>
+            <div className="rounded-3xl bg-navy text-white p-7 flex flex-col">
+              <div className="text-[12px] tracking-[0.2em] uppercase text-coral">Featured</div>
+              <div className="mt-3 font-serif text-[30px] leading-tight">Data Privacy & the DPDP Act</div>
+              <p className="mt-3 text-[14px] text-white/65">Consent, cross-border transfers and compliance programs for India’s new privacy regime.</p>
+              <a href="#insights" className="mt-auto pt-6 inline-flex items-center gap-2 text-[14px] font-medium text-white">Read insights <${Icon} name="arrow" className="w-4 h-4" /></a>
+            </div>
+          </div>
+        <//>`}
+    <//>
+    <${AnimatePresence}>
+      ${open && html`
+        <${motion.div} key="drawer" className="fixed inset-0 z-[60] bg-navy text-white flex flex-col" initial=${{ y: '-100%' }} animate=${{ y: 0 }} exit=${{ y: '-100%' }} transition=${{ duration: 0.55, ease }}>
+          <div className="flex items-center justify-between px-5 h-[86px]">
+            <img src=${g.logo.urlLight} alt=${g.logo.alt} className="h-8" />
+            <button onClick=${() => setOpen(false)} className="grid place-items-center w-11 h-11 rounded-full bg-white/10" aria-label="Close menu"><${Icon} name="x" /></button>
+          </div>
+          <${motion.nav} className="px-6 pt-4 flex-1 overflow-y-auto" variants=${stagger(0.05, 0.25)} initial="hidden" animate="show">
+            ${[...g.nav, g.cta].map((n) => html`<${motion.a} key=${n.label} variants=${fadeUp} href=${n.href} onClick=${() => setOpen(false)} className="flex items-center justify-between py-4 border-b border-white/10 font-serif text-[38px]">${n.label}<${Icon} name="arrowUR" className="w-6 h-6 text-coral" /><//>`)}
+          <//>
+        <//>`}
+    <//>
+  </header>`;
+};
+
+/* ============================== Sections ============================== */
+const Hero = ({ d }) => {
+  const [w, setW] = useState(0);
+  useEffect(() => { const t = setInterval(() => setW((x) => (x + 1) % d.rotating.length), 2800); return () => clearInterval(t); }, []);
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  return html`
+  <section ref=${ref} className="relative">
+    <div className="max-w-site mx-auto px-5 lg:px-10 pt-10 lg:pt-16">
+      <${motion.div} variants=${stagger(0.1, 0.1)} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <div className="lg:col-span-8">
+          <${motion.div} variants=${fadeUp}><${Eyebrow}>${d.kicker}<//><//>
+          <h1 className="mt-6 font-serif text-[52px] sm:text-[80px] lg:text-[108px] leading-[0.95] tracking-[-0.02em]">
+            <${motion.span} variants=${fadeUp} className="block">${d.lead}</${motion.span}>
+            <span className="relative block h-[1.05em] overflow-hidden italic text-ksk-blue text-[42px] sm:text-[80px] lg:text-[108px] max-sm:h-[60px]">
+              <${AnimatePresence} mode="popLayout" initial=${false}>
+                <${motion.span} key=${w} className="absolute left-0 top-0 whitespace-nowrap" initial=${{ y: '100%', opacity: 0 }} animate=${{ y: 0, opacity: 1 }} exit=${{ y: '-100%', opacity: 0 }} transition=${{ duration: 0.7, ease }}>${d.rotating[w]}<//>
+              <//>
+            </span>
+          </h1>
+        </div>
+        <div className="lg:col-span-4 lg:pb-4">
+          <${motion.p} variants=${fadeUp} className="text-[16.5px] leading-relaxed text-navy/70">${d.subtitle}<//>
+          <${motion.div} variants=${fadeUp} className="mt-7 flex flex-wrap gap-3">
+            <${Button} href=${d.primaryCta.href}>${d.primaryCta.label}<//>
+            <${Button} href=${d.secondaryCta.href} variant="outline" icon=${null}>${d.secondaryCta.label}<//>
+          <//>
+        </div>
+      <//>
+    </div>
+    <div className="max-w-site mx-auto px-5 lg:px-10 mt-12">
+      <${motion.div} className="relative h-[420px] sm:h-[520px] lg:h-[600px] rounded-[32px] overflow-hidden bg-navy"
+        initial=${{ clipPath: 'inset(12% 8% 0% 8% round 32px)' }} animate=${{ clipPath: 'inset(0% 0% 0% 0% round 32px)' }} transition=${{ duration: 1.4, ease, delay: 0.2 }}>
+        <${motion.img} style=${{ scale }} src=${d.image.url} alt=${d.image.alt} className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-navy/25 to-transparent"></div>
+        <${motion.a} href=${d.card.href} initial=${{ opacity: 0, y: 30 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 0.8, ease, delay: 1.1 }} whileHover=${{ y: -4 }}
+          className="group absolute top-5 right-5 sm:top-8 sm:right-8 max-w-[340px] rounded-[22px] bg-white/90 backdrop-blur-xl p-5 shadow-xl">
+          <div className="flex items-center gap-2 text-[11.5px] font-medium tracking-[0.18em] uppercase text-coral"><span className="w-1.5 h-1.5 rounded-full bg-coral animate-pulse"></span>${d.card.kicker}</div>
+          <div className="mt-2 font-serif text-[22px] leading-snug">${d.card.title}</div>
+          <span className="mt-3 inline-flex items-center gap-2 text-[13.5px] font-medium text-ksk-blue">Read <${Icon} name="arrow" className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
+        <//>
+        <${motion.dl} className="absolute inset-x-0 bottom-0 grid grid-cols-2 lg:grid-cols-4 text-white" variants=${stagger(0.1, 1)} initial="hidden" animate="show">
+          ${d.stats.map((s, i) => html`
+            <${motion.div} key=${s.label} variants=${fadeUp} className=${`px-6 sm:px-8 py-5 sm:py-7 ${i ? 'border-l border-white/15' : ''} ${i > 1 ? 'max-lg:border-t max-lg:border-white/15' : ''} ${i === 2 ? 'max-lg:border-l-0' : ''}`}>
+              <dd className="font-serif text-[36px] sm:text-[48px] leading-none">${s.value}</dd>
+              <dt className="mt-2 text-[13px] text-white/65">${s.label}</dt>
+            <//>`)}
+        <//>
+      <//>
+    </div>
+  </section>`;
+};
+
+const About = ({ d }) => html`
+  <section id=${d.id} className="max-w-site mx-auto px-5 lg:px-10 py-24 lg:py-32 scroll-mt-24">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <${Reveal} className="lg:col-span-3"><${Eyebrow}>${d.eyebrow}<//><//>
+      <div className="lg:col-span-9">
+        <${Reveal}><p className="font-serif text-[34px] sm:text-[46px] lg:text-[56px] leading-[1.1] tracking-[-0.01em]">${d.quote.split(' ').map((w, i) => html`<${motion.span} key=${i} className="inline-block mr-[0.25em]" initial=${{ opacity: 0.15 }} whileInView=${{ opacity: 1 }} viewport=${{ once: true, margin: '-15% 0px -15% 0px' }} transition=${{ duration: 0.5, delay: i * 0.04 }}>${w}<//>`)}</p><//>
+        <${Reveal} delay=${0.1} className="mt-10 grid sm:grid-cols-2 gap-8 items-end">
+          <p className="text-[16.5px] leading-relaxed text-navy/70">${d.body}</p>
+          <div className="sm:justify-self-end"><${Button} href=${d.cta.href} variant="outline">${d.cta.label}<//></div>
+        <//>
+      </div>
+    </div>
+  </section>`;
+
+const Expertise = ({ d }) => {
+  const [q, setQ] = useState('');
+  const [g, setG] = useState('All');
+  const list = d.areas.filter((a) => (g === 'All' || a.group === g) && a.name.toLowerCase().includes(q.toLowerCase()));
+  return html`
+  <section id=${d.id} className="bg-white py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <${Reveal} className="lg:col-span-7"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+        <${Reveal} className="lg:col-span-5" delay=${0.1}>
+          <label htmlFor="pa-search" className="sr-only">Search practice areas</label>
+          <div className="flex items-center gap-3 h-14 rounded-full bg-ivory ring-1 ring-line px-5 focus-within:ring-navy/40 transition">
+            <${Icon} name="search" className="w-5 h-5 text-navy/50" />
+            <input id="pa-search" value=${q} onChange=${(e) => setQ(e.target.value)} placeholder="Search practice areas…" className="flex-1 min-w-0 bg-transparent text-[15.5px] placeholder:text-navy/40 focus:outline-none" />
+            ${q && html`<button onClick=${() => setQ('')} aria-label="Clear search" className="text-navy/50 hover:text-navy"><${Icon} name="x" className="w-4 h-4" /></button>`}
+          </div>
+        <//>
+      </div>
+      <div role="tablist" aria-label="Practice groups" className="mt-10 flex gap-2 overflow-x-auto no-scrollbar">
+        ${d.groups.map((x) => html`
+          <button key=${x} role="tab" aria-selected=${g === x} onClick=${() => setG(x)} className=${`relative h-11 px-5 rounded-full text-[14px] whitespace-nowrap transition-colors ${g === x ? 'text-white' : 'text-navy/70 ring-1 ring-line hover:ring-navy/30'}`}>
+            ${g === x && html`<${motion.span} layoutId="grp" className="absolute inset-0 rounded-full bg-navy" transition=${{ type: 'spring', stiffness: 420, damping: 34 }} />`}
+            <span className="relative">${x}<span className="ml-2 text-[12px] opacity-60">${x === 'All' ? d.areas.length : d.areas.filter((a) => a.group === x).length}</span></span>
+          </button>`)}
+      </div>
+      <${motion.ul} layout className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t border-line">
+        <${AnimatePresence} mode="popLayout">
+          ${list.map((a, i) => html`
+            <${motion.li} layout key=${a.name} initial=${{ opacity: 0, y: 10 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, scale: 0.98 }} transition=${{ duration: 0.35, ease }} className="border-b border-line sm:[&:nth-child(odd)]:border-r lg:[&:nth-child(odd)]:border-r-0 lg:[&:not(:nth-child(3n))]:border-r">
+              <a href="#" className="group relative flex items-center justify-between gap-4 px-1 sm:px-6 py-6 overflow-hidden">
+                <span className="absolute inset-0 bg-navy origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out"></span>
+                <span className="relative flex items-baseline gap-4">
+                  <span className="text-[12px] text-navy/35 group-hover:text-white/40 w-6 transition-colors">${String(d.areas.indexOf(a) + 1).padStart(2, '0')}</span>
+                  <span className="font-serif text-[24px] leading-tight group-hover:text-white transition-colors">${a.name}</span>
+                  ${a.tag && html`<span className="rounded-full bg-coral-50 text-coral text-[11px] font-medium px-2 py-0.5 group-hover:bg-white/15 group-hover:text-white">${a.tag}</span>`}
+                </span>
+                <span className="relative grid place-items-center w-9 h-9 rounded-full ring-1 ring-line group-hover:ring-0 group-hover:bg-coral group-hover:text-white transition-all shrink-0"><${Icon} name="arrowUR" className="w-4 h-4" /></span>
+              </a>
+            <//>`)}
+        <//>
+      <//>
+      ${list.length === 0 && html`<p className="mt-8 text-navy/60">No practice areas match “${q}”. <button onClick=${() => { setQ(''); setG('All'); }} className="text-coral underline underline-offset-4">Clear filters</button></p>`}
+    </div>
+  </section>`;
+};
+
+const Industries = ({ d }) => {
+  const [a, setA] = useState(0);
+  return html`
+  <section id=${d.id} className="py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-10">
+      <${Reveal} className="max-w-3xl"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+      <${Reveal} delay=${0.1} className="mt-12 hidden lg:flex gap-3 h-[520px]">
+        ${d.items.map((it, i) => html`
+          <${motion.a} key=${it.name} href="#" layout onMouseEnter=${() => setA(i)} onFocus=${() => setA(i)}
+            animate=${{ flex: a === i ? 5 : 1 }} transition=${{ duration: 0.7, ease }}
+            className="group relative overflow-hidden rounded-[28px] bg-navy min-w-0">
+            <img src=${it.image} alt="" loading="lazy" className=${`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${a === i ? 'scale-100 opacity-80' : 'scale-110 opacity-40 grayscale'}`} />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-950/20 to-transparent"></div>
+            <div className="absolute inset-x-0 bottom-0 p-7 text-white">
+              <${AnimatePresence} mode="wait">
+                ${a === i ? html`
+                  <${motion.div} key="open" initial=${{ opacity: 0, y: 14 }} animate=${{ opacity: 1, y: 0, transition: { delay: 0.25 } }} exit=${{ opacity: 0 }}>
+                    <div className="text-[12px] tracking-[0.2em] uppercase text-coral">0${i + 1}</div>
+                    <div className="mt-2 font-serif text-[40px] leading-none">${it.name}</div>
+                    <p className="mt-3 text-[15px] text-white/70 max-w-sm">${it.body}</p>
+                    <span className="mt-5 inline-flex items-center gap-2 text-[14px] font-medium">Explore sector <${Icon} name="arrow" className="w-4 h-4" /></span>
+                  <//>` : html`
+                  <${motion.div} key="closed" initial=${{ opacity: 0 }} animate=${{ opacity: 1 }} exit=${{ opacity: 0 }} className="[writing-mode:vertical-rl] rotate-180 font-serif text-[24px] whitespace-nowrap">${it.name}<//>`}
+              <//>
+            </div>
+          <//>`)}
+      <//>
+      <${motion.div} className="mt-10 lg:hidden grid sm:grid-cols-2 gap-4" variants=${stagger(0.08)} ...${inView}>
+        ${d.items.map((it) => html`
+          <${motion.a} key=${it.name} href="#" variants=${fadeUp} className="relative h-[240px] overflow-hidden rounded-[24px] bg-navy">
+            <img src=${it.image} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-70" />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 to-transparent"></div>
+            <div className="absolute inset-x-0 bottom-0 p-6 text-white"><div className="font-serif text-[30px] leading-none">${it.name}</div><p className="mt-2 text-[14px] text-white/70">${it.body}</p></div>
+          <//>`)}
+      <//>
+    </div>
+  </section>`;
+};
+
+const Desks = ({ d }) => html`
+  <section id=${d.id} className="relative bg-navy text-white py-24 lg:py-32 overflow-hidden scroll-mt-20">
+    <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style=${{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '28px 28px' }}></div>
+    <${motion.div} className="absolute -right-48 -top-48 w-[640px] h-[640px] rounded-full border border-white/10" animate=${{ rotate: 360 }} transition=${{ duration: 120, repeat: Infinity, ease: 'linear' }}>
+      <span className="absolute top-1/2 -left-1.5 w-3 h-3 rounded-full bg-coral"></span>
+    <//>
+    <div className="relative max-w-site mx-auto px-5 lg:px-10">
+      <${Reveal} className="max-w-3xl"><${Eyebrow} light>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+      <div className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <${motion.div} className="lg:col-span-7 grid sm:grid-cols-3 gap-5" variants=${stagger(0.1)} ...${inView}>
+          ${d.desks.map((k) => html`
+            <${motion.a} key=${k.code} href="#" variants=${fadeUp} whileHover=${{ y: -6 }} className="group rounded-[26px] bg-white/[0.05] ring-1 ring-white/10 p-6 flex flex-col min-h-[300px] hover:bg-white/[0.09] transition-colors">
+              <div className="flex items-center justify-between"><span className="font-serif text-[64px] leading-none text-white/90">${k.code}</span><${Icon} name="globe" className="w-6 h-6 text-coral" /></div>
+              <div className="mt-auto">
+                <h3 className="font-serif text-[26px]">${k.name}</h3>
+                <p className="mt-2 text-[14px] text-white/60 leading-relaxed">${k.body}</p>
+                <span className="mt-4 inline-flex items-center gap-2 text-[13.5px] font-medium text-coral">Visit desk <${Icon} name="arrow" className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
+              </div>
+            <//>`)}
+        <//>
+        <${Reveal} className="lg:col-span-5" delay=${0.2}>
+          <a href="#" className="group relative block h-full min-h-[300px] rounded-[26px] overflow-hidden">
+            <img src=${d.feature.image} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/50 to-navy-950/10"></div>
+            <div className="absolute inset-x-0 bottom-0 p-7">
+              <span className="inline-flex rounded-full bg-coral px-3 py-1 text-[11.5px] font-medium tracking-[0.16em] uppercase">${d.feature.kicker}</span>
+              <h3 className="mt-4 font-serif text-[36px] leading-[1.05]">${d.feature.title}</h3>
+              <p className="mt-3 text-[14.5px] text-white/70">${d.feature.body}</p>
+              <span className="mt-5 inline-flex items-center gap-2 text-[14px] font-medium">${d.feature.cta} <${Icon} name="arrow" className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
+            </div>
+          </a>
+        <//>
+      </div>
+    </div>
+  </section>`;
+
+const Insights = ({ d }) => {
+  const [t, setT] = useState(d.tabs[0]);
+  const posts = d.posts.filter((p) => p.tab === t);
+  const [feat, ...rest] = posts;
+  return html`
+  <section id=${d.id} className="py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-10">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+        <div role="tablist" aria-label="Insight type" className="flex gap-1 rounded-full bg-white ring-1 ring-line p-1">
+          ${d.tabs.map((x) => html`
+            <button key=${x} role="tab" aria-selected=${t === x} onClick=${() => setT(x)} className=${`relative h-10 px-4 rounded-full text-[14px] whitespace-nowrap ${t === x ? 'text-white' : 'text-navy/65 hover:text-navy'}`}>
+              ${t === x && html`<${motion.span} layoutId="ins-tab" className="absolute inset-0 rounded-full bg-navy" transition=${{ type: 'spring', stiffness: 420, damping: 34 }} />`}<span className="relative">${x}</span>
+            </button>`)}
+        </div>
+      </div>
+      <${AnimatePresence} mode="wait">
+        <${motion.div} key=${t} initial=${{ opacity: 0, y: 16 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -10 }} transition=${{ duration: 0.4, ease }} className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
+          ${feat && html`
+            <a href="#" className=${`group ${rest.length ? 'lg:col-span-6' : 'lg:col-span-12'} rounded-[28px] bg-white ring-1 ring-line overflow-hidden flex flex-col`}>
+              <div className="relative aspect-[16/10] overflow-hidden"><img src=${feat.image} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" /></div>
+              <div className="p-7 lg:p-8 flex flex-col flex-1">
+                <span className="text-[12px] font-medium tracking-[0.16em] uppercase text-coral">${feat.cat}</span>
+                <h3 className="mt-3 font-serif text-[30px] lg:text-[34px] leading-[1.1] group-hover:text-ksk-blue transition-colors">${feat.title}</h3>
+                <p className="mt-3 text-[15px] text-navy/65">${feat.excerpt}</p>
+                <span className="mt-auto pt-6 inline-flex items-center gap-2 text-[14px] font-medium">Read more <${Icon} name="arrow" className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
+              </div>
+            </a>`}
+          ${rest.length > 0 && html`
+            <div className="lg:col-span-6 flex flex-col divide-y divide-line border-y border-line">
+              ${rest.map((p, i) => html`
+                <${motion.a} key=${p.title} href="#" initial=${{ opacity: 0, x: 16 }} animate=${{ opacity: 1, x: 0 }} transition=${{ delay: 0.1 + i * 0.08, duration: 0.5, ease }} className="group flex gap-5 py-6 items-start">
+                  <div className="relative w-28 sm:w-36 aspect-[4/3] shrink-0 rounded-2xl overflow-hidden"><img src=${p.image} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" /></div>
+                  <div className="min-w-0">
+                    <span className="text-[11.5px] font-medium tracking-[0.16em] uppercase text-coral">${p.cat}</span>
+                    <h3 className="mt-1.5 font-serif text-[21px] leading-snug group-hover:text-ksk-blue transition-colors">${p.title}</h3>
+                  </div>
+                <//>`)}
+            </div>`}
+        <//>
+      <//>
+    </div>
+  </section>`;
+};
+
+const People = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const y1 = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [-40, 80]);
+  return html`
+  <section ref=${ref} id=${d.id} className="bg-white py-24 lg:py-32 overflow-hidden scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-10 grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
+      <div className="lg:col-span-5">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><p className="mt-6 text-[16.5px] leading-relaxed text-navy/70">${d.body}</p>
+          <div className="mt-9 flex flex-wrap gap-3"><${Button} href=${d.cta.href}>${d.cta.label}<//><${Button} href=${d.secondary.href} variant="outline" icon=${null}>${d.secondary.label}<//></div>
+        <//>
+      </div>
+      <div className="lg:col-span-7 grid grid-cols-3 gap-4 h-[520px] sm:h-[600px]">
+        ${[0, 1, 2].map((c) => html`
+          <${motion.div} key=${c} style=${{ y: c === 1 ? y2 : y1 }} className=${`flex flex-col gap-4 ${c === 1 ? 'pt-16' : ''}`}>
+            ${d.portraits.filter((_, i) => i % 3 === c).map((p) => html`
+              <div key=${p} className="group relative flex-1 rounded-[24px] overflow-hidden bg-ivory">
+                <img src=${p} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" />
+              </div>`)}
+          <//>`)}
+      </div>
+    </div>
+  </section>`;
+};
+
+const Offices = ({ d }) => {
+  const [a, setA] = useState(0);
+  const [sent, setSent] = useState(false);
+  const field = 'w-full h-12 rounded-xl bg-white/10 px-4 text-[15px] text-white placeholder:text-white/40 ring-1 ring-white/15 focus:outline-none focus:ring-coral transition';
+  return html`
+  <section id=${d.id} className="py-24 lg:py-32 scroll-mt-20">
+    <div className="max-w-site mx-auto px-5 lg:px-10">
+      <${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+      <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7">
+          <div className="relative h-[340px] sm:h-[420px] rounded-[28px] overflow-hidden bg-navy">
+            <${AnimatePresence} mode="popLayout" initial=${false}>
+              <${motion.img} key=${a} src=${d.offices[a].image} alt=${`${d.offices[a].city} office`} initial=${{ opacity: 0, scale: 1.08 }} animate=${{ opacity: 1, scale: 1 }} exit=${{ opacity: 0 }} transition=${{ duration: 0.7, ease }} className="absolute inset-0 w-full h-full object-cover" />
+            <//>
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 to-transparent"></div>
+            <div className="absolute left-7 bottom-6 text-white">
+              <div className="flex items-center gap-2 text-[12px] tracking-[0.2em] uppercase text-coral"><${Icon} name="pin" className="w-4 h-4" />Office</div>
+              <${AnimatePresence} mode="wait"><${motion.div} key=${a} initial=${{ opacity: 0, y: 12 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0 }} className="font-serif text-[52px] leading-none mt-1">${d.offices[a].city}<//><//>
+            </div>
+          </div>
+          <div role="tablist" aria-label="Offices" className="mt-4 grid grid-cols-5 gap-2">
+            ${d.offices.map((o, i) => html`
+              <button key=${o.city} role="tab" aria-selected=${a === i} onClick=${() => setA(i)} className=${`relative h-14 rounded-2xl text-[13px] sm:text-[14px] transition-colors ${a === i ? 'text-white' : 'bg-white ring-1 ring-line hover:ring-navy/30'}`}>
+                ${a === i && html`<${motion.span} layoutId="office" className="absolute inset-0 rounded-2xl bg-navy" transition=${{ type: 'spring', stiffness: 420, damping: 34 }} />`}<span className="relative">${o.city}</span>
+              </button>`)}
+          </div>
+        </div>
+        <${Reveal} className="lg:col-span-5" delay=${0.1}>
+          <div className="h-full rounded-[28px] bg-navy text-white p-7 sm:p-9">
+            <h3 className="font-serif text-[36px] leading-none">${d.form.title}</h3>
+            <p className="mt-3 text-[14.5px] text-white/65">${d.form.body}</p>
+            <${AnimatePresence} mode="wait">
+              ${sent ? html`<${motion.div} key="ok" initial=${{ opacity: 0, scale: 0.96 }} animate=${{ opacity: 1, scale: 1 }} className="mt-10 flex items-center gap-4"><span className="grid place-items-center w-12 h-12 rounded-full bg-coral"><${Icon} name="check" sw=${2.4} /></span><span className="text-[15px]">Thank you — our team will contact you shortly.</span><//>`
+              : html`<${motion.form} key="f" exit=${{ opacity: 0 }} onSubmit=${(e) => { e.preventDefault(); setSent(true); }} className="mt-7 grid gap-3">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div><label htmlFor="c-name" className="block text-[12.5px] text-white/60 mb-1.5">Full name</label><input id="c-name" required autoComplete="name" className=${field} /></div>
+                    <div><label htmlFor="c-org" className="block text-[12.5px] text-white/60 mb-1.5">Organisation</label><input id="c-org" autoComplete="organization" className=${field} /></div>
+                  </div>
+                  <div><label htmlFor="c-email" className="block text-[12.5px] text-white/60 mb-1.5">Work email</label><input id="c-email" type="email" required autoComplete="email" className=${field} /></div>
+                  <div><label htmlFor="c-msg" className="block text-[12.5px] text-white/60 mb-1.5">How can we help?</label><textarea id="c-msg" rows="3" className=${`${field} h-auto py-3 resize-none`}></textarea></div>
+                  <${Button} type="submit" variant="white" className="mt-2 w-full sm:w-auto sm:justify-self-start">Send enquiry<//>
+                <//>`}
+            <//>
+          </div>
+        <//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Footer = ({ g }) => html`
+  <footer className="bg-navy-950 text-white/65">
+    <div className="max-w-site mx-auto px-5 lg:px-10 pt-20 pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-14 border-b border-white/10">
+        <div className="lg:col-span-5">
+          <img src=${g.logo.urlLight} alt=${g.logo.alt} className="h-9 w-auto" loading="lazy" />
+          <p className="mt-6 font-serif text-[30px] leading-tight text-white max-w-sm">Local insight. <span className="italic text-coral">Global standards.</span></p>
+          <p className="mt-4 text-[14px]">New Delhi · Bengaluru · Mumbai · Hyderabad · Chennai</p>
+        </div>
+        <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+          ${g.footer.columns.map((c) => html`
+            <div key=${c.title}>
+              <div className="text-white font-medium text-[14px] mb-5">${c.title}</div>
+              <ul className="space-y-3 text-[14.5px]">${c.links.map((l) => html`<li key=${l}><a href="#" className="hover:text-white transition-colors">${l}</a></li>`)}</ul>
+            </div>`)}
+        </div>
+      </div>
+      <div className="pt-8 flex flex-col md:flex-row gap-4 justify-between text-[13px] text-white/40">
+        <p>© 2026 King Stubb & Kasiva <span className="mx-2 text-white/20">|</span>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" className="text-white/75 font-medium hover:text-white underline-offset-4 hover:underline">VOCSO</a></p>
+        <div className="flex flex-wrap gap-5">${g.footer.legal.map((l) => html`<a key=${l} href="#" className="hover:text-white transition-colors">${l}</a>`)}</div>
+      </div>
+    </div>
+  </footer>`;
+
+/* =========================== Section renderer =========================== */
+const REGISTRY = {
+  'sections.hero': Hero,
+  'sections.about': About,
+  'sections.expertise': Expertise,
+  'sections.industries': Industries,
+  'sections.desks': Desks,
+  'sections.insights': Insights,
+  'sections.people': People,
+  'sections.offices': Offices,
+};
+
+const areas = CMS.page.sections.find((s) => s.__component === 'sections.expertise').areas;
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-navy focus:text-white focus:px-4 focus:py-2 focus:rounded-full">Skip to content</a>
+    <${Disclaimer} d=${CMS.global.disclaimer} />
+    <${Header} g=${CMS.global} areas=${areas} />
+    <main id="main">${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} />` : null; })}</main>
+    <${Footer} g=${CMS.global} />
+  <//>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+document.getElementById('boot').remove();
+</script>
+</body>
+</html>
