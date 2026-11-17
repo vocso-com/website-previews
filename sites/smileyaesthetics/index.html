@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smiley Aesthetics — Medical Spa in Nashville, TN | Injectables, Weight Loss & Wellness</title>
+<meta name="description" content="Injectables, weight loss solutions, holistic health and medical tourism at Smiley Aesthetics locations across Tennessee, Kentucky and Georgia. Same-day appointments." />
+<link rel="icon" href="assets/logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          teal: { DEFAULT: '#3CAFBF', 600: '#2B9AA8', 700: '#1D8A9C', 800: '#146B79', 300: '#70D5E3', 100: '#D3F1F5', 50: '#EEF8FA' },
+          cyan: '#00B7CD',
+          slate: { DEFAULT: '#2D374B', 900: '#1C2433', 950: '#121823', 700: '#3B4760' },
+          line: '#DDE7EA',
+        },
+        fontFamily: {
+          serif: ['Fraunces', 'Georgia', 'serif'],
+          sans: ['"Plus Jakarta Sans"', 'Helvetica', 'system-ui', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: "Plus Jakarta Sans", Helvetica, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid #1D8A9C; outline-offset: 3px; border-radius: 8px; }
+  .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  .arch { border-radius: 999px 999px 32px 32px; }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#EEF8FA; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-white text-slate">
+<div id="boot"><img src="assets/logo.svg" alt="" width="200" /></div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (promo bar, header, footer) + Collection
+   "page" with a Dynamic Zone `sections`. Treatments and locations are their
+   own Collection Types, referenced here.
+   ========================================================================== */
+const img = (id, w = 1200) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+const PHONE = '(629) 276-8914';
+
+const CMS = {
+  global: {
+    logo: { url: 'assets/logo.svg', urlLight: 'assets/logo-white.svg', alt: 'Smiley Aesthetics' },
+    promo: { text: 'Curious what treatments would look like on you?', link: 'Try it free and get $50 off', href: '#tryon' },
+    nav: [
+      { label: 'Services', href: '#services', mega: true },
+      { label: 'Locations', href: '#locations' },
+      { label: 'Wellness', href: '#wellness' },
+      { label: 'About', href: '#about' },
+      { label: 'Become an Injector', href: '#injector' },
+    ],
+    cta: { label: 'Book Now', href: '#book' },
+    footer: {
+      hours: [['Monday – Friday', '9:00am – 5:00pm', 'Later appointments available'], ['Saturday – Sunday', 'By appointment', '']],
+      address: ['339 White Bridge Pike', 'Nashville, TN 37209'],
+      email: 'admin@smileyaesthetics.com',
+      columns: [
+        { title: 'Explore', links: ['About Us', 'Meet Our Team', 'Media', 'Blog', 'Success Stories'] },
+        { title: 'Providers', links: ['Become an Injector', 'Training Events', 'Independent Providers', 'Supply List', 'Cherry Payment Portal'] },
+      ],
+      legal: ['Cancellation and Refund Policy', 'Privacy Policy', 'Privacy Practices', 'Terms of Service'],
+    },
+  },
+
+  page: {
+    sections: [
+      {
+        __component: 'sections.hero',
+        kicker: 'Medical spa · Tennessee · Kentucky · Georgia',
+        title: ['Own your beauty', 'from the inside out.'],
+        subtitle: 'Injectables, weight loss solutions, holistic health and medical tourism — by licensed medical providers at Smiley Aesthetics locations across Tennessee, Kentucky and Georgia.',
+        primaryCta: { label: 'Book now', href: '#book' },
+        secondaryCta: { label: 'Explore services', href: '#services' },
+        images: [img('photo-1616394584738-fc6e612e71b9', 900), img('photo-1570172619644-dfd03ed5d881', 700), img('photo-1515377905703-c4788e51af15', 700)],
+        chips: ['Same-day appointments', 'Licensed medical providers', 'Steady, low pricing'],
+        tryon: { title: 'See your results first', body: 'Try our treatment preview for free and get $50 off.', cta: 'Try it free' },
+      },
+      {
+        __component: 'sections.promise',
+        eyebrow: 'Our promise',
+        title: 'No matter your goals, we’re dedicated to making your experience truly rewarding.',
+        items: [
+          { icon: 'clock', title: 'Same day appointments', body: 'With flexible hours and mobility, we offer same day appointments in most of the locations we serve.' },
+          { icon: 'map', title: 'Extensive network', body: 'Our injectors work across multiple states, so we can provide coverage statewide — including rural areas.' },
+          { icon: 'award', title: 'Expert staff', body: 'Highly trained injectors with ongoing education, so their skills and knowledge stay current.' },
+        ],
+      },
+      {
+        __component: 'sections.services',
+        id: 'services',
+        eyebrow: 'Services & treatments',
+        title: 'Looking for the best medspa? You’ve found it.',
+        body: 'High-end products, services and personalised treatments to help you reach your goals and enhance your natural beauty.',
+        categories: [
+          { name: 'Injectables', image: img('photo-1560750588-73207b1ef5b8', 900), items: [['Neurotoxin', 'Smooth lines and wrinkles'], ['Dermal Fillers', 'Restore volume and contour'], ['Sculptra', 'Rebuild collagen gradually'], ['Derma PRP Filler', 'Your own growth factors'], ['PDGF+', 'Regenerative skin support']] },
+          { name: 'Laser & machines', image: img('photo-1598440947619-2c35fc9aa908', 900), items: [['Scarlet SRF', 'Microneedling radiofrequency'], ['NOUVADerm Laser', 'Knoxville & Nashville only'], ['IPL', 'Tone, spots and redness'], ['Laser Hair Removal', 'Long-lasting smooth skin'], ['Agnes RF', 'Collierville only']] },
+          { name: 'Facials', image: img('photo-1570172619644-dfd03ed5d881', 900), items: [['Aquafirme XS', 'Deep-cleansing hydration'], ['BioRePeel', 'Needle-free bio-revitalisation']] },
+          { name: 'Health & wellness', image: img('photo-1576091160399-112ba8d25d1d', 900), items: [['Weight Loss', 'Medically guided programs'], ['Bioidentical Hormone Replacement', 'Balance from within']] },
+          { name: 'Advanced', image: img('photo-1540555700478-4be289fbecef', 900), items: [['Alpha', 'Advanced aesthetic treatment'], ['Non-Invasive Hair Restoration', 'Fuller hair, no surgery'], ['CoolSculpting Elite', 'Freeze away stubborn fat'], ['SkinMedica', 'Medical-grade skincare']] },
+        ],
+      },
+      {
+        __component: 'sections.wellness',
+        id: 'wellness',
+        eyebrow: 'Wellness from within',
+        title: 'We are committed to your wellness.',
+        body: 'True beauty starts from within. Our wellness products from Isagenix nourish and enhance your body’s natural beauty, from the inside out.',
+        image: img('photo-1620916566398-39f1143ab7be', 1000),
+        products: [
+          { tag: 'Best seller', name: 'Marine-Based Collagen Elixir', body: 'The building blocks for healthy skin, hair, nails and joints.' },
+          { tag: 'Program', name: 'Weight Management Systems', body: 'Support for lasting, healthy results.' },
+          { tag: 'Clean beauty', name: 'Vegan Skin Care Line', body: 'No-compromise quality with amazing results.' },
+        ],
+      },
+      {
+        __component: 'sections.about',
+        id: 'about',
+        eyebrow: 'The Smiley difference',
+        title: 'More than a medical spa.',
+        body: 'We serve clients looking for medical-grade aesthetics — and the nurses and medical professionals entering the aesthetics field. We bring aesthetic services to the masses by keeping our prices steady and low, regardless of the competition’s extreme pricing.',
+        image: img('photo-1487412947147-5cebf100ffc2', 1000),
+        stats: [{ value: '7', label: 'Clinic locations' }, { value: '3', label: 'States served' }, { value: 'Same day', label: 'Appointments available' }, { value: 'Low', label: 'Steady, honest pricing' }],
+      },
+      {
+        __component: 'sections.injector',
+        id: 'injector',
+        eyebrow: 'For medical professionals',
+        title: 'Become an injector.',
+        body: 'We’re removing barriers for medical professionals entering the aesthetic industry — a comprehensive program that empowers you to become a skilled injector and successful medspa owner without years of prior experience.',
+        steps: [
+          { title: 'Hands-on injecting', body: 'Practical, supervised training on real technique.' },
+          { title: 'Safety first', body: 'Patient safety and best practice at every step.' },
+          { title: 'Business strategy', body: 'Build and grow a successful medspa.' },
+          { title: 'Compliance support', body: 'Expertise in complex medical spa laws in the states we operate.' },
+        ],
+        image: img('photo-1579684385127-1ef15d508118', 1000),
+        primary: { label: 'Become an injector', href: '#' },
+        secondary: { label: 'Training events', href: '#' },
+      },
+      {
+        __component: 'sections.locations',
+        id: 'locations',
+        eyebrow: 'Locations',
+        title: 'Find a Smiley near you.',
+        states: ['All', 'Tennessee', 'Kentucky', 'Georgia'],
+        items: [
+          { name: 'Nashville West', state: 'Tennessee', note: 'Headquarters · 339 White Bridge Pike', tag: 'NOUVADerm' },
+          { name: 'Knoxville', state: 'Tennessee', note: 'Injectables, laser & wellness', tag: 'NOUVADerm' },
+          { name: 'Collierville', state: 'Tennessee', note: 'Injectables, laser & wellness', tag: 'Agnes RF' },
+          { name: 'Gallatin', state: 'Tennessee', note: 'Injectables & wellness' },
+          { name: 'Soddy-Daisy', state: 'Tennessee', note: 'Injectables & wellness' },
+          { name: 'Bowling Green', state: 'Kentucky', note: 'Injectables & wellness' },
+          { name: 'Rome', state: 'Georgia', note: 'Injectables & wellness' },
+          { name: 'Training Facility', state: 'Tennessee', note: 'Nashville, TN · injector education', tag: 'Training' },
+          { name: 'Cosmetic Surgery Center', state: 'Tennessee', note: 'Surgical partner services', tag: 'Surgery' },
+        ],
+      },
+      {
+        __component: 'sections.faq',
+        eyebrow: 'Frequently asked questions',
+        title: 'Good to know.',
+        items: [
+          { q: 'What is Smiley Aesthetics?', a: 'A medical spa specialising in injectables, weight loss solutions, holistic health, wellness and medical tourism — with treatments provided by licensed medical providers.' },
+          { q: 'Where is Smiley Aesthetics located?', a: 'We have locations across Tennessee, Kentucky and Georgia, including Nashville West, Knoxville, Collierville, Gallatin, Soddy-Daisy, Bowling Green and Rome.' },
+          { q: 'How much does Botox cost at Smiley Aesthetics?', a: 'We keep our prices steady and low, regardless of the competition. Book a consultation or call us for current neurotoxin pricing at your location.' },
+          { q: 'Do I need an appointment, or do you offer same-day visits?', a: 'Thanks to flexible hours and mobility, we offer same day appointments in most of the locations we serve.' },
+          { q: 'What weight loss services does Smiley Aesthetics offer?', a: 'Medically guided weight loss programs and bioidentical hormone replacement therapy, alongside Isagenix weight management systems.' },
+          { q: 'Who performs the treatments at Smiley Aesthetics?', a: 'Licensed medical providers — highly trained injectors who receive ongoing education.' },
+          { q: 'Does Smiley Aesthetics offer injector training?', a: 'Yes. Our training program covers hands-on injecting, safety and business strategy for nurses and medical professionals.' },
+        ],
+      },
+      {
+        __component: 'sections.book',
+        id: 'book',
+        title: 'Take the first step toward a more beautiful you.',
+        body: 'Looking and feeling your best is an ongoing journey — and we’re here for every step. Schedule a consultation today.',
+        image: img('photo-1531746020798-e6953c6e8e04', 1200),
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M12 5l7 7-7 7',
+  arrowUR: 'M7 17 17 7M8 7h9v9',
+  phone: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z',
+  menu: 'M4 7h16M4 12h16M4 17h10',
+  x: 'M18 6 6 18M6 6l12 12',
+  check: 'M20 6 9 17l-5-5',
+  plus: 'M12 5v14M5 12h14',
+  chevron: 'M6 9l6 6 6-6',
+  clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2',
+  map: 'M9 4 3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14',
+  award: 'M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM8.2 13.9 7 23l5-3 5 3-1.2-9.1',
+  pin: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  mail: 'M4 4h16v16H4zM4 6l8 7 8-7',
+  sparkle: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+  leaf: 'M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 16-10 16zM4 21c3-5 6-8 10-10',
+  camera: 'M3 7h4l2-3h6l2 3h4v13H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+};
+const Icon = ({ name, className = 'w-5 h-5', sw = 1.8 }) => html`
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth=${sw} strokeLinecap="round" strokeLinejoin="round" className=${className} aria-hidden="true"><path d=${ICONS[name]} /></svg>`;
+const Smile = ({ className = '' }) => html`<svg viewBox="0 0 120 30" className=${className} fill="none" aria-hidden="true"><path d="M4 6c18 22 94 22 112 0" stroke="currentColor" strokeWidth="5" strokeLinecap="round" /></svg>`;
+
+const ease = [0.22, 1, 0.36, 1];
+const fadeUp = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.75, ease } } };
+const stagger = (s = 0.08, d = 0) => ({ hidden: {}, show: { transition: { staggerChildren: s, delayChildren: d } } });
+const inView = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-70px' } };
+const Reveal = ({ children, className = '', delay = 0 }) => html`
+  <${motion.div} className=${className} ...${inView} variants=${{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.75, ease, delay } } }}>${children}<//>`;
+const Eyebrow = ({ children, light }) => html`<div className=${`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12.5px] font-bold tracking-wide ${light ? 'bg-white/10 text-teal-300' : 'bg-teal-50 text-teal-700'}`}><${Icon} name="sparkle" className="w-3.5 h-3.5" sw=${2} />${children}</div>`;
+const H2 = ({ children, className = '' }) => html`<h2 className=${`font-serif tracking-[-0.02em] text-[38px] sm:text-[50px] lg:text-[62px] leading-[1.03] ${className}`}>${children}</h2>`;
+const tel = (p) => `tel:${p.replace(/\D/g, '')}`;
+
+const Button = ({ href, children, variant = 'teal', className = '', icon = 'arrow', type, onClick }) => {
+  const styles = {
+    teal: 'bg-teal text-white hover:bg-teal-700 shadow-[0_14px_30px_-12px_rgba(60,175,191,.7)]',
+    slate: 'bg-slate text-white hover:bg-slate-700',
+    white: 'bg-white text-slate hover:bg-teal-50',
+    outline: 'ring-1 ring-slate/20 text-slate hover:ring-teal hover:text-teal-700 bg-white',
+    ghost: 'ring-1 ring-white/30 text-white hover:bg-white hover:text-slate',
+  };
+  const Tag = href ? motion.a : motion.button;
+  return html`<${Tag} href=${href} type=${type} onClick=${onClick} whileHover=${{ y: -2 }} whileTap=${{ scale: 0.97 }}
+    className=${`group inline-flex items-center justify-center gap-2.5 rounded-full px-7 h-[52px] text-[15px] font-bold whitespace-nowrap transition-colors duration-300 ${styles[variant]} ${className}`}>
+    ${children}${icon && html`<${Icon} name=${icon} className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" sw=${2.2} />`}
+  <//>`;
+};
+
+/* ============================== Header ============================== */
+const Promo = ({ d }) => html`
+  <div id="tryon" className="bg-slate text-white text-[13px]">
+    <div className="w-[92%] mx-auto h-10 flex items-center justify-center gap-2 text-center">
+      <${Icon} name="camera" className="w-4 h-4 text-teal-300 hidden sm:block" /><span className="hidden sm:inline text-white/80">${d.text}</span>
+      <a href=${d.href} className="font-bold text-teal-300 hover:text-white underline-offset-4 hover:underline">${d.link} ›</a>
+    </div>
+  </div>`;
+
+const Header = ({ g, cats }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [mega, setMega] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [hc, setHc] = useState(0);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 40));
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+  return html`
+  <header className="sticky top-0 z-50" onMouseLeave=${() => setMega(false)}>
+    <div className=${`transition-all duration-300 ${scrolled || mega ? 'bg-white/90 backdrop-blur-xl shadow-[0_10px_30px_-22px_rgba(45,55,75,.5)]' : 'bg-white'}`}>
+      <div className=${`w-[92%] mx-auto flex items-center justify-between gap-6 transition-all duration-300 ${scrolled ? 'h-[70px]' : 'h-[86px]'}`}>
+        <a href="#" aria-label="Smiley Aesthetics home" className="shrink-0"><img src=${g.logo.url} alt=${g.logo.alt} className=${`w-auto transition-all duration-300 ${scrolled ? 'h-11' : 'h-14'}`} /></a>
+        <nav className="hidden xl:flex items-center gap-1 rounded-full bg-teal-50 p-1.5" aria-label="Primary">
+          ${g.nav.map((n) => html`
+            <a key=${n.label} href=${n.href} onMouseEnter=${() => setMega(!!n.mega)} aria-haspopup=${n.mega ? 'true' : undefined} aria-expanded=${n.mega ? mega : undefined}
+              className="flex items-center gap-1 h-10 px-4 rounded-full text-[14.5px] font-semibold text-slate/75 hover:text-slate hover:bg-white transition-colors whitespace-nowrap">
+              ${n.label}${n.mega && html`<${Icon} name="chevron" className=${`w-3.5 h-3.5 transition-transform ${mega ? 'rotate-180' : ''}`} sw=${2.4} />`}
+            </a>`)}
+        </nav>
+        <div className="flex items-center gap-2.5">
+          <a href=${tel('6292768914')} className="hidden lg:flex items-center gap-2 h-11 px-4 rounded-full text-[14.5px] font-bold hover:bg-teal-50 transition-colors whitespace-nowrap"><${Icon} name="phone" className="w-4 h-4 text-teal-700" />${PHONE}</a>
+          <${Button} href=${g.cta.href} className="hidden sm:inline-flex h-11 px-6 text-[14px]" icon=${null}>${g.cta.label}<//>
+          <button onClick=${() => setOpen(true)} className="xl:hidden grid place-items-center w-11 h-11 rounded-full bg-teal-50 text-slate" aria-label="Open menu"><${Icon} name="menu" /></button>
+        </div>
+      </div>
+      <${AnimatePresence}>
+        ${mega && html`
+          <${motion.div} key="mega" initial=${{ opacity: 0, y: -8 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, transition: { duration: 0.15 } }} transition=${{ duration: 0.3, ease }}
+            className="hidden xl:block absolute inset-x-0 top-full bg-white border-t border-line shadow-[0_40px_60px_-40px_rgba(45,55,75,.45)]">
+            <div className="w-[92%] mx-auto py-9 grid grid-cols-[240px_1fr_300px] gap-10">
+              <ul className="space-y-1">${cats.map((c, i) => html`<li key=${c.name}><button onMouseEnter=${() => setHc(i)} className=${`w-full flex items-center justify-between rounded-2xl px-4 py-3 text-left text-[15px] font-bold transition-colors ${hc === i ? 'bg-teal-50 text-teal-700' : 'text-slate/70 hover:text-slate'}`}>${c.name}<${Icon} name="arrow" className=${`w-4 h-4 transition-opacity ${hc === i ? 'opacity-100' : 'opacity-0'}`} /></button></li>`)}</ul>
+              <${AnimatePresence} mode="wait">
+                <${motion.ul} key=${hc} initial=${{ opacity: 0, x: 10 }} animate=${{ opacity: 1, x: 0 }} exit=${{ opacity: 0 }} transition=${{ duration: 0.25 }} className="grid grid-cols-2 gap-2 content-start">
+                  ${cats[hc].items.map(([n, s]) => html`<li key=${n}><a href="#services" className="block rounded-2xl px-4 py-3 hover:bg-teal-50 transition-colors"><span className="block text-[15px] font-bold">${n}</span><span className="block text-[13px] text-slate/55">${s}</span></a></li>`)}
+                <//>
+              <//>
+              <div className="relative rounded-3xl overflow-hidden h-[230px]"><img src=${cats[hc].image} alt="" className="absolute inset-0 w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent"></div><div className="absolute left-5 bottom-5 text-white"><div className="font-serif text-[26px]">${cats[hc].name}</div><a href="#book" className="text-[13px] font-bold text-teal-300">Book a consult ›</a></div></div>
+            </div>
+          <//>`}
+      <//>
+    </div>
+    <${AnimatePresence}>
+      ${open && html`
+        <${motion.div} key="drawer" className="fixed inset-0 z-[60] bg-white flex flex-col" initial=${{ opacity: 0, y: -16 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -16 }} transition=${{ duration: 0.3, ease }}>
+          <div className="flex items-center justify-between px-5 h-[86px] border-b border-line"><img src=${g.logo.url} alt=${g.logo.alt} className="h-12" /><button onClick=${() => setOpen(false)} className="grid place-items-center w-11 h-11 rounded-full bg-teal-50" aria-label="Close menu"><${Icon} name="x" /></button></div>
+          <${motion.nav} className="px-6 pt-4 flex-1 overflow-y-auto" variants=${stagger(0.05, 0.1)} initial="hidden" animate="show">
+            ${g.nav.map((n) => html`<${motion.a} key=${n.label} variants=${fadeUp} href=${n.href} onClick=${() => setOpen(false)} className="flex items-center justify-between py-4 border-b border-line font-serif text-[32px]">${n.label}<${Icon} name="arrowUR" className="w-6 h-6 text-teal" /><//>`)}
+          <//>
+          <div className="p-6 grid gap-3"><${Button} href="#book" className="w-full" onClick=${() => setOpen(false)}>Book Now<//><${Button} href=${tel('6292768914')} variant="outline" icon="phone" className="w-full">${PHONE}<//></div>
+        <//>`}
+    <//>
+  </header>`;
+};
+
+/* ============================== Sections ============================== */
+const Hero = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -70]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  return html`
+  <section ref=${ref} className="relative bg-gradient-to-b from-white via-teal-50 to-white overflow-hidden">
+    <div className="absolute -top-40 -right-40 w-[640px] h-[640px] rounded-full bg-teal-100 blur-[110px] pointer-events-none"></div>
+    <div className="relative w-[92%] mx-auto pt-12 lg:pt-16 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <${motion.div} className="lg:col-span-6" variants=${stagger(0.1, 0.1)} initial="hidden" animate="show">
+        <${motion.div} variants=${fadeUp}><${Eyebrow}>${d.kicker}<//><//>
+        <h1 className="mt-6 font-serif text-[50px] sm:text-[68px] xl:text-[84px] leading-[0.98] tracking-[-0.03em]">
+          ${d.title.map((t, i) => html`<span key=${i} className="block overflow-hidden pb-1"><${motion.span} className=${`block ${i === 1 ? 'italic text-teal-700' : ''}`} initial=${{ y: '105%' }} animate=${{ y: 0 }} transition=${{ duration: 1, ease, delay: 0.15 + i * 0.12 }}>${t}<//></span>`)}
+        </h1>
+        <${motion.div} variants=${fadeUp} className="text-teal w-40 -mt-1"><${Smile} className="w-full" /><//>
+        <${motion.p} variants=${fadeUp} className="mt-5 text-[17.5px] leading-relaxed text-slate/70 max-w-[540px]">${d.subtitle}<//>
+        <${motion.div} variants=${fadeUp} className="mt-8 flex flex-wrap gap-3"><${Button} href=${d.primaryCta.href}>${d.primaryCta.label}<//><${Button} href=${d.secondaryCta.href} variant="outline" icon=${null}>${d.secondaryCta.label}<//><//>
+        <${motion.ul} variants=${fadeUp} className="mt-9 flex flex-wrap gap-2">
+          ${d.chips.map((c) => html`<li key=${c} className="inline-flex items-center gap-2 rounded-full bg-white ring-1 ring-line px-4 py-2 text-[13.5px] font-semibold"><span className="grid place-items-center w-5 h-5 rounded-full bg-teal text-white"><${Icon} name="check" className="w-3 h-3" sw=${3} /></span>${c}</li>`)}
+        <//>
+      <//>
+      <div className="lg:col-span-6 relative h-[520px] sm:h-[600px]">
+        <${motion.div} style=${{ y: y1 }} initial=${{ opacity: 0, y: 40 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 1, ease, delay: 0.2 }} className="absolute left-[8%] top-0 w-[54%] h-[86%] arch overflow-hidden shadow-[0_50px_90px_-50px_rgba(29,138,156,.8)]">
+          <img src=${d.images[0]} alt="Smiling woman with radiant skin" className="w-full h-full object-cover" />
+        <//>
+        <${motion.div} style=${{ y: y2 }} initial=${{ opacity: 0, y: 60 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 1, ease, delay: 0.4 }} className="absolute right-0 top-[18%] w-[40%] h-[56%] arch overflow-hidden ring-[6px] ring-white shadow-xl">
+          <img src=${d.images[1]} alt="Facial treatment at Smiley Aesthetics" className="w-full h-full object-cover" />
+        <//>
+        <${motion.div} initial=${{ opacity: 0, scale: 0.85 }} animate=${{ opacity: 1, scale: 1 }} transition=${{ type: 'spring', stiffness: 180, damping: 16, delay: 0.9 }}
+          className="absolute left-0 bottom-4 sm:bottom-8 w-[290px] rounded-[26px] bg-white p-5 shadow-[0_30px_60px_-30px_rgba(45,55,75,.5)] ring-1 ring-line">
+          <div className="flex items-center gap-3"><img src=${d.images[2]} alt="" className="w-14 h-14 rounded-2xl object-cover" /><div><div className="text-[15px] font-extrabold">${d.tryon.title}</div><div className="text-[13px] text-slate/60 leading-snug">${d.tryon.body}</div></div></div>
+          <a href="#tryon" className="mt-4 flex items-center justify-between rounded-full bg-teal-50 pl-4 pr-1.5 h-11 text-[14px] font-bold text-teal-700 hover:bg-teal-100 transition-colors">${d.tryon.cta}<span className="grid place-items-center w-8 h-8 rounded-full bg-teal text-white"><${Icon} name="camera" className="w-4 h-4" /></span></a>
+        <//>
+        <${motion.div} initial=${{ opacity: 0, x: 20 }} animate=${{ opacity: 1, x: 0 }} transition=${{ duration: 0.8, ease, delay: 1.1 }}
+          className="absolute right-2 bottom-[6%] rounded-2xl bg-slate text-white px-5 py-4 shadow-xl">
+          <div className="text-[12px] font-bold tracking-wide text-teal-300">SAME DAY</div><div className="text-[15px] font-bold">Appointments available</div>
+        <//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Promise_ = ({ d }) => html`
+  <section className="bg-white py-20 lg:py-24">
+    <div className="w-[92%] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <${Reveal} className="lg:col-span-4"><${Eyebrow}>${d.eyebrow}<//><//>
+        <${Reveal} className="lg:col-span-8" delay=${0.05}><h2 className="font-serif text-[30px] sm:text-[38px] lg:text-[44px] leading-[1.12] tracking-[-0.015em]">${d.title}</h2><//>
+      </div>
+      <${motion.div} className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5" variants=${stagger(0.1)} ...${inView}>
+        ${d.items.map((it, i) => html`
+          <${motion.div} key=${it.title} variants=${fadeUp} whileHover=${{ y: -6 }} className=${`group rounded-[28px] p-8 ${i === 1 ? 'bg-teal text-white' : 'bg-teal-50'}`}>
+            <span className=${`grid place-items-center w-14 h-14 rounded-2xl ${i === 1 ? 'bg-white/20 text-white' : 'bg-white text-teal-700'} group-hover:rotate-[-8deg] transition-transform duration-500`}><${Icon} name=${it.icon} className="w-6 h-6" /></span>
+            <h3 className="mt-8 text-[21px] font-extrabold">${it.title}</h3>
+            <p className=${`mt-2 text-[15.5px] leading-relaxed ${i === 1 ? 'text-white/85' : 'text-slate/65'}`}>${it.body}</p>
+          <//>`)}
+      <//>
+    </div>
+  </section>`;
+
+const Services = ({ d }) => {
+  const [c, setC] = useState(0);
+  const cat = d.categories[c];
+  return html`
+  <section id=${d.id} className="bg-teal-50 py-24 lg:py-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <${Reveal} className="lg:col-span-7"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+        <${Reveal} className="lg:col-span-5" delay=${0.1}><p className="text-[16.5px] leading-relaxed text-slate/65">${d.body}</p><//>
+      </div>
+      <div role="tablist" aria-label="Treatment categories" className="mt-10 flex gap-2 overflow-x-auto no-scrollbar p-1.5 rounded-full bg-white w-fit max-w-full">
+        ${d.categories.map((x, i) => html`
+          <button key=${x.name} role="tab" aria-selected=${c === i} onClick=${() => setC(i)} className=${`relative h-11 px-5 rounded-full text-[14.5px] font-bold whitespace-nowrap transition-colors ${c === i ? 'text-white' : 'text-slate/60 hover:text-slate'}`}>
+            ${c === i && html`<${motion.span} layoutId="cat" className="absolute inset-0 rounded-full bg-slate" transition=${{ type: 'spring', stiffness: 420, damping: 34 }} />`}<span className="relative">${x.name}</span>
+          </button>`)}
+      </div>
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="lg:col-span-5 relative h-[320px] lg:h-auto lg:min-h-[460px] rounded-[32px] overflow-hidden bg-slate">
+          <${AnimatePresence} mode="popLayout" initial=${false}><${motion.img} key=${cat.image} src=${cat.image} alt=${cat.name} initial=${{ opacity: 0, scale: 1.08 }} animate=${{ opacity: 1, scale: 1 }} exit=${{ opacity: 0 }} transition=${{ duration: 0.7, ease }} className="absolute inset-0 w-full h-full object-cover" /><//>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+          <${AnimatePresence} mode="wait"><${motion.div} key=${c} initial=${{ opacity: 0, y: 12 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0 }} className="absolute left-7 bottom-7 text-white"><div className="font-serif text-[40px] leading-none">${cat.name}</div><div className="mt-2 text-[14px] text-white/75">${cat.items.length} treatments</div><//><//>
+        </div>
+        <${AnimatePresence} mode="wait">
+          <${motion.ul} key=${c} className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start" initial="hidden" animate="show" exit=${{ opacity: 0 }} variants=${stagger(0.06)}>
+            ${cat.items.map(([n, s], i) => html`
+              <${motion.li} key=${n} variants=${fadeUp}>
+                <a href="#book" className="group h-full flex flex-col rounded-[24px] bg-white p-6 ring-1 ring-transparent hover:ring-teal/40 hover:shadow-[0_30px_50px_-34px_rgba(29,138,156,.7)] transition-all">
+                  <div className="flex items-center justify-between"><span className="text-[13px] font-bold text-teal-700">0${i + 1}</span><span className="grid place-items-center w-9 h-9 rounded-full bg-teal-50 text-teal-700 group-hover:bg-teal group-hover:text-white transition-colors"><${Icon} name="arrowUR" className="w-4 h-4" /></span></div>
+                  <h3 className="mt-6 text-[20px] font-extrabold leading-tight">${n}</h3>
+                  <p className="mt-1.5 text-[14.5px] text-slate/60">${s}</p>
+                </a>
+              <//>`)}
+          <//>
+        <//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Wellness = ({ d }) => html`
+  <section id=${d.id} className="bg-white py-24 lg:py-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <${Reveal} className="lg:col-span-5 relative">
+        <div className="relative aspect-[4/5] arch overflow-hidden bg-teal-50"><img src=${d.image} alt="Wellness serum and skincare products" loading="lazy" className="w-full h-full object-cover" /></div>
+        <${motion.div} animate=${{ rotate: 360 }} transition=${{ duration: 24, repeat: Infinity, ease: 'linear' }} className="absolute right-2 sm:-right-4 top-6 sm:top-10 w-24 h-24 sm:w-28 sm:h-28">
+          <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true"><defs><path id="c" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" /></defs><circle cx="50" cy="50" r="50" fill="#3CAFBF" /><text fontSize="10" letterSpacing="2.4" fill="#fff" fontFamily="Plus Jakarta Sans" fontWeight="700"><textPath href="#c">BEAUTY FROM WITHIN · ISAGENIX · </textPath></text></svg>
+        <//>
+      <//>
+      <div className="lg:col-span-7">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><p className="mt-6 text-[16.5px] leading-relaxed text-slate/65 max-w-xl">${d.body}</p><//>
+        <${motion.ul} className="mt-10 grid gap-4" variants=${stagger(0.1)} ...${inView}>
+          ${d.products.map((p, i) => html`
+            <${motion.li} key=${p.name} variants=${fadeUp} whileHover=${{ x: 6 }} className="flex items-center gap-5 rounded-[24px] ring-1 ring-line p-5 hover:ring-teal/40 transition-colors">
+              <span className=${`grid place-items-center w-14 h-14 rounded-2xl shrink-0 ${i === 0 ? 'bg-teal text-white' : 'bg-teal-50 text-teal-700'}`}><${Icon} name="leaf" className="w-6 h-6" /></span>
+              <div className="flex-1"><div className="flex items-center gap-2 flex-wrap"><span className="text-[18px] font-extrabold">${p.name}</span><span className=${`rounded-full px-2.5 py-0.5 text-[11.5px] font-bold ${i === 0 ? 'bg-slate text-white' : 'bg-teal-50 text-teal-700'}`}>${p.tag}</span></div><p className="mt-1 text-[14.5px] text-slate/60">${p.body}</p></div>
+              <${Icon} name="arrow" className="w-5 h-5 text-teal-700 hidden sm:block" />
+            <//>`)}
+        <//>
+      </div>
+    </div>
+  </section>`;
+
+const About = ({ d }) => html`
+  <section id=${d.id} className="bg-white pb-24 lg:pb-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto">
+      <${Reveal}>
+        <div className="relative overflow-hidden rounded-[40px] bg-gradient-to-br from-teal-700 via-teal-600 to-teal text-white">
+          <div className="absolute inset-0 opacity-[0.08] pointer-events-none" style=${{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '26px 26px' }}></div>
+          <div className="relative grid grid-cols-1 lg:grid-cols-12">
+            <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16">
+              <${Eyebrow} light>${d.eyebrow}<//>
+              <h2 className="mt-5 font-serif text-[42px] sm:text-[58px] leading-[1] tracking-[-0.02em]">${d.title}</h2>
+              <p className="mt-6 text-[17px] leading-relaxed text-white/85 max-w-xl">${d.body}</p>
+              <dl className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-6">${d.stats.map((s) => html`<div key=${s.label}><dd className="font-serif text-[36px] leading-none">${s.value}</dd><dt className="mt-2 text-[13px] text-white/75">${s.label}</dt></div>`)}</dl>
+              <div className="mt-10"><${Button} href="#" variant="white">About Smiley Aesthetics<//></div>
+            </div>
+            <div className="lg:col-span-5 relative min-h-[340px]"><img src=${d.image} alt="Smiley Aesthetics client" loading="lazy" className="absolute inset-0 w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-r from-teal-600 via-transparent to-transparent lg:block hidden"></div></div>
+          </div>
+        </div>
+      <//>
+    </div>
+  </section>`;
+
+const Injector = ({ d }) => html`
+  <section id=${d.id} className="relative bg-slate text-white py-24 lg:py-32 overflow-hidden scroll-mt-20">
+    <div className="absolute -left-40 top-0 w-[560px] h-[560px] rounded-full bg-teal/25 blur-[140px] pointer-events-none"></div>
+    <div className="relative w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div className="lg:col-span-6">
+        <${Reveal}><${Eyebrow} light>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><p className="mt-6 text-[16.5px] leading-relaxed text-white/70 max-w-xl">${d.body}</p><//>
+        <${motion.ol} className="mt-10 grid sm:grid-cols-2 gap-4" variants=${stagger(0.08)} ...${inView}>
+          ${d.steps.map((s, i) => html`
+            <${motion.li} key=${s.title} variants=${fadeUp} className="rounded-[22px] bg-white/[0.06] ring-1 ring-white/10 p-5 hover:bg-white/[0.1] transition-colors">
+              <span className="grid place-items-center w-9 h-9 rounded-full bg-teal text-white text-[14px] font-extrabold">${i + 1}</span>
+              <div className="mt-4 text-[17px] font-extrabold">${s.title}</div><p className="mt-1 text-[14px] text-white/65">${s.body}</p>
+            <//>`)}
+        <//>
+        <${Reveal} className="mt-10 flex flex-wrap gap-3"><${Button} href=${d.primary.href}>${d.primary.label}<//><${Button} href=${d.secondary.href} variant="ghost" icon=${null}>${d.secondary.label}<//><//>
+      </div>
+      <${Reveal} className="lg:col-span-6" delay=${0.15}>
+        <div className="relative aspect-[5/6] rounded-[36px] overflow-hidden"><img src=${d.image} alt="Medical professional in training" loading="lazy" className="absolute inset-0 w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent"></div>
+          <div className="absolute left-6 right-6 bottom-6 rounded-2xl bg-white/10 backdrop-blur-xl ring-1 ring-white/20 p-5 flex items-center gap-4"><span className="grid place-items-center w-12 h-12 rounded-full bg-teal"><${Icon} name="award" /></span><div><div className="text-[15px] font-extrabold">No years of prior experience needed</div><div className="text-[13px] text-white/70">Become a skilled injector and medspa owner</div></div></div>
+        </div>
+      <//>
+    </div>
+  </section>`;
+
+const Locations = ({ d }) => {
+  const [s, setS] = useState('All');
+  const list = s === 'All' ? d.items : d.items.filter((x) => x.state === s);
+  return html`
+  <section id=${d.id} className="bg-white py-24 lg:py-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+        <div role="tablist" aria-label="Filter by state" className="flex gap-1 p-1.5 rounded-full bg-teal-50">
+          ${d.states.map((x) => html`<button key=${x} role="tab" aria-selected=${s === x} onClick=${() => setS(x)} className=${`relative h-10 px-4 rounded-full text-[14px] font-bold ${s === x ? 'text-white' : 'text-slate/60 hover:text-slate'}`}>${s === x && html`<${motion.span} layoutId="st" className="absolute inset-0 rounded-full bg-teal" transition=${{ type: 'spring', stiffness: 420, damping: 34 }} />`}<span className="relative">${x}</span></button>`)}
+        </div>
+      </div>
+      <${motion.ul} layout className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <${AnimatePresence} mode="popLayout">
+          ${list.map((l) => html`
+            <${motion.li} layout key=${l.name} initial=${{ opacity: 0, scale: 0.95 }} animate=${{ opacity: 1, scale: 1 }} exit=${{ opacity: 0, scale: 0.95 }} transition=${{ duration: 0.35, ease }}>
+              <a href="#book" className="group h-full flex items-start gap-4 rounded-[24px] ring-1 ring-line p-6 hover:ring-teal/50 hover:bg-teal-50/60 transition-all">
+                <span className="grid place-items-center w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 group-hover:bg-teal group-hover:text-white transition-colors shrink-0"><${Icon} name="pin" /></span>
+                <div className="flex-1 min-w-0"><div className="flex items-center gap-2 flex-wrap"><span className="text-[19px] font-extrabold">${l.name}</span>${l.tag && html`<span className="rounded-full bg-slate text-white px-2.5 py-0.5 text-[11px] font-bold">${l.tag}</span>`}</div>
+                  <div className="mt-1 text-[13px] font-bold text-teal-700">${l.state}</div><p className="mt-1 text-[14px] text-slate/60">${l.note}</p></div>
+                <${Icon} name="arrowUR" className="w-5 h-5 text-slate/30 group-hover:text-teal-700 transition-colors shrink-0" />
+              </a>
+            <//>`)}
+        <//>
+      <//>
+    </div>
+  </section>`;
+};
+
+const Faq = ({ d }) => {
+  const [o, setO] = useState(0);
+  return html`
+  <section className="bg-teal-50 py-24 lg:py-32">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <${Reveal} className="lg:col-span-4"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//>
+        <p className="mt-5 text-[16px] text-slate/65">Still have questions? Call us on <a href=${tel('6292768914')} className="font-bold text-teal-700">${PHONE}</a>.</p><//>
+      <${motion.div} className="lg:col-span-8 grid gap-3" variants=${stagger(0.05)} ...${inView}>
+        ${d.items.map((f, i) => html`
+          <${motion.div} key=${f.q} variants=${fadeUp} className=${`rounded-[22px] bg-white transition-shadow ${o === i ? 'shadow-[0_24px_50px_-34px_rgba(29,138,156,.7)]' : ''}`}>
+            <h3><button onClick=${() => setO(o === i ? -1 : i)} aria-expanded=${o === i} aria-controls=${`faq-${i}`} className="w-full flex items-center justify-between gap-6 px-6 py-5 text-left text-[17px] sm:text-[18px] font-bold">
+              ${f.q}<${motion.span} animate=${{ rotate: o === i ? 45 : 0 }} className=${`grid place-items-center w-10 h-10 rounded-full shrink-0 ${o === i ? 'bg-teal text-white' : 'bg-teal-50 text-teal-700'}`}><${Icon} name="plus" sw=${2.2} /><//>
+            </button></h3>
+            <${AnimatePresence} initial=${false}>${o === i && html`<${motion.div} id=${`faq-${i}`} key="a" initial=${{ height: 0, opacity: 0 }} animate=${{ height: 'auto', opacity: 1 }} exit=${{ height: 0, opacity: 0 }} transition=${{ duration: 0.3, ease }} className="overflow-hidden"><p className="px-6 pb-6 pr-20 text-[15.5px] leading-relaxed text-slate/65">${f.a}</p><//>`}<//>
+          <//>`)}
+      <//>
+    </div>
+  </section>`;
+};
+
+const Book = ({ d }) => {
+  const [sent, setSent] = useState(false);
+  const field = 'w-full h-12 rounded-xl bg-teal-50 px-4 text-[15px] placeholder:text-slate/40 focus:outline-none focus:ring-2 focus:ring-teal focus:bg-white transition';
+  return html`
+  <section id=${d.id} className="bg-white py-24 lg:py-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto">
+      <${Reveal}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 rounded-[40px] overflow-hidden ring-1 ring-line">
+          <div className="lg:col-span-5 relative min-h-[320px]"><img src=${d.image} alt="Happy Smiley Aesthetics client" loading="lazy" className="absolute inset-0 w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-teal-800/70 to-transparent"></div>
+            <div className="absolute left-7 bottom-7 text-white"><div className="text-teal-100 w-28"><${Smile} /></div><div className="mt-2 font-serif text-[30px] leading-tight">Same-day appointments<br />in most locations</div></div></div>
+          <div className="lg:col-span-7 p-8 sm:p-12 lg:p-14">
+            <h2 className="font-serif text-[38px] sm:text-[48px] leading-[1.03] tracking-[-0.02em]">${d.title}</h2>
+            <p className="mt-4 text-[16px] text-slate/65">${d.body}</p>
+            <${AnimatePresence} mode="wait">
+              ${sent ? html`<${motion.div} key="ok" initial=${{ opacity: 0, scale: 0.96 }} animate=${{ opacity: 1, scale: 1 }} className="mt-10 flex items-center gap-4"><span className="grid place-items-center w-14 h-14 rounded-full bg-teal text-white"><${Icon} name="check" className="w-6 h-6" sw=${2.6} /></span><span className="text-[16px] font-semibold">Thank you! We’ll reach out to confirm your consultation.</span><//>`
+              : html`<${motion.form} key="f" exit=${{ opacity: 0 }} onSubmit=${(e) => { e.preventDefault(); setSent(true); }} className="mt-8 grid gap-3">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div><label htmlFor="b-name" className="block text-[13px] font-bold mb-1.5">Full name</label><input id="b-name" required autoComplete="name" className=${field} /></div>
+                    <div><label htmlFor="b-phone" className="block text-[13px] font-bold mb-1.5">Phone</label><input id="b-phone" type="tel" required autoComplete="tel" className=${field} /></div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div><label htmlFor="b-loc" className="block text-[13px] font-bold mb-1.5">Location</label><select id="b-loc" className=${field}>${['Nashville West', 'Knoxville', 'Collierville', 'Gallatin', 'Soddy-Daisy', 'Bowling Green', 'Rome'].map((x) => html`<option key=${x}>${x}</option>`)}</select></div>
+                    <div><label htmlFor="b-svc" className="block text-[13px] font-bold mb-1.5">Interested in</label><select id="b-svc" className=${field}>${['Injectables', 'Laser & machines', 'Facials', 'Weight loss', 'Hormone therapy', 'Not sure yet'].map((x) => html`<option key=${x}>${x}</option>`)}</select></div>
+                  </div>
+                  <${Button} type="submit" className="mt-3 w-full sm:w-auto sm:justify-self-start">Request a consultation<//>
+                <//>`}
+            <//>
+          </div>
+        </div>
+      <//>
+    </div>
+  </section>`;
+};
+
+const Footer = ({ g }) => html`
+  <footer className="bg-slate-900 text-white/65">
+    <div className="w-[92%] mx-auto pt-20 pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-14 border-b border-white/10">
+        <div className="lg:col-span-4">
+          <img src=${g.logo.urlLight} alt=${g.logo.alt} className="h-14 w-auto" loading="lazy" />
+          <p className="mt-6 text-[14.5px] leading-relaxed max-w-sm">We specialise in medical aesthetics provided by licensed medical providers — enhancing natural beauty with injectables on the outside and health and well-being products from the inside.</p>
+        </div>
+        <div className="lg:col-span-3">
+          <div className="text-white font-bold text-[14px] mb-5">Office hours</div>
+          <ul className="space-y-3 text-[14px]">${g.footer.hours.map(([d, h, n]) => html`<li key=${d}><span className="block text-white">${d}</span><span className="block">${h}</span>${n && html`<span className="block text-teal-300 text-[12.5px]">${n}</span>`}</li>`)}</ul>
+          <div className="mt-6 text-white font-bold text-[14px] mb-3">General inquiries</div>
+          <div className="space-y-2 text-[14px]">
+            <div className="flex gap-2"><${Icon} name="pin" className="w-4 h-4 text-teal-300 mt-0.5 shrink-0" />${g.footer.address.join(', ')}</div>
+            <a href=${tel('6292768914')} className="flex gap-2 hover:text-white"><${Icon} name="phone" className="w-4 h-4 text-teal-300 shrink-0" />${PHONE}</a>
+            <a href=${`mailto:${g.footer.email}`} className="flex gap-2 hover:text-white"><${Icon} name="mail" className="w-4 h-4 text-teal-300 shrink-0" />${g.footer.email}</a>
+          </div>
+        </div>
+        <div className="lg:col-span-5 grid grid-cols-2 gap-8">
+          ${g.footer.columns.map((c) => html`<div key=${c.title}><div className="text-white font-bold text-[14px] mb-5">${c.title}</div><ul className="space-y-3 text-[14px]">${c.links.map((l) => html`<li key=${l}><a href="#" className="hover:text-white transition-colors">${l}</a></li>`)}</ul></div>`)}
+        </div>
+      </div>
+      <div className="pt-8 flex flex-col lg:flex-row gap-4 justify-between text-[13px] text-white/40">
+        <p>© 2022 – 2026 Smiley Aesthetics. All rights reserved. <span className="mx-2 text-white/20">|</span>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" className="text-white/75 font-bold hover:text-white underline-offset-4 hover:underline">VOCSO</a></p>
+        <div className="flex flex-wrap gap-5">${g.footer.legal.map((l) => html`<a key=${l} href="#" className="hover:text-white transition-colors">${l}</a>`)}</div>
+      </div>
+    </div>
+  </footer>`;
+
+/* =========================== Section renderer =========================== */
+const REGISTRY = {
+  'sections.hero': Hero,
+  'sections.promise': Promise_,
+  'sections.services': Services,
+  'sections.wellness': Wellness,
+  'sections.about': About,
+  'sections.injector': Injector,
+  'sections.locations': Locations,
+  'sections.faq': Faq,
+  'sections.book': Book,
+};
+const cats = CMS.page.sections.find((s) => s.__component === 'sections.services').categories;
+
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-teal focus:text-white focus:px-4 focus:py-2 focus:rounded-full">Skip to content</a>
+    <${Promo} d=${CMS.global.promo} />
+    <${Header} g=${CMS.global} cats=${cats} />
+    <main id="main">${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} />` : null; })}</main>
+    <${Footer} g=${CMS.global} />
+  <//>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+document.getElementById('boot').remove();
+</script>
+</body>
+</html>
