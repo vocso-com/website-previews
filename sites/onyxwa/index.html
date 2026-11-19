@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ONYX Wellness & Aesthetics — Medspa in Nashville, TN</title>
+<meta name="description" content="Boutique medical aesthetics and wellness practice in Nashville. Injectables, lasers, microneedling, hair restoration and medical weight loss. Founded by Ericka Marshall, FNP-BC." />
+<link rel="icon" href="assets/logo-black.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          onyx: { DEFAULT: '#111111', 950: '#0A0A0A', 900: '#151515', 800: '#1E1D1C', 700: '#2A2827' },
+          gold: { DEFAULT: '#CDAB71', light: '#E3CB9F', dark: '#A9874D' },
+          taupe: { DEFAULT: '#C2B7B7', 100: '#EFEBE8', 200: '#E2DCD8', 600: '#8C8282' },
+        },
+        fontFamily: {
+          serif: ['"Cormorant Garamond"', 'Cormorant', 'Georgia', 'serif'],
+          sans: ['Montserrat', 'system-ui', 'sans-serif'],
+          script: ['"Alex Brush"', 'cursive'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: Montserrat, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid #CDAB71; outline-offset: 3px; border-radius: 4px; }
+  .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  .arch { border-radius: 999px 999px 0 0; }
+  input[type=range].ba { -webkit-appearance:none; appearance:none; background:transparent; }
+  input[type=range].ba::-webkit-slider-thumb { -webkit-appearance:none; width:56px; height:100vh; cursor:ew-resize; }
+  input[type=range].ba::-moz-range-thumb { width:56px; height:1000px; border:0; background:transparent; cursor:ew-resize; }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#0A0A0A; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-onyx-950 text-white">
+<div id="boot"><img src="assets/logo-alt.svg" alt="" width="160" /></div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (header, contact, footer) + Collection "page"
+   with a Dynamic Zone `sections`. Services, team, reviews and results are
+   their own Collection Types, referenced here. Media from onyxwa.com.
+   ========================================================================== */
+const A = (p) => `assets/${p}`;
+const PHONE = '(615) 626-7905';
+
+const CMS = {
+  global: {
+    logo: { light: A('logo-alt.svg'), dark: A('logo-gold.svg'), alt: 'ONYX Wellness & Aesthetics' },
+    nav: [
+      { label: 'About', href: '#about' },
+      { label: 'Services', href: '#services', mega: true },
+      { label: 'Results', href: '#results' },
+      { label: 'Team', href: '#team' },
+      { label: 'Reviews', href: '#reviews' },
+      { label: 'Contact', href: '#contact' },
+    ],
+    cta: { label: 'Book an appointment', href: '#contact' },
+    contact: {
+      address: '917 8th Ave. South, Suite E, Nashville, Tennessee 37203',
+      instagram: '@Onyx.nashville',
+      hours: [['Mon – Wed', '9:00 AM – 5:00 PM'], ['Thursday', 'Closed'], ['Friday', '9:00 AM – 3:00 PM'], ['Sat & Sun', 'Closed']],
+    },
+    menu: [
+      { name: 'Consultations', items: ['Aesthetic Consultation', 'Wellness Consultation'] },
+      { name: 'Facials & Advanced Facials', items: ['Dermaplaning', 'Sculptural Face Lifting Massage Facial', 'Peptide Microinfusion Treatment', 'SKNLAB Dermal Infusion Facial'] },
+      { name: 'Neurotoxins, PRF & Fillers', items: ['Lip Flip', 'Neurotoxin Treatments', 'PRP & PRF Treatments'] },
+      { name: 'Lasers & Medical Devices', items: ['CoolPeel', 'Fractional CO2 Laser', 'Helios Laser Treatments', 'RF Microneedling', 'SkinPen® Microneedling', 'iLaser by Promoitalia — ICell, ILift, IMelt'] },
+      { name: 'Wellness', items: ['Supplement Injections', 'Vitamin Injections', 'Medical Weight Loss'] },
+      { name: 'Hair & Lifting', items: ['Hair Regeneration', 'Hair Restoration', 'PDO Thread Lift'] },
+    ],
+  },
+
+  page: {
+    sections: [
+      {
+        __component: 'sections.hero-video',
+        video: 'https://g99-resources.b-cdn.net/All%20website/onyxwa/herospace.mp4',
+        poster: A('img/hero-poster.webp'),
+        lead: 'Refine',
+        script: 'your',
+        words: ['Beauty', 'Radiance', 'Confidence'],
+        body: 'A boutique medical aesthetics and wellness practice in Nashville, Tennessee — personalised care, advanced treatments and natural-looking results.',
+        rating: { score: '5.0', label: 'stars from 70+ reviews' },
+      },
+      {
+        __component: 'sections.intro-arch',
+        id: 'about',
+        eyebrow: 'About ONYX',
+        title: 'Looking your best should still feel like you.',
+        body: 'Our approach goes beyond a single treatment or concern by considering the full picture — from facial balance and skin health to confidence and overall wellness. Your experience begins with understanding your individual goals.',
+        image: A('img/ericka-clinic.webp'),
+        pillars: [
+          { title: 'No one-size-fits-all', body: 'We take the time to listen, educate and recommend treatments that make sense for you.' },
+          { title: 'Refine · refresh · restore', body: 'Individualised plans for natural enhancement — never to make you look like someone else.' },
+          { title: 'Aesthetics + longevity', body: 'Advanced treatments integrated with evidence-based longevity practices.' },
+        ],
+      },
+      {
+        __component: 'sections.signature-services',
+        id: 'services',
+        eyebrow: 'ONYX special services',
+        title: 'Beauty, wellness & innovation.',
+        tiles: [
+          { name: 'Injectables', body: 'Botox, Xeomin, Daxxify, dermal fillers, Kybella, Sculptra, PRF and PDO threading.', image: A('img/ericka-injecting.webp') },
+          { name: 'Microneedling', body: 'SkinPen® and RF microneedling for texture, scarring and fine lines.', image: A('img/microneedling.webp') },
+          { name: 'Lasers', body: 'Fractional CO2, Helios and CoolPeel for resurfacing, acne and pigment.', image: A('img/co2-laser.webp') },
+          { name: 'Weight loss', body: 'Medical weight management and carefully selected supplements.', image: A('img/weight-loss.webp') },
+        ],
+      },
+      {
+        __component: 'sections.founder',
+        eyebrow: 'Owner & founder',
+        name: 'Ericka Marshall',
+        role: 'FNP-BC · Board-certified Nurse Practitioner',
+        image: A('img/ericka.webp'),
+        education: ['Exercise Science — UT Knoxville', 'BS Nursing — East Tennessee State University', 'MS Nursing — Lincoln Memorial University'],
+        story: [
+          'After years of working with various companies, Ericka became increasingly aware of the lack of quality in the healthcare and aesthetic industry. Believing quality should never be compromised, she created a personalised, quality-driven practice that puts patients above all else.',
+          'She believes aesthetics and longevity medicine work synergistically to enhance inner vitality — helping clients feel confident and vibrant at any age.',
+        ],
+        quote: 'Thoughtful care backed by science and elevated by expertise.',
+      },
+      {
+        __component: 'sections.results',
+        id: 'results',
+        eyebrow: 'Results crafted specifically for you',
+        title: 'Real ONYX results.',
+        items: [
+          { label: 'SkinPen · Nasolabial fold', before: A('results/skinpen-nlf-before.webp'), after: A('results/skinpen-nlf-after.webp') },
+          { label: 'SkinPen · Under eyes', before: A('results/skinpen-eyes-before.webp'), after: A('results/skinpen-eyes-after.webp') },
+          { label: 'Helios Acne · Forehead', before: A('results/acne-forehead-before.webp'), after: A('results/acne-forehead-after.webp') },
+          { label: 'Helios Acne · Cheek', before: A('results/acne-cheek-before.webp'), after: A('results/acne-cheek-after.webp') },
+          { label: 'Helios Pigment', before: A('results/pigment-before.webp'), after: A('results/pigment-after.webp') },
+        ],
+      },
+      {
+        __component: 'sections.reviews',
+        id: 'reviews',
+        eyebrow: 'The difference of ONYX',
+        rating: { score: '5.0', count: '70+' },
+        background: A('img/testimonials-bg.webp'),
+        items: [
+          { text: 'I cannot say enough great things about Ericka! She takes her time with each client & genuinely listens to our concerns & needs. She’s a pro with PDO threads & my go-to for Botox & microneedling.', name: 'D.S.F.' },
+          { text: 'I have been going to ONYX Wellness for 4 years now and it has always been such a welcoming, warm and comfortable experience. I always feel like I’m walking in to see old friends.', name: 'Becca White' },
+          { text: 'I’ve had both dermaplaning and Botox treatments here, and the experience has been amazing from start to finish. The skincare product selection is unmatched! Onyx client for life!', name: 'The Libby O Show' },
+          { text: 'All of the staff that I interacted with were so kind and welcoming. The location is great and has plenty of free parking. Highly recommend Onyx to help you curate an aesthetics plan.', name: 'Kelsey Eva' },
+        ],
+      },
+      {
+        __component: 'sections.team',
+        id: 'team',
+        eyebrow: 'ONYX dedicated team',
+        title: 'Medical expertise with an eye for balance.',
+        members: [
+          { name: 'Ericka Marshall', role: 'FNP-BC · Founder', image: A('img/ericka-clinic.webp') },
+          { name: 'Tessa Mason', role: 'BSN, RN', image: A('img/member-four.webp') },
+          { name: 'Lily Hogan', role: 'Practice Manager', image: A('img/lily.webp') },
+        ],
+      },
+      {
+        __component: 'sections.instagram',
+        handle: '@Onyx.nashville',
+        images: ['one', 'two', 'three', 'four', 'five', 'six'].map((n) => A(`insta/${n}.webp`)),
+      },
+      {
+        __component: 'sections.contact',
+        id: 'contact',
+        title: 'Get in touch with ONYX.',
+        body: 'Whether you are beginning your aesthetic journey or taking a more intentional approach to your wellness, we are here to help you feel confident every step of the way.',
+        image: A('img/cta.webp'),
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M12 5l7 7-7 7',
+  arrowUR: 'M7 17 17 7M8 7h9v9',
+  phone: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z',
+  menu: 'M4 8h16M4 16h16',
+  x: 'M18 6 6 18M6 6l12 12',
+  plus: 'M12 5v14M5 12h14',
+  check: 'M20 6 9 17l-5-5',
+  pin: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2',
+  insta: 'M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM17.5 6.5h.01',
+  left: 'M15 18l-6-6 6-6',
+  right: 'M9 18l6-6-6-6',
+};
+const Icon = ({ name, className = 'w-5 h-5', sw = 1.5 }) => html`
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth=${sw} strokeLinecap="round" strokeLinejoin="round" className=${className} aria-hidden="true"><path d=${ICONS[name]} /></svg>`;
+const Stars = ({ className = 'w-4 h-4' }) => html`<span className="inline-flex gap-0.5 text-gold" aria-hidden="true">${[0, 1, 2, 3, 4].map((i) => html`<svg key=${i} viewBox="0 0 24 24" className=${className} fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" /></svg>`)}</span>`;
+
+const ease = [0.22, 1, 0.36, 1];
+const fadeUp = { hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease } } };
+const stagger = (s = 0.08, d = 0) => ({ hidden: {}, show: { transition: { staggerChildren: s, delayChildren: d } } });
+const inView = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-70px' } };
+const Reveal = ({ children, className = '', delay = 0 }) => html`
+  <${motion.div} className=${className} ...${inView} variants=${{ hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease, delay } } }}>${children}<//>`;
+const Eyebrow = ({ children, dark }) => html`<div className=${`flex items-center gap-3 text-[11.5px] font-medium tracking-[0.34em] uppercase ${dark ? 'text-gold-dark' : 'text-gold'}`}><span className="w-8 h-px bg-current"></span>${children}</div>`;
+const H2 = ({ children, className = '' }) => html`<h2 className=${`font-serif font-normal uppercase tracking-[0.02em] text-[40px] sm:text-[56px] lg:text-[72px] leading-[0.98] ${className}`}>${children}</h2>`;
+const tel = `tel:${PHONE.replace(/\D/g, '')}`;
+
+const Button = ({ href, children, variant = 'gold', className = '', icon = 'arrow', type, onClick }) => {
+  const styles = {
+    gold: 'bg-gold text-onyx-950 hover:bg-gold-light',
+    ghost: 'ring-1 ring-white/35 text-white hover:bg-white hover:text-onyx-950',
+    dark: 'bg-onyx-950 text-white hover:bg-onyx-800',
+    outline: 'ring-1 ring-onyx/30 text-onyx hover:bg-onyx hover:text-white',
+  };
+  const Tag = href ? motion.a : motion.button;
+  return html`<${Tag} href=${href} type=${type} onClick=${onClick} whileTap=${{ scale: 0.97 }}
+    className=${`group inline-flex items-center justify-center gap-3 px-8 h-[54px] text-[12px] font-medium tracking-[0.24em] uppercase whitespace-nowrap transition-colors duration-300 ${styles[variant]} ${className}`}>
+    ${children}${icon && html`<${Icon} name=${icon} className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" sw=${1.6} />`}
+  <//>`;
+};
+
+/* ============================== Header ============================== */
+const Header = ({ g }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [mega, setMega] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 60));
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+  return html`
+  <header className="fixed top-0 inset-x-0 z-50" onMouseLeave=${() => setMega(false)}>
+    <div className=${`transition-all duration-500 ${scrolled || mega ? 'bg-onyx-950/90 backdrop-blur-xl border-b border-white/10' : 'bg-gradient-to-b from-black/60 to-transparent border-b border-transparent'}`}>
+      <div className=${`w-[92%] mx-auto flex items-center justify-between gap-6 transition-all duration-500 ${scrolled ? 'h-[76px]' : 'h-[100px]'}`}>
+        <nav className="hidden xl:flex items-center gap-8 flex-1" aria-label="Primary">
+          ${g.nav.slice(0, 3).map((n) => html`<a key=${n.label} href=${n.href} onMouseEnter=${() => setMega(!!n.mega)} aria-haspopup=${n.mega ? 'true' : undefined} aria-expanded=${n.mega ? mega : undefined} className="group relative h-10 flex items-center text-[11.5px] tracking-[0.28em] uppercase text-white/80 hover:text-white">${n.label}<span className="absolute left-0 right-0 bottom-1.5 h-px bg-gold origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span></a>`)}
+        </nav>
+        <button onClick=${() => setOpen(true)} className="xl:hidden grid place-items-center w-11 h-11 text-white" aria-label="Open menu"><${Icon} name="menu" className="w-6 h-6" /></button>
+        <a href="#" aria-label="ONYX Wellness & Aesthetics home" className="shrink-0"><img src=${g.logo.light} alt=${g.logo.alt} className=${`w-auto transition-all duration-500 ${scrolled ? 'h-12' : 'h-16'}`} /></a>
+        <div className="flex items-center justify-end gap-8 flex-1">
+          ${g.nav.slice(3).map((n) => html`<a key=${n.label} href=${n.href} className="hidden xl:flex group relative h-10 items-center text-[11.5px] tracking-[0.28em] uppercase text-white/80 hover:text-white">${n.label}<span className="absolute left-0 right-0 bottom-1.5 h-px bg-gold origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span></a>`)}
+          <${Button} href=${g.cta.href} className="hidden sm:inline-flex h-11 px-5 text-[11px]" icon=${null}>Book now<//>
+        </div>
+      </div>
+      <${AnimatePresence}>
+        ${mega && html`
+          <${motion.div} key="mega" initial=${{ opacity: 0, y: -8 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, transition: { duration: 0.15 } }} transition=${{ duration: 0.3, ease }} className="hidden xl:block absolute inset-x-0 top-full bg-onyx-950/95 backdrop-blur-xl border-b border-white/10">
+            <div className="w-[92%] mx-auto py-10 grid grid-cols-6 gap-8">
+              ${g.menu.map((c) => html`<div key=${c.name}><div className="text-[11px] tracking-[0.24em] uppercase text-gold mb-4">${c.name}</div><ul className="space-y-2.5">${c.items.map((i) => html`<li key=${i}><a href="#services" className="font-serif text-[18px] text-white/80 hover:text-white hover:italic transition-all">${i}</a></li>`)}</ul></div>`)}
+            </div>
+          <//>`}
+      <//>
+    </div>
+    <${AnimatePresence}>
+      ${open && html`
+        <${motion.div} key="drawer" className="fixed inset-0 z-[60] bg-onyx-950 flex flex-col" initial=${{ clipPath: 'circle(0% at 40px 40px)' }} animate=${{ clipPath: 'circle(150% at 40px 40px)' }} exit=${{ clipPath: 'circle(0% at 40px 40px)' }} transition=${{ duration: 0.6, ease }}>
+          <div className="flex items-center justify-between px-5 h-[100px]"><button onClick=${() => setOpen(false)} className="grid place-items-center w-11 h-11" aria-label="Close menu"><${Icon} name="x" className="w-6 h-6" /></button><img src=${g.logo.light} alt=${g.logo.alt} className="h-14" /><span className="w-11"></span></div>
+          <${motion.nav} className="px-8 pt-6 flex-1 overflow-y-auto" variants=${stagger(0.06, 0.25)} initial="hidden" animate="show">
+            ${g.nav.map((n) => html`<${motion.a} key=${n.label} variants=${fadeUp} href=${n.href} onClick=${() => setOpen(false)} className="flex items-center justify-between py-4 border-b border-white/10 font-serif uppercase text-[34px] tracking-[0.04em]">${n.label}<${Icon} name="arrowUR" className="w-5 h-5 text-gold" /><//>`)}
+          <//>
+          <div className="p-6 grid gap-3"><${Button} href="#contact" className="w-full" onClick=${() => setOpen(false)}>Book an appointment<//><${Button} href=${tel} variant="ghost" icon="phone" className="w-full">${PHONE}<//></div>
+        <//>`}
+    <//>
+  </header>`;
+};
+
+/* ============================== Sections ============================== */
+const HeroVideo = ({ d }) => {
+  const [w, setW] = useState(0);
+  useEffect(() => { const t = setInterval(() => setW((x) => (x + 1) % d.words.length), 2600); return () => clearInterval(t); }, []);
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  const yText = useTransform(scrollYProgress, [0, 1], [0, 140]);
+  const fade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  return html`
+  <section ref=${ref} className="relative h-[100svh] min-h-[640px] overflow-hidden bg-onyx-950">
+    <${motion.video} style=${{ scale }} className="absolute inset-0 w-full h-full object-cover" src=${d.video} poster=${d.poster} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" />
+    <div className="absolute inset-0 bg-black/45"></div>
+    <div className="absolute inset-0 bg-gradient-to-t from-onyx-950 via-transparent to-black/40"></div>
+    <${motion.div} style=${{ y: yText, opacity: fade }} className="relative h-full w-[92%] mx-auto flex flex-col items-center justify-center text-center pt-16">
+      <h1 className="w-full font-serif font-normal uppercase leading-[0.86] tracking-[0.03em]">
+        <span className="block overflow-hidden"><${motion.span} className="block text-[48px] sm:text-[100px] lg:text-[140px]" initial=${{ y: '100%' }} animate=${{ y: 0 }} transition=${{ duration: 1.2, ease, delay: 0.2 }}>${d.lead}<//></span>
+        <${motion.span} className="block font-script normal-case text-gold text-[56px] sm:text-[84px] lg:text-[104px] leading-none -my-2 sm:-my-4 tracking-normal" initial=${{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }} animate=${{ opacity: 1, clipPath: 'inset(0 0% 0 0)' }} transition=${{ duration: 1.3, ease, delay: 0.6 }}>${d.script}<//>
+        <span className="relative block w-full h-[0.9em] text-[48px] sm:text-[100px] lg:text-[140px] whitespace-nowrap overflow-hidden">
+          <${AnimatePresence} mode="popLayout" initial=${false}>
+            <${motion.span} key=${w} className="absolute inset-x-0 top-0" initial=${{ y: '100%', opacity: 0 }} animate=${{ y: 0, opacity: 1 }} exit=${{ y: '-100%', opacity: 0 }} transition=${{ duration: 0.8, ease }}>${d.words[w]}<//>
+          <//>
+        </span>
+      </h1>
+      <${motion.p} initial=${{ opacity: 0, y: 16 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 0.9, ease, delay: 1 }} className="mt-8 max-w-xl text-[15.5px] leading-relaxed text-white/80 font-light">${d.body}<//>
+      <${motion.div} initial=${{ opacity: 0, y: 16 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 0.9, ease, delay: 1.15 }} className="mt-9 flex flex-wrap justify-center gap-3">
+        <${Button} href="#contact">Book an appointment<//><${Button} href="#about" variant="ghost" icon=${null}>Explore ONYX<//>
+      <//>
+    <//>
+    <div className="absolute bottom-0 inset-x-0">
+      <div className="w-[92%] mx-auto flex items-center justify-between gap-6 border-t border-white/15 py-5 text-[11.5px] tracking-[0.24em] uppercase text-white/70">
+        <span className="flex items-center gap-3"><${Stars} className="w-3.5 h-3.5" /><span className="text-white">${d.rating.score}</span> ${d.rating.label}</span>
+        <span className="hidden md:flex items-center gap-2"><${Icon} name="pin" className="w-4 h-4 text-gold" />Nashville, Tennessee</span>
+        <a href="#about" className="flex items-center gap-3 hover:text-white">Scroll<${motion.span} animate=${{ y: [0, 5, 0] }} transition=${{ duration: 1.8, repeat: Infinity }} className="block w-px h-6 bg-gold" /></a>
+      </div>
+    </div>
+  </section>`;
+};
+
+const IntroArch = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'start 20%'] });
+  const radius = useTransform(scrollYProgress, [0, 1], ['50% 50% 0 0', '48px 48px 0 0']);
+  const width = useTransform(scrollYProgress, [0, 1], ['72%', '100%']);
+  return html`
+  <section ref=${ref} id=${d.id} className="relative bg-onyx-950 pt-10 scroll-mt-20">
+    <${motion.div} style=${{ borderRadius: radius, width }} className="mx-auto bg-taupe-100 text-onyx overflow-hidden">
+      <div className="w-[92%] mx-auto py-24 lg:py-32 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="lg:col-span-6">
+          <${Reveal}><${Eyebrow} dark>${d.eyebrow}<//><${H2} className="mt-6">${d.title}<//><p className="mt-7 text-[16px] leading-relaxed text-onyx/70 font-light max-w-xl">${d.body}</p><//>
+          <${motion.ul} className="mt-10 border-t border-onyx/15" variants=${stagger(0.1)} ...${inView}>
+            ${d.pillars.map((p, i) => html`<${motion.li} key=${p.title} variants=${fadeUp} className="grid grid-cols-[48px_1fr] gap-4 py-5 border-b border-onyx/15"><span className="font-serif text-[28px] text-gold-dark leading-none">0${i + 1}</span><div><div className="text-[12.5px] tracking-[0.2em] uppercase font-medium">${p.title}</div><p className="mt-1.5 text-[14.5px] text-onyx/65 font-light">${p.body}</p></div><//>`)}
+          <//>
+          <${Reveal} className="mt-10"><${Button} href="#team" variant="dark">Meet the team<//><//>
+        </div>
+        <${Reveal} className="lg:col-span-6 relative" delay=${0.1}>
+          <div className="relative aspect-[4/5] arch overflow-hidden bg-taupe-200"><img src=${d.image} alt="Ericka Marshall, FNP-BC, in the ONYX clinic" loading="lazy" className="absolute inset-0 w-full h-full object-cover" /></div>
+          <div className="absolute -left-4 sm:-left-10 bottom-10 bg-onyx text-white px-7 py-6 max-w-[260px]"><div className="font-script text-gold text-[40px] leading-none">Personal</div><div className="mt-2 text-[12px] tracking-[0.2em] uppercase text-white/75">care · natural results</div></div>
+        <//>
+      </div>
+    <//>
+  </section>`;
+};
+
+const SignatureServices = ({ d, menu }) => {
+  const [a, setA] = useState(0);
+  const [cat, setCat] = useState(null);
+  return html`
+  <section id=${d.id} className="bg-onyx-950 py-24 lg:py-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <${Reveal} className="lg:col-span-8"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-6">${d.title}<//><//>
+        <${Reveal} className="lg:col-span-4 lg:justify-self-end" delay=${0.1}><${Button} href="#menu" variant="ghost">View all services<//><//>
+      </div>
+      <div className="mt-14 hidden lg:flex gap-3 h-[560px]">
+        ${d.tiles.map((t, i) => html`
+          <${motion.a} key=${t.name} href="#contact" onMouseEnter=${() => setA(i)} onFocus=${() => setA(i)} animate=${{ flex: a === i ? 3.2 : 1 }} transition=${{ duration: 0.8, ease }} className="group relative min-w-0 overflow-hidden ${'arch'}" style=${{ borderRadius: a === i ? '0' : '999px 999px 0 0' }}>
+            <img src=${t.image} alt="" loading="lazy" className=${`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${a === i ? 'scale-100' : 'scale-110 grayscale'}`} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent"></div>
+            <div className="absolute inset-x-0 bottom-0 p-8">
+              <span className="font-serif text-[22px] text-gold">0${i + 1}</span>
+              <h3 className=${`mt-1 font-serif uppercase leading-none tracking-[0.04em] transition-all duration-500 ${a === i ? 'text-[56px]' : 'text-[30px]'}`}>${t.name}</h3>
+              <${AnimatePresence}>${a === i && html`<${motion.div} initial=${{ opacity: 0, y: 10 }} animate=${{ opacity: 1, y: 0, transition: { delay: 0.3 } }} exit=${{ opacity: 0 }}><p className="mt-4 max-w-md text-[15px] font-light text-white/80">${t.body}</p><span className="mt-5 inline-flex items-center gap-2 text-[11.5px] tracking-[0.24em] uppercase text-gold">Book this treatment <${Icon} name="arrow" className="w-4 h-4" /></span><//>`}<//>
+            </div>
+          <//>`)}
+      </div>
+      <${motion.div} className="mt-12 lg:hidden grid sm:grid-cols-2 gap-4" variants=${stagger(0.08)} ...${inView}>
+        ${d.tiles.map((t, i) => html`<${motion.a} key=${t.name} href="#contact" variants=${fadeUp} className="relative h-[360px] overflow-hidden arch"><img src=${t.image} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent"></div><div className="absolute inset-x-0 bottom-0 p-6"><span className="font-serif text-gold">0${i + 1}</span><h3 className="font-serif uppercase text-[32px] leading-none">${t.name}</h3><p className="mt-2 text-[14px] font-light text-white/80">${t.body}</p></div><//>`)}
+      <//>
+
+      <div id="menu" className="mt-20 grid grid-cols-1 lg:grid-cols-12 gap-10 scroll-mt-28">
+        <${Reveal} className="lg:col-span-4"><div className="font-script text-gold text-[52px] leading-none">the full menu</div><p className="mt-4 text-[15px] font-light text-white/65">Every plan begins with an aesthetic or wellness consultation.</p><//>
+        <${motion.ul} className="lg:col-span-8 border-t border-white/10" variants=${stagger(0.05)} ...${inView}>
+          ${menu.map((c, i) => html`
+            <${motion.li} key=${c.name} variants=${fadeUp} className="border-b border-white/10">
+              <button onClick=${() => setCat(cat === i ? null : i)} aria-expanded=${cat === i} className="w-full flex items-center justify-between gap-6 py-5 text-left">
+                <span className="flex items-baseline gap-5"><span className="text-[12px] text-gold">0${i + 1}</span><span className="font-serif uppercase text-[24px] sm:text-[30px] tracking-[0.04em]">${c.name}</span></span>
+                <span className="flex items-center gap-4"><span className="hidden sm:inline text-[11px] tracking-[0.2em] uppercase text-white/45">${c.items.length} treatments</span><${motion.span} animate=${{ rotate: cat === i ? 45 : 0 }} className="grid place-items-center w-10 h-10 rounded-full ring-1 ring-white/20 text-gold"><${Icon} name="plus" /><//></span>
+              </button>
+              <${AnimatePresence} initial=${false}>${cat === i && html`<${motion.div} key="m" initial=${{ height: 0, opacity: 0 }} animate=${{ height: 'auto', opacity: 1 }} exit=${{ height: 0, opacity: 0 }} transition=${{ duration: 0.35, ease }} className="overflow-hidden">
+                <ul className="pb-6 pl-10 grid sm:grid-cols-2 gap-x-8 gap-y-2.5">${c.items.map((x) => html`<li key=${x} className="flex items-center gap-3 text-[15px] font-light text-white/80"><span className="w-1.5 h-1.5 rotate-45 bg-gold"></span>${x}</li>`)}</ul>
+              <//>`}<//>
+            <//>`)}
+        <//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Founder = ({ d }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  return html`
+  <section ref=${ref} className="bg-taupe-100 text-onyx py-24 lg:py-32 overflow-hidden">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <div className="lg:col-span-5 relative">
+        <${motion.div} style=${{ y }} className="relative aspect-[3/4] overflow-hidden"><img src=${d.image} alt=${`${d.name}, ${d.role}`} loading="lazy" className="absolute inset-0 w-full h-full object-cover" /></${motion.div}>
+        <div className="absolute -right-3 sm:-right-8 top-10 bg-gold text-onyx-950 px-5 py-4"><div className="text-[11px] tracking-[0.24em] uppercase">Founder</div><div className="font-serif text-[22px] leading-tight">FNP-BC</div></div>
+      </div>
+      <div className="lg:col-span-7">
+        <${Reveal}><${Eyebrow} dark>${d.eyebrow}<//>
+          <h2 className="mt-6 font-serif uppercase text-[48px] sm:text-[68px] lg:text-[84px] leading-[0.92] tracking-[0.02em]">${d.name}</h2>
+          <div className="mt-3 text-[12.5px] tracking-[0.22em] uppercase text-onyx/60">${d.role}</div><//>
+        <${Reveal} delay=${0.1} className="mt-8 space-y-4 text-[16px] leading-relaxed text-onyx/75 font-light max-w-2xl">${d.story.map((p, i) => html`<p key=${i}>${p}</p>`)}<//>
+        <${motion.ul} className="mt-8 flex flex-wrap gap-2" variants=${stagger(0.06)} ...${inView}>${d.education.map((e) => html`<${motion.li} key=${e} variants=${fadeUp} className="ring-1 ring-onyx/20 px-4 py-2 text-[12.5px]">${e}<//>`)}<//>
+        <${Reveal} delay=${0.2} className="mt-10 flex flex-wrap items-center gap-8">
+          <blockquote className="font-script text-[44px] sm:text-[52px] leading-none text-gold-dark">“${d.quote}”</blockquote>
+        <//>
+        <${Reveal} delay=${0.25} className="mt-8"><${Button} href="#" variant="dark">Know more about Ericka<//><//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Results = ({ d }) => {
+  const [a, setA] = useState(0);
+  const [pos, setPos] = useState(50);
+  const r = d.items[a];
+  return html`
+  <section id=${d.id} className="bg-onyx-950 py-24 lg:py-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div className="lg:col-span-5">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-6">${d.title}<//><p className="mt-6 text-[15.5px] font-light text-white/65 max-w-md">Drag the handle to compare. Results vary by individual — every plan starts with a consultation.</p><//>
+        <ul className="mt-10 border-t border-white/10">
+          ${d.items.map((x, i) => html`<li key=${x.label} className="border-b border-white/10"><button onClick=${() => { setA(i); setPos(50); }} aria-pressed=${a === i} className="w-full flex items-center justify-between py-4 text-left group">
+            <span className=${`font-serif uppercase text-[22px] tracking-[0.04em] transition-colors ${a === i ? 'text-gold' : 'text-white/70 group-hover:text-white'}`}>${x.label}</span>
+            <span className=${`h-px transition-all duration-500 ${a === i ? 'w-14 bg-gold' : 'w-6 bg-white/25'}`}></span></button></li>`)}
+        </ul>
+      </div>
+      <${Reveal} className="lg:col-span-7" delay=${0.1}>
+        <div className="relative aspect-[4/3] overflow-hidden select-none bg-onyx-800">
+          <${AnimatePresence} mode="popLayout" initial=${false}>
+            <${motion.div} key=${a} className="absolute inset-0" initial=${{ opacity: 0 }} animate=${{ opacity: 1 }} exit=${{ opacity: 0 }} transition=${{ duration: 0.5 }}>
+              <img src=${r.after} alt=${`${r.label} — after`} className="absolute inset-0 w-full h-full object-cover" draggable="false" />
+              <div className="absolute inset-0" style=${{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}><img src=${r.before} alt=${`${r.label} — before`} className="absolute inset-0 w-full h-full object-cover" draggable="false" /></div>
+            <//>
+          <//>
+          <span className="absolute top-5 left-5 bg-black/60 backdrop-blur px-3 py-1.5 text-[11px] tracking-[0.24em] uppercase">Before</span>
+          <span className="absolute top-5 right-5 bg-gold text-onyx-950 px-3 py-1.5 text-[11px] tracking-[0.24em] uppercase">After</span>
+          <div className="absolute inset-y-0 w-px bg-gold pointer-events-none" style=${{ left: `${pos}%` }}>
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid place-items-center w-14 h-14 rounded-full bg-onyx-950 ring-1 ring-gold text-gold"><svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" /></svg></span>
+          </div>
+          <input type="range" min="0" max="100" value=${pos} onInput=${(e) => setPos(+e.target.value)} onChange=${(e) => setPos(+e.target.value)} aria-label=${`Compare before and after: ${r.label}`} className="ba absolute inset-0 w-full h-full opacity-0 cursor-ew-resize" />
+        </div>
+      <//>
+    </div>
+  </section>`;
+};
+
+const Reviews = ({ d }) => {
+  const [i, setI] = useState(0);
+  useEffect(() => { const t = setTimeout(() => setI((x) => (x + 1) % d.items.length), 7000); return () => clearTimeout(t); }, [i]);
+  const r = d.items[i];
+  return html`
+  <section id=${d.id} className="relative py-28 lg:py-36 overflow-hidden scroll-mt-20">
+    <img src=${d.background} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+    <div className="absolute inset-0 bg-onyx-950/80"></div>
+    <div className="relative w-[92%] max-w-[1000px] mx-auto text-center">
+      <${Reveal}><div className="flex justify-center"><${Eyebrow}>${d.eyebrow}<//></div>
+        <div className="mt-6 flex items-center justify-center gap-4"><span className="font-serif text-[64px] leading-none">${d.rating.score}</span><div className="text-left"><${Stars} /><div className="mt-1 text-[11.5px] tracking-[0.22em] uppercase text-white/65">${d.rating.count} reviews</div></div></div><//>
+      <div className="relative mt-10 min-h-[240px] sm:min-h-[200px]">
+        <${AnimatePresence} mode="wait">
+          <${motion.figure} key=${i} initial=${{ opacity: 0, y: 18, filter: 'blur(6px)' }} animate=${{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit=${{ opacity: 0, y: -12, filter: 'blur(6px)' }} transition=${{ duration: 0.6, ease }}>
+            <blockquote className="font-serif italic text-[24px] sm:text-[32px] lg:text-[36px] leading-[1.3] text-white/90">“${r.text}”</blockquote>
+            <figcaption className="mt-7 text-[12px] tracking-[0.3em] uppercase text-gold">${r.name}</figcaption>
+          <//>
+        <//>
+      </div>
+      <div className="mt-10 flex items-center justify-center gap-5">
+        <button onClick=${() => setI((i - 1 + d.items.length) % d.items.length)} aria-label="Previous review" className="grid place-items-center w-11 h-11 rounded-full ring-1 ring-white/25 hover:bg-white hover:text-onyx-950 transition-colors"><${Icon} name="left" /></button>
+        <div className="flex gap-2">${d.items.map((_, k) => html`<button key=${k} onClick=${() => setI(k)} aria-label=${`Review ${k + 1}`} aria-current=${k === i} className=${`h-1.5 transition-all duration-500 ${k === i ? 'w-10 bg-gold' : 'w-4 bg-white/30'}`}></button>`)}</div>
+        <button onClick=${() => setI((i + 1) % d.items.length)} aria-label="Next review" className="grid place-items-center w-11 h-11 rounded-full ring-1 ring-white/25 hover:bg-white hover:text-onyx-950 transition-colors"><${Icon} name="right" /></button>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Team = ({ d }) => html`
+  <section id=${d.id} className="bg-taupe-100 text-onyx py-24 lg:py-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <${Reveal} className="lg:col-span-8"><${Eyebrow} dark>${d.eyebrow}<//><${H2} className="mt-6">${d.title}<//><//>
+        <${Reveal} className="lg:col-span-4 lg:justify-self-end" delay=${0.1}><${Button} href="#" variant="outline">Meet the team<//><//>
+      </div>
+      <${motion.ul} className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-6" variants=${stagger(0.12)} ...${inView}>
+        ${d.members.map((m, i) => html`
+          <${motion.li} key=${m.name} variants=${fadeUp} className=${i === 1 ? 'sm:mt-16' : ''}>
+            <a href="#" className="group block">
+              <div className="relative aspect-[3/4] arch overflow-hidden bg-taupe-200"><img src=${m.image} alt=${`${m.name}, ${m.role}`} loading="lazy" className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" /></div>
+              <div className="mt-5 text-center"><div className="font-serif uppercase text-[26px] tracking-[0.06em]">${m.name}</div><div className="mt-1 text-[11.5px] tracking-[0.22em] uppercase text-gold-dark">${m.role}</div></div>
+            </a>
+          <//>`)}
+      <//>
+    </div>
+  </section>`;
+
+const Instagram = ({ d }) => html`
+  <section className="bg-onyx-950 pt-24 lg:pt-28">
+    <div className="w-[92%] mx-auto flex flex-wrap items-end justify-between gap-6">
+      <${Reveal}><div className="font-script text-gold text-[52px] leading-none">follow along</div><h2 className="mt-2 font-serif uppercase text-[34px] sm:text-[44px] tracking-[0.04em]">${d.handle}</h2><//>
+      <${Button} href="https://www.instagram.com/onyx.nashville/" variant="ghost" icon="insta">Follow on Instagram<//>
+    </div>
+    <${motion.div} className="mt-12 grid grid-cols-3 lg:grid-cols-6" variants=${stagger(0.06)} ...${inView}>
+      ${d.images.map((s, i) => html`<${motion.a} key=${s} href="https://www.instagram.com/onyx.nashville/" target="_blank" rel="noopener" variants=${fadeUp} className="group relative aspect-square overflow-hidden" aria-label=${`Instagram post ${i + 1}`}>
+        <img src=${s} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+        <span className="absolute inset-0 grid place-items-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"><${Icon} name="insta" className="w-7 h-7 text-gold" /></span>
+      <//>`)}
+    <//>
+  </section>`;
+
+const Contact = ({ d, g }) => {
+  const [sent, setSent] = useState(false);
+  const field = 'w-full h-12 bg-transparent border-b border-white/25 px-0 text-[15px] text-white placeholder:text-white/40 focus:outline-none focus:border-gold transition-colors';
+  return html`
+  <section id=${d.id} className="relative bg-onyx-950 py-24 lg:py-32 scroll-mt-20">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+      <div className="lg:col-span-5">
+        <${Reveal}><${Eyebrow}>Book an appointment<//><${H2} className="mt-6">${d.title}<//><p className="mt-6 text-[15.5px] font-light text-white/70">${d.body}</p><//>
+        <${Reveal} delay=${0.1} className="mt-10 grid sm:grid-cols-2 gap-8 text-[14.5px]">
+          <div><div className="text-[11px] tracking-[0.24em] uppercase text-gold mb-3">Visit</div><p className="font-light text-white/80">${g.contact.address}</p><a href=${tel} className="mt-3 inline-flex items-center gap-2 text-white hover:text-gold"><${Icon} name="phone" className="w-4 h-4 text-gold" />${PHONE}</a><a href="https://www.instagram.com/onyx.nashville/" className="mt-2 flex items-center gap-2 text-white/80 hover:text-gold"><${Icon} name="insta" className="w-4 h-4 text-gold" />${g.contact.instagram}</a></div>
+          <div><div className="text-[11px] tracking-[0.24em] uppercase text-gold mb-3">Hours</div><ul className="space-y-1.5">${g.contact.hours.map(([dd, h]) => html`<li key=${dd} className="flex justify-between gap-4 font-light"><span className="text-white/60">${dd}</span><span className=${h === 'Closed' ? 'text-white/40' : 'text-white'}>${h}</span></li>`)}</ul></div>
+        <//>
+      </div>
+      <${Reveal} className="lg:col-span-7" delay=${0.15}>
+        <div className="relative overflow-hidden">
+          <img src=${d.image} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+          <div className="relative bg-onyx-900/80 backdrop-blur ring-1 ring-white/10 p-8 sm:p-12">
+            <${AnimatePresence} mode="wait">
+              ${sent ? html`<${motion.div} key="ok" initial=${{ opacity: 0, scale: 0.96 }} animate=${{ opacity: 1, scale: 1 }} className="py-16 text-center"><div className="mx-auto grid place-items-center w-16 h-16 rounded-full ring-1 ring-gold text-gold"><${Icon} name="check" className="w-7 h-7" sw=${2} /></div><div className="mt-6 font-serif uppercase text-[32px]">Thank you</div><p className="mt-2 font-light text-white/70">We’ll be in touch to confirm your consultation.</p><//>`
+              : html`<${motion.form} key="f" exit=${{ opacity: 0 }} onSubmit=${(e) => { e.preventDefault(); setSent(true); }} className="grid gap-7">
+                  <div className="font-script text-gold text-[44px] leading-none">request a consultation</div>
+                  <div className="grid sm:grid-cols-2 gap-7">
+                    <label><span className="block text-[11px] tracking-[0.24em] uppercase text-white/55 mb-1">Full name</span><input required autoComplete="name" className=${field} /></label>
+                    <label><span className="block text-[11px] tracking-[0.24em] uppercase text-white/55 mb-1">Phone</span><input type="tel" required autoComplete="tel" className=${field} /></label>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-7">
+                    <label><span className="block text-[11px] tracking-[0.24em] uppercase text-white/55 mb-1">Email</span><input type="email" required autoComplete="email" className=${field} /></label>
+                    <label><span className="block text-[11px] tracking-[0.24em] uppercase text-white/55 mb-1">Interested in</span><select className=${`${field} [&>option]:text-onyx`}>${['Aesthetic consultation', 'Wellness consultation', 'Injectables', 'Lasers & microneedling', 'Facials', 'Medical weight loss', 'Hair restoration'].map((o) => html`<option key=${o}>${o}</option>`)}</select></label>
+                  </div>
+                  <label><span className="block text-[11px] tracking-[0.24em] uppercase text-white/55 mb-1">Your goals</span><textarea rows="3" className=${`${field} h-auto py-2 resize-none`}></textarea></label>
+                  <${Button} type="submit" className="justify-self-start">Book an appointment<//>
+                <//>`}
+            <//>
+          </div>
+        </div>
+      <//>
+    </div>
+  </section>`;
+};
+
+const Footer = ({ g }) => html`
+  <footer className="bg-black text-white/60 border-t border-white/10">
+    <div className="w-[92%] mx-auto pt-20 pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-14 border-b border-white/10">
+        <div className="lg:col-span-5"><img src=${g.logo.light} alt=${g.logo.alt} className="h-20 w-auto" loading="lazy" /><p className="mt-6 text-[14px] font-light leading-relaxed max-w-md">ONYX is a medical boutique where beauty, wellness and innovation come together — specialising in anti-aging treatments through Botox, Xeomin, Daxxify, dermal fillers, Kybella, Sculptra, PRF and PDO threading.</p></div>
+        <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8 text-[13.5px]">
+          <div><div className="text-[11px] tracking-[0.24em] uppercase text-gold mb-5">Explore</div><ul className="space-y-3 font-light">${['Who We Are', 'Meet The Team', 'Gallery', 'Blogs', 'Reviews', 'Contact'].map((l) => html`<li key=${l}><a href="#" className="hover:text-white">${l}</a></li>`)}</ul></div>
+          <div><div className="text-[11px] tracking-[0.24em] uppercase text-gold mb-5">Services</div><ul className="space-y-3 font-light">${g.menu.map((c) => html`<li key=${c.name}><a href="#menu" className="hover:text-white">${c.name}</a></li>`)}</ul></div>
+          <div><div className="text-[11px] tracking-[0.24em] uppercase text-gold mb-5">Contact</div><p className="font-light">${g.contact.address}</p><a href=${tel} className="mt-3 block text-white hover:text-gold">${PHONE}</a><div className="mt-4 flex items-center gap-2"><${Stars} className="w-3.5 h-3.5" /><span className="text-[12px]">5.0 · 70+ reviews</span></div></div>
+        </div>
+      </div>
+      <div className="pt-8 flex flex-col md:flex-row gap-4 justify-between text-[12px] tracking-wide text-white/40">
+        <p>© 2026 ONYX Wellness & Aesthetics <span className="mx-2 text-white/20">|</span>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" className="text-white/75 hover:text-white underline-offset-4 hover:underline">VOCSO</a></p>
+        <div className="flex gap-5"><a href="#" className="hover:text-white">Privacy Policy</a><a href="#" className="hover:text-white">Terms and Conditions</a></div>
+      </div>
+    </div>
+  </footer>`;
+
+/* =========================== Section renderer =========================== */
+const REGISTRY = {
+  'sections.hero-video': HeroVideo,
+  'sections.intro-arch': IntroArch,
+  'sections.signature-services': SignatureServices,
+  'sections.founder': Founder,
+  'sections.results': Results,
+  'sections.reviews': Reviews,
+  'sections.team': Team,
+  'sections.instagram': Instagram,
+  'sections.contact': Contact,
+};
+
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-gold focus:text-onyx-950 focus:px-4 focus:py-2">Skip to content</a>
+    <${Header} g=${CMS.global} />
+    <main id="main">${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} g=${CMS.global} menu=${CMS.global.menu} />` : null; })}</main>
+    <${Footer} g=${CMS.global} />
+    <a href="#contact" className="sm:hidden fixed bottom-4 inset-x-4 z-40 flex items-center justify-center h-14 bg-gold text-onyx-950 text-[12px] tracking-[0.24em] uppercase shadow-2xl">Book an appointment</a>
+  <//>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+document.getElementById('boot').remove();
+</script>
+</body>
+</html>
