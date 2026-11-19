@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VIO Med Spa — Injectables, Skin & Body Treatments</title>
+<meta name="description" content="Med spa aesthetics, curated for you. Injectables, skin, body and wellness treatments performed by licensed providers. Find your VIO." />
+<link rel="icon" href="assets/logo-black.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=Syne:wght@500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          cream: '#FEFFF9',
+          sand: { DEFAULT: '#E9E3DC', 300: '#D7CEBB', 100: '#F4F0EA' },
+          taupe: { DEFAULT: '#B29D92', 600: '#8F7A6F', 800: '#5E4F47' },
+          slate: { DEFAULT: '#7C95A2', 600: '#5F7886', 800: '#3D4F59' },
+          ink: '#24201D',
+        },
+        fontFamily: {
+          display: ['Syne', 'Archivo', 'system-ui', 'sans-serif'],
+          sans: ['Archivo', 'system-ui', 'sans-serif'],
+          serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: Archivo, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid #5F7886; outline-offset: 3px; border-radius: 6px; }
+  .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  input[type=range].ba { -webkit-appearance:none; appearance:none; background:transparent; }
+  input[type=range].ba::-webkit-slider-thumb { -webkit-appearance:none; width:56px; height:100vh; cursor:ew-resize; }
+  input[type=range].ba::-moz-range-thumb { width:56px; height:1000px; border:0; background:transparent; cursor:ew-resize; }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#FEFFF9; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-cream text-ink">
+<div id="boot"><img src="assets/logo-black.svg" alt="" width="120" /></div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (promo, header, footer) + Collection "page"
+   with a Dynamic Zone `sections`. Treatments, concerns, results, reviews
+   and FAQs are their own Collection Types. Media from viomedspa.com.
+   ========================================================================== */
+const A = (p) => `assets/${p}`;
+const VIDEO = 'https://viomedspa.com/wp-content/uploads/2026/11/Homepage-Hero.mp4';
+
+const CMS = {
+  global: {
+    logo: { dark: A('logo-black.svg'), light: A('logo-white.svg'), alt: 'VIO Med Spa' },
+    promo: { text: 'Black Friday: up to 30% off', link: 'See the savings', href: '#clubvio' },
+    nav: [
+      { label: 'Treatments', href: '#treatments', mega: true },
+      { label: 'Skin Quiz', href: '#quiz' },
+      { label: 'Results', href: '#results' },
+      { label: 'ClubVIO', href: '#clubvio' },
+      { label: 'Financing', href: '#financing' },
+    ],
+    cta: { label: 'Find your VIO', href: '#find' },
+    concerns: [
+      ['Wrinkle Relaxers', 'Injectables'], ['Dermal Fillers', 'Injectables'], ['Collagen Production', 'Injectables'], ['Lift & Contour', 'Injectables'],
+      ['Facials', 'Skin'], ['Microneedling', 'Skin'], ['Laser & Lights', 'Skin'], ['Peels', 'Skin'],
+      ['Body Contouring & Sculpting', 'Body'], ['Hair Removal & Scalp Restoration', 'Body'],
+      ['Weight & Metabolic Health', 'Wellness'], ['Hormone Support', 'Wellness'], ['Peptide Therapy', 'Wellness'], ['Nutrient Therapy', 'Wellness'],
+    ],
+    footer: [
+      { title: 'Treatments', links: ['Injectables', 'Skin', 'Body', 'Wellness', 'Products'] },
+      { title: 'Company', links: ['Our VIO', 'Setting the Standard', 'Financing', 'The Reference Point', 'Own a VIO'] },
+      { title: 'Connect', links: ['Locations', 'Contact Us', 'Instagram', 'Facebook'] },
+    ],
+  },
+
+  page: {
+    sections: [
+      {
+        __component: 'sections.hero',
+        title: ['Med spa aesthetics,', 'curated for you.'],
+        sub: 'Clinical care made personal.',
+        poster: A('img/slider.jpg'),
+        video: VIDEO,
+      },
+      {
+        __component: 'sections.categories',
+        id: 'treatments',
+        eyebrow: 'Our treatments',
+        title: 'Find the care that fits your goals.',
+        body: 'Every treatment, from injectables to skin rejuvenation, is matched to your goals and performed by licensed providers you can trust.',
+        items: [
+          { name: 'Injectables', line: 'Wrinkle relaxers, fillers, and collagen production', image: A('img/injectables.jpg'), list: ['Botox®', 'Daxxify®', 'Dysport®', 'Juvederm®', 'RHA® Collection', 'Sculptra®', 'Skinvive™', 'PDO Threads'] },
+          { name: 'Skin', line: 'Facials, peels, and microneedling', image: A('img/skin.jpg'), list: ['Hydrafacial', 'DiamondGlow', 'Glo2Facial', 'Morpheus8', 'SkinPen', 'HALO Laser', 'BBL + MOXI', 'IPL Therapy'] },
+          { name: 'Body', line: 'Contouring, skin tightening, and sculpting', image: A('img/body.jpg'), list: ['Body contouring', 'Skin tightening', 'Sculpting', 'Laser hair removal', 'Scalp restoration'] },
+          { name: 'Wellness', line: 'Weight loss, peptides, and hormone health', image: A('img/wellness.jpg'), list: ['Weight & metabolic health', 'Peptide therapy', 'Hormone support', 'Nutrient therapy'] },
+        ],
+      },
+      {
+        __component: 'sections.concerns',
+        title: 'We treat your goals, not trends.',
+        image: A('img/lobby.jpg'),
+      },
+      {
+        __component: 'sections.quiz',
+        id: 'quiz',
+        eyebrow: 'New to VIO?',
+        title: 'Find your starting point.',
+        body: 'A short quiz to guide your next step. Tell us about your skin and your goals, and we will match you with the right treatments.',
+        image: A('img/skin-quiz.jpg'),
+        steps: [
+          { q: 'What’s your main goal?', options: ['Smooth lines', 'Restore volume', 'Brighter, clearer skin', 'Contour my body', 'Feel my best'] },
+          { q: 'How much downtime works for you?', options: ['None — lunch break', 'A day or two', 'Up to a week'] },
+          { q: 'Have you had med spa treatments before?', options: ['First time', 'A few times', 'Regular client'] },
+        ],
+        map: { 'Smooth lines': 'Injectables', 'Restore volume': 'Injectables', 'Brighter, clearer skin': 'Skin', 'Contour my body': 'Body', 'Feel my best': 'Wellness' },
+      },
+      {
+        __component: 'sections.results',
+        id: 'results',
+        eyebrow: 'See the difference',
+        title: 'Real VIO results.',
+        items: [
+          ['Microneedling + Hydrafacial', 'micro'], ['Lip Filler', 'lips'], ['Wrinkle Relaxer', 'wrinkle'], ['Hydrafacial Deluxe', 'hydra'],
+          ['Facial Rebalancing', 'rebalance'], ['BBL + MOXI', 'moxi'], ['BBL', 'bbl'], ['BBL Forever Clear + Peel', 'clear'],
+        ].map(([label, k]) => ({ label, before: A(`results/${k}-before.jpg`), after: A(`results/${k}-after.jpg`) })),
+      },
+      {
+        __component: 'sections.reviews',
+        eyebrow: 'Feel the difference',
+        items: [
+          ['Integrity', 'Excellent service! Highly recommended. Everyone is professional and knowledgeable. They don’t push products that you don’t need!', 'Daniela', 'Jacksonville, FL'],
+          ['Confidence', 'The spa is so clean, everyone is so professional and knowledgeable. I had a facial with Sophia and she explained everything and left my skin glowing.', 'Elyse', 'Columbus, OH'],
+          ['Ease', 'Convenient location, friendly professional staff and no wait time!', 'Violeta', 'Chicago, IL'],
+          ['Comfort', 'They made me feel so comfortable from the minute I walked through the doors! I truly look forward to every visit!!!', 'Jade', 'Toledo, OH'],
+          ['Loyalty', 'Liz the injector is AMAZING and Natasha the Esthetician is equally AMAZING. I found my forever place at VIO Med Spa.', 'Tammy', 'Jacksonville, FL'],
+          ['Mastery', 'I’ve been getting Botox for over 10 years and Ally wins the award for best results!!! Stop contemplating and schedule already!', 'Lisa', 'Carmel, IN'],
+          ['Results', 'I had the oxygeneo facial today and my skin has never looked better.', 'Paige', 'Solon, OH'],
+          ['Expertise', 'My Morpheus8 treatment was the best thing I’ve done for my skin lately. They educate you on the entire process.', 'Lamees', 'McKinney, TX'],
+          ['First Impressions', 'The spa is clean, relaxing and beautifully designed. The staff truly cares about your comfort and results.', 'Lori', 'Huntersville, NC'],
+        ],
+      },
+      {
+        __component: 'sections.clubvio',
+        id: 'clubvio',
+        eyebrow: 'ClubVIO',
+        title: 'Membership that rewards consistency.',
+        image: A('img/clubvio.jpg'),
+        perks: [
+          { title: 'Bank monthly', body: 'Your balance builds each month and is always yours to use.' },
+          { title: 'Preferred rates', body: 'Member pricing on specialized care.' },
+          { title: 'First access', body: 'Member events and preferred partners.' },
+        ],
+      },
+      {
+        __component: 'sections.financing',
+        id: 'financing',
+        eyebrow: 'Flexible payment',
+        title: 'Start your plan and pay over time.',
+        body: 'Financing through trusted partners makes your plan easier to begin. Ask your VIO about lender options.',
+        note: '* Financing availability and terms vary by location.',
+        partners: [{ name: 'Cherry' }, { name: 'PatientFi', logo: A('img/patientFi.svg') }, { name: 'CareCredit', logo: A('img/care-credit.svg') }],
+      },
+      {
+        __component: 'sections.faq',
+        title: 'The questions we hear most.',
+        items: [
+          ['What is a med spa?', 'A med spa combines the relaxing experience of a day spa with clinical treatments — like injectables, lasers and medical-grade facials — performed or overseen by licensed medical providers.'],
+          ['Who performs treatments at a med spa?', 'At VIO, treatments are performed by licensed providers such as nurse practitioners, registered nurses and licensed estheticians, matched to the treatment you choose.'],
+          ['How do med spa memberships work?', 'With ClubVIO, your balance banks monthly and is always yours to use, with member pricing on specialized care and first access to events.'],
+          ['How much do med spa treatments cost?', 'Pricing depends on the treatment and your plan. Your provider will walk you through options, and financing is available through trusted partners.'],
+          ['What should I expect at my first med spa visit?', 'A consultation about your goals, a look at your skin and history, and a personalised plan — so you only do what makes sense for you.'],
+          ['Is there a med spa near me?', 'VIO has locations across the country. Use “Find your VIO” to see the closest one and book.'],
+        ],
+      },
+      {
+        __component: 'sections.find',
+        id: 'find',
+        title: ['Aesthetics, curated for you.', 'Clinical care made personal.'],
+        image: A('img/wellness-wide.jpg'),
+        handle: '@viomedspa',
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M12 5l7 7-7 7',
+  arrowUR: 'M7 17 17 7M8 7h9v9',
+  menu: 'M4 8h16M4 16h16',
+  x: 'M18 6 6 18M6 6l12 12',
+  plus: 'M12 5v14M5 12h14',
+  check: 'M20 6 9 17l-5-5',
+  pin: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3',
+  play: 'M7 4l13 8-13 8z',
+  pause: 'M7 4h3v16H7zM14 4h3v16h-3z',
+  left: 'M15 18l-6-6 6-6',
+  right: 'M9 18l6-6-6-6',
+  insta: 'M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM17.5 6.5h.01',
+};
+const Icon = ({ name, className = 'w-5 h-5', sw = 1.5 }) => html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth=${sw} strokeLinecap="round" strokeLinejoin="round" className=${className} aria-hidden="true"><path d=${ICONS[name]} /></svg>`;
+
+const ease = [0.22, 1, 0.36, 1];
+const fadeUp = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.85, ease } } };
+const stagger = (s = 0.08, d = 0) => ({ hidden: {}, show: { transition: { staggerChildren: s, delayChildren: d } } });
+const inView = { initial: 'hidden', whileInView: 'show', viewport: { once: true, margin: '-70px' } };
+const Reveal = ({ children, className = '', delay = 0 }) => html`<${motion.div} className=${className} ...${inView} variants=${{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.85, ease, delay } } }}>${children}<//>`;
+const Eyebrow = ({ children, light }) => html`<div className=${`text-[11.5px] font-medium tracking-[0.3em] uppercase ${light ? 'text-sand' : 'text-slate-600'}`}>${children}</div>`;
+const H2 = ({ children, className = '' }) => html`<h2 className=${`font-display font-semibold tracking-[-0.03em] text-[38px] sm:text-[52px] lg:text-[68px] leading-[0.98] ${className}`}>${children}</h2>`;
+
+const Button = ({ href, children, variant = 'ink', className = '', icon = 'arrow', type, onClick }) => {
+  const styles = {
+    ink: 'bg-ink text-cream hover:bg-slate-800',
+    cream: 'bg-cream text-ink hover:bg-sand',
+    slate: 'bg-slate-600 text-white hover:bg-slate-800',
+    outline: 'ring-1 ring-ink/25 text-ink hover:bg-ink hover:text-cream',
+    ghost: 'ring-1 ring-white/40 text-white hover:bg-white hover:text-ink',
+  };
+  const Tag = href ? motion.a : motion.button;
+  return html`<${Tag} href=${href} type=${type} onClick=${onClick} whileTap=${{ scale: 0.97 }}
+    className=${`group inline-flex items-center justify-center gap-3 rounded-full px-7 h-[52px] text-[12.5px] font-medium tracking-[0.18em] uppercase whitespace-nowrap transition-colors duration-300 ${styles[variant]} ${className}`}>
+    ${children}${icon && html`<${Icon} name=${icon} className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" sw=${1.7} />`}
+  <//>`;
+};
+
+const FindVio = ({ dark, className = '' }) => {
+  const [q, setQ] = useState('');
+  const [done, setDone] = useState(false);
+  return html`<div className=${className}>
+    <form onSubmit=${(e) => { e.preventDefault(); setDone(true); }} className=${`flex items-center gap-2 rounded-full p-1.5 pl-5 ${dark ? 'bg-white/10 ring-1 ring-white/25 backdrop-blur' : 'bg-white ring-1 ring-ink/10 shadow-[0_20px_40px_-30px_rgba(36,32,29,.5)]'}`}>
+      <${Icon} name="pin" className=${`w-5 h-5 shrink-0 ${dark ? 'text-sand' : 'text-slate-600'}`} />
+      <label className="flex-1 min-w-0"><span className="sr-only">City, state or ZIP</span><input value=${q} onChange=${(e) => { setQ(e.target.value); setDone(false); }} placeholder="City, state or ZIP" autoComplete="postal-code" className=${`w-full h-11 bg-transparent text-[15px] focus:outline-none ${dark ? 'text-white placeholder:text-white/55' : 'placeholder:text-ink/40'}`} /></label>
+      <button type="submit" className=${`h-11 px-5 rounded-full text-[12px] font-medium tracking-[0.18em] uppercase whitespace-nowrap ${dark ? 'bg-cream text-ink' : 'bg-ink text-cream'}`}>Find your VIO</button>
+    </form>
+    <${AnimatePresence}>${done && html`<${motion.p} initial=${{ opacity: 0, y: -4 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0 }} className=${`mt-3 pl-5 text-[13.5px] ${dark ? 'text-white/80' : 'text-ink/60'}`}>Showing VIO locations near <strong className="font-medium">${q || 'you'}</strong> — connected to the live locations API in production.<//>`}<//>
+  </div>`;
+};
+
+/* ============================== Header ============================== */
+const Header = ({ g, cats }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [mega, setMega] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 30));
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+  return html`
+  <header className="sticky top-0 z-50" onMouseLeave=${() => setMega(false)}>
+    <div className="bg-ink text-cream text-[12px] tracking-[0.2em] uppercase"><div className="h-9 flex items-center justify-center gap-3 px-4 text-center"><span>${g.promo.text}</span><a href=${g.promo.href} className="underline underline-offset-4 decoration-taupe hover:text-sand">${g.promo.link}</a></div></div>
+    <div className=${`transition-all duration-300 ${scrolled || mega ? 'bg-cream/90 backdrop-blur-xl border-b border-ink/10' : 'bg-cream border-b border-transparent'}`}>
+      <div className=${`w-[92%] mx-auto flex items-center justify-between gap-6 transition-all duration-300 ${scrolled ? 'h-[66px]' : 'h-[82px]'}`}>
+        <a href="#" aria-label="VIO Med Spa home"><img src=${g.logo.dark} alt=${g.logo.alt} className=${`w-auto transition-all duration-300 ${scrolled ? 'h-7' : 'h-9'}`} /></a>
+        <nav className="hidden xl:flex items-center gap-8" aria-label="Primary">
+          ${g.nav.map((n) => html`<a key=${n.label} href=${n.href} onMouseEnter=${() => setMega(!!n.mega)} aria-haspopup=${n.mega ? 'true' : undefined} aria-expanded=${n.mega ? mega : undefined} className="group relative h-10 flex items-center text-[12.5px] tracking-[0.2em] uppercase text-ink/75 hover:text-ink">${n.label}<span className="absolute left-0 right-0 bottom-2 h-px bg-ink origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span></a>`)}
+        </nav>
+        <div className="flex items-center gap-2">
+          <${Button} href=${g.cta.href} className="hidden sm:inline-flex h-11 px-6 text-[11.5px]" icon="pin">${g.cta.label}<//>
+          <button onClick=${() => setOpen(true)} className="xl:hidden grid place-items-center w-11 h-11 rounded-full ring-1 ring-ink/15" aria-label="Open menu"><${Icon} name="menu" /></button>
+        </div>
+      </div>
+      <${AnimatePresence}>
+        ${mega && html`
+          <${motion.div} key="mega" initial=${{ opacity: 0, y: -8 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, transition: { duration: 0.15 } }} transition=${{ duration: 0.3, ease }} className="hidden xl:block absolute inset-x-0 top-full bg-cream border-b border-ink/10 shadow-[0_40px_60px_-40px_rgba(36,32,29,.35)]">
+            <div className="w-[92%] mx-auto py-10 grid grid-cols-4 gap-6">
+              ${cats.map((c) => html`<a key=${c.name} href="#treatments" className="group block"><div className="relative aspect-[4/3] rounded-2xl overflow-hidden"><img src=${c.image} alt="" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" /></div>
+                <div className="mt-3 flex items-center justify-between"><span className="font-display text-[20px] font-semibold">${c.name}</span><${Icon} name="arrowUR" className="w-4 h-4 text-slate-600" /></div><p className="text-[13px] text-ink/55">${c.line}</p></a>`)}
+            </div>
+          <//>`}
+      <//>
+    </div>
+    <${AnimatePresence}>
+      ${open && html`
+        <${motion.div} key="drawer" className="fixed inset-0 z-[60] bg-cream flex flex-col" initial=${{ y: '-100%' }} animate=${{ y: 0 }} exit=${{ y: '-100%' }} transition=${{ duration: 0.5, ease }}>
+          <div className="flex items-center justify-between px-5 h-[82px]"><img src=${g.logo.dark} alt=${g.logo.alt} className="h-8" /><button onClick=${() => setOpen(false)} className="grid place-items-center w-11 h-11 rounded-full ring-1 ring-ink/15" aria-label="Close menu"><${Icon} name="x" /></button></div>
+          <${motion.nav} className="px-6 pt-4 flex-1 overflow-y-auto" variants=${stagger(0.05, 0.2)} initial="hidden" animate="show">
+            ${g.nav.map((n) => html`<${motion.a} key=${n.label} variants=${fadeUp} href=${n.href} onClick=${() => setOpen(false)} className="flex items-center justify-between py-4 border-b border-ink/10 font-display font-semibold text-[34px] tracking-[-0.02em]">${n.label}<${Icon} name="arrowUR" className="w-5 h-5 text-slate-600" /><//>`)}
+          <//>
+          <div className="p-6"><${FindVio} /></div>
+        <//>`}
+    <//>
+  </header>`;
+};
+
+/* ============================== Sections ============================== */
+const Hero = ({ d }) => {
+  const ref = useRef(null);
+  const vid = useRef(null);
+  const [playing, setPlaying] = useState(true);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const inset = useTransform(scrollYProgress, [0, 1], ['0px', '48px']);
+  const radius = useTransform(scrollYProgress, [0, 1], ['28px', '56px']);
+  const toggle = () => { const v = vid.current; if (!v) return; if (v.paused) { v.play(); setPlaying(true); } else { v.pause(); setPlaying(false); } };
+  return html`
+  <section ref=${ref} className="relative bg-cream px-3 sm:px-5 pb-6">
+    <${motion.div} style=${{ marginLeft: inset, marginRight: inset, borderRadius: radius }} className="relative h-[calc(100svh-140px)] min-h-[560px] overflow-hidden bg-sand">
+      <video ref=${vid} className="absolute inset-0 w-full h-full object-cover" src=${d.video} poster=${d.poster} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"></video>
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-ink/20"></div>
+      <div className="relative h-full flex flex-col justify-end p-6 sm:p-10 lg:p-14 text-white">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+          <div className="lg:col-span-8">
+            <h1 className="font-display font-semibold tracking-[-0.04em] leading-[0.92] text-[46px] sm:text-[78px] lg:text-[104px]">
+              ${d.title.map((t, i) => html`<span key=${i} className="block overflow-hidden pb-1"><${motion.span} className="block" initial=${{ y: '105%' }} animate=${{ y: 0 }} transition=${{ duration: 1.05, ease, delay: 0.2 + i * 0.13 }}>${t}<//></span>`)}
+            </h1>
+            <${motion.p} initial=${{ opacity: 0, y: 14 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 0.8, ease, delay: 0.7 }} className="mt-4 font-serif italic text-[28px] sm:text-[36px] text-sand">${d.sub}<//>
+          </div>
+          <${motion.div} initial=${{ opacity: 0, y: 20 }} animate=${{ opacity: 1, y: 0 }} transition=${{ duration: 0.8, ease, delay: 0.9 }} className="lg:col-span-4">
+            <${FindVio} dark />
+            <div className="mt-4 flex items-center gap-3"><${Button} href="#quiz" variant="ghost" icon=${null} className="h-11 px-5 text-[11.5px]">Take the skin quiz<//>
+              <button onClick=${toggle} aria-label=${playing ? 'Pause background video' : 'Play background video'} className="grid place-items-center w-11 h-11 rounded-full ring-1 ring-white/40 hover:bg-white/15"><${Icon} name=${playing ? 'pause' : 'play'} className="w-4 h-4" /></button></div>
+          <//>
+        </div>
+      </div>
+    <//>
+  </section>`;
+};
+
+const Categories = ({ d }) => {
+  const [a, setA] = useState(0);
+  return html`
+  <section id=${d.id} className="bg-cream py-24 lg:py-32 scroll-mt-24">
+    <div className="w-[92%] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <${Reveal} className="lg:col-span-7"><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+        <${Reveal} className="lg:col-span-5" delay=${0.1}><p className="text-[16.5px] leading-relaxed text-ink/65">${d.body}</p><div className="mt-6"><${Button} href="#find">Book an appointment<//></div><//>
+      </div>
+      <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        ${d.items.map((c, i) => html`
+          <${motion.a} key=${c.name} href="#find" onMouseEnter=${() => setA(i)} initial=${{ opacity: 0, y: 40 }} whileInView=${{ opacity: 1, y: 0 }} viewport=${{ once: true, margin: '-60px' }} transition=${{ duration: 0.9, ease, delay: i * 0.08 }}
+            className=${`group relative overflow-hidden rounded-[28px] h-[460px] lg:h-[540px] ${i % 2 ? 'lg:mt-14' : ''}`}>
+            <img src=${c.image} alt=${`${c.name} treatment at VIO Med Spa`} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent"></div>
+            <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+              <div className="flex items-end justify-between gap-4"><h3 className="font-display font-semibold text-[34px] tracking-[-0.02em] leading-none">${c.name}</h3><span className="grid place-items-center w-11 h-11 rounded-full bg-cream text-ink group-hover:rotate-[-45deg] transition-transform"><${Icon} name="arrow" className="w-4 h-4" /></span></div>
+              <p className="mt-2 text-[14px] text-white/80">${c.line}</p>
+              <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-500"><ul className="overflow-hidden flex flex-wrap gap-1.5">${c.list.map((t) => html`<li key=${t} className="mt-3 rounded-full bg-white/15 backdrop-blur px-3 py-1 text-[12.5px]">${t}</li>`)}</ul></div>
+            </div>
+          <//>`)}
+      </div>
+    </div>
+  </section>`;
+};
+
+const Concerns = ({ d, concerns }) => {
+  const [hover, setHover] = useState(null);
+  return html`
+  <section className="relative bg-sand-100 py-24 lg:py-32 overflow-hidden">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <${Reveal} className="lg:col-span-5">
+        <div className="relative aspect-[4/5] rounded-t-full overflow-hidden"><img src=${d.image} alt="VIO Med Spa lobby" loading="lazy" className="absolute inset-0 w-full h-full object-cover" /></div>
+      <//>
+      <div className="lg:col-span-7">
+        <${Reveal}><${Eyebrow}>Shop by concern<//><${H2} className="mt-5">${d.title.split('goals').map((p, i) => i ? html`<span key=${i}><span className="font-serif italic font-normal text-taupe-600">goals</span>${p}</span>` : p)}<//><//>
+        <${motion.ul} className="mt-10 flex flex-wrap gap-2.5" variants=${stagger(0.03)} ...${inView}>
+          ${concerns.map(([n, c], i) => html`<${motion.li} key=${n} variants=${fadeUp}><a href="#treatments" onMouseEnter=${() => setHover(i)} onMouseLeave=${() => setHover(null)} className=${`inline-flex items-center gap-2 h-12 px-5 rounded-full text-[15px] transition-all duration-300 ${hover === i ? 'bg-ink text-cream' : 'bg-white ring-1 ring-ink/10 hover:ring-ink/30'}`}>
+            ${n}<span className=${`text-[11px] tracking-[0.16em] uppercase ${hover === i ? 'text-sand' : 'text-slate-600'}`}>${c}</span></a><//>`)}
+        <//>
+        <${Reveal} className="mt-10"><${Button} href="#find" variant="outline">Find your VIO<//><//>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Quiz = ({ d }) => {
+  const [step, setStep] = useState(0);
+  const [ans, setAns] = useState([]);
+  const pick = (o) => { const a = [...ans]; a[step] = o; setAns(a); setStep(step + 1); };
+  const done = step >= d.steps.length;
+  const rec = done ? d.map[ans[0]] : null;
+  return html`
+  <section id=${d.id} className="bg-cream py-24 lg:py-32 scroll-mt-24">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <${Reveal} className="lg:col-span-5 relative min-h-[420px] rounded-[32px] overflow-hidden">
+        <img src=${d.image} alt="Client completing the VIO skin quiz" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent"></div>
+        <div className="absolute left-7 bottom-7 right-7 text-white"><${Eyebrow} light>${d.eyebrow}<//><h2 className="mt-3 font-display font-semibold text-[40px] tracking-[-0.03em] leading-none">${d.title}</h2></div>
+      <//>
+      <${Reveal} className="lg:col-span-7 rounded-[32px] bg-slate-600 text-white p-8 sm:p-12 flex flex-col" delay=${0.1}>
+        <p className="text-[16px] text-white/80 max-w-lg">${d.body}</p>
+        <div className="mt-8 flex gap-2">${d.steps.map((_, i) => html`<span key=${i} className="h-1 flex-1 rounded-full bg-white/20 overflow-hidden"><${motion.span} className="block h-full bg-cream" animate=${{ width: step > i ? '100%' : '0%' }} transition=${{ duration: 0.5, ease }} /></span>`)}</div>
+        <div className="mt-8 flex-1 min-h-[260px]">
+          <${AnimatePresence} mode="wait">
+            ${done ? html`
+              <${motion.div} key="r" initial=${{ opacity: 0, y: 16 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0 }}>
+                <div className="text-[12px] tracking-[0.28em] uppercase text-sand">Your starting point</div>
+                <div className="mt-3 font-display font-semibold text-[56px] tracking-[-0.03em] leading-none">${rec}</div>
+                <p className="mt-4 text-white/80 max-w-md">Based on your goal (${ans[0].toLowerCase()}), ${ans[1].toLowerCase()} downtime and your experience, we’d start with a ${rec.toLowerCase()} consultation with a licensed VIO provider.</p>
+                <div className="mt-7 flex flex-wrap gap-3"><${Button} href="#find" variant="cream">Book a consultation<//><${Button} variant="ghost" icon=${null} onClick=${() => { setStep(0); setAns([]); }}>Retake quiz<//></div>
+              <//>` : html`
+              <${motion.div} key=${step} initial=${{ opacity: 0, x: 24 }} animate=${{ opacity: 1, x: 0 }} exit=${{ opacity: 0, x: -24 }} transition=${{ duration: 0.35, ease }}>
+                <div className="text-[12px] tracking-[0.28em] uppercase text-sand">Question ${step + 1} of ${d.steps.length}</div>
+                <h3 className="mt-3 font-display font-semibold text-[30px] sm:text-[36px] tracking-[-0.02em] leading-tight">${d.steps[step].q}</h3>
+                <div className="mt-6 grid sm:grid-cols-2 gap-2.5">${d.steps[step].options.map((o) => html`<button key=${o} onClick=${() => pick(o)} className="group flex items-center justify-between rounded-2xl bg-white/10 hover:bg-cream hover:text-ink px-5 h-14 text-left text-[15px] transition-colors">${o}<${Icon} name="arrow" className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" /></button>`)}</div>
+                ${step > 0 && html`<button onClick=${() => setStep(step - 1)} className="mt-5 inline-flex items-center gap-1.5 text-[13px] text-white/70 hover:text-white"><${Icon} name="left" className="w-4 h-4" />Back</button>`}
+              <//>`}
+          <//>
+        </div>
+      <//>
+    </div>
+  </section>`;
+};
+
+const Results = ({ d }) => {
+  const [a, setA] = useState(0);
+  const [pos, setPos] = useState(50);
+  const rail = useRef(null);
+  const r = d.items[a];
+  return html`
+  <section id=${d.id} className="bg-sand py-24 lg:py-32 scroll-mt-24">
+    <div className="w-[92%] mx-auto">
+      <div className="flex flex-wrap items-end justify-between gap-6"><${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">${d.title}<//><//>
+        <div className="flex gap-2"><button onClick=${() => { setA((a - 1 + d.items.length) % d.items.length); setPos(50); }} aria-label="Previous result" className="grid place-items-center w-12 h-12 rounded-full ring-1 ring-ink/20 hover:bg-cream"><${Icon} name="left" /></button><button onClick=${() => { setA((a + 1) % d.items.length); setPos(50); }} aria-label="Next result" className="grid place-items-center w-12 h-12 rounded-full bg-ink text-cream"><${Icon} name="right" /></button></div></div>
+      <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <${Reveal} className="lg:col-span-8">
+          <div className="relative aspect-[4/3] sm:aspect-[16/10] rounded-[28px] overflow-hidden select-none bg-sand-300">
+            <${AnimatePresence} mode="popLayout" initial=${false}>
+              <${motion.div} key=${a} className="absolute inset-0" initial=${{ opacity: 0 }} animate=${{ opacity: 1 }} exit=${{ opacity: 0 }} transition=${{ duration: 0.5 }}>
+                <img src=${r.after} alt=${`${r.label} — after`} className="absolute inset-0 w-full h-full object-cover" draggable="false" />
+                <div className="absolute inset-0" style=${{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}><img src=${r.before} alt=${`${r.label} — before`} className="absolute inset-0 w-full h-full object-cover" draggable="false" /></div>
+              <//>
+            <//>
+            <span className="absolute top-4 left-4 rounded-full bg-ink/70 backdrop-blur text-cream px-3.5 py-1.5 text-[11px] tracking-[0.2em] uppercase">Before</span>
+            <span className="absolute top-4 right-4 rounded-full bg-cream text-ink px-3.5 py-1.5 text-[11px] tracking-[0.2em] uppercase">After</span>
+            <div className="absolute inset-y-0 w-0.5 bg-cream pointer-events-none" style=${{ left: `${pos}%` }}><span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid place-items-center w-14 h-14 rounded-full bg-cream text-ink shadow-xl"><svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" /></svg></span></div>
+            <input type="range" min="0" max="100" value=${pos} onInput=${(e) => setPos(+e.target.value)} onChange=${(e) => setPos(+e.target.value)} aria-label=${`Compare before and after: ${r.label}`} className="ba absolute inset-0 w-full h-full opacity-0 cursor-ew-resize" />
+          </div>
+        <//>
+        <div ref=${rail} className="lg:col-span-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 content-start">
+          ${d.items.map((x, i) => html`<button key=${x.label} onClick=${() => { setA(i); setPos(50); }} aria-pressed=${a === i} className=${`group text-left rounded-2xl p-2 transition-colors ${a === i ? 'bg-ink text-cream' : 'bg-cream hover:bg-white'}`}>
+            <div className="aspect-square rounded-xl overflow-hidden"><img src=${x.after} alt="" loading="lazy" className="w-full h-full object-cover" /></div><div className="mt-2 px-1 pb-1 text-[12.5px] leading-tight">${x.label}</div></button>`)}
+        </div>
+      </div>
+    </div>
+  </section>`;
+};
+
+const Reviews = ({ d }) => html`
+  <section className="bg-cream py-24 lg:py-32 overflow-hidden">
+    <div className="w-[92%] mx-auto"><${Reveal}><${Eyebrow}>${d.eyebrow}<//><${H2} className="mt-5">Feel the <span className="font-serif italic font-normal text-taupe-600">difference.</span><//><//></div>
+    <div className="mt-14 space-y-4">
+      ${[0, 1].map((r) => html`<div key=${r} className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_6%,black_94%,transparent)]">
+        <${motion.div} className="flex gap-4 w-max" animate=${{ x: r ? ['-50%', '0%'] : ['0%', '-50%'] }} transition=${{ duration: 70 + r * 10, repeat: Infinity, ease: 'linear' }}>
+          ${[...d.items.slice(r * 4), ...d.items.slice(0, r * 4), ...d.items].map(([on, text, name, city], k) => html`
+            <figure key=${k} className=${`w-[340px] shrink-0 rounded-[26px] p-7 ${k % 3 === 1 ? 'bg-slate-600 text-white' : 'bg-sand-100'}`}>
+              <div className=${`text-[11px] tracking-[0.26em] uppercase ${k % 3 === 1 ? 'text-sand' : 'text-slate-600'}`}>On ${on}</div>
+              <blockquote className="mt-4 font-serif italic text-[22px] leading-snug">“${text}”</blockquote>
+              <figcaption className=${`mt-5 text-[13px] ${k % 3 === 1 ? 'text-white/75' : 'text-ink/55'}`}>${name} · ${city}</figcaption>
+            </figure>`)}
+        <//></div>`)}
+    </div>
+  </section>`;
+
+const ClubVio = ({ d }) => html`
+  <section id=${d.id} className="bg-cream pb-24 lg:pb-32 scroll-mt-24">
+    <div className="w-[92%] mx-auto">
+      <${Reveal}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 rounded-[36px] overflow-hidden bg-ink text-cream">
+          <div className="lg:col-span-6 relative min-h-[360px]"><img src=${d.image} alt="ClubVIO member treatment" loading="lazy" className="absolute inset-0 w-full h-full object-cover" /></div>
+          <div className="lg:col-span-6 p-8 sm:p-12 lg:p-16 flex flex-col">
+            <div className="font-display font-semibold text-[22px] tracking-[0.18em] uppercase text-sand">${d.eyebrow}</div>
+            <h2 className="mt-4 font-display font-semibold text-[40px] sm:text-[52px] tracking-[-0.03em] leading-[1]">${d.title}</h2>
+            <${motion.ul} className="mt-10 grid gap-4" variants=${stagger(0.1)} ...${inView}>
+              ${d.perks.map((p, i) => html`<${motion.li} key=${p.title} variants=${fadeUp} className="flex gap-5 items-start border-t border-white/15 pt-5"><span className="font-serif italic text-[30px] text-taupe leading-none">0${i + 1}</span><div><div className="text-[17px] font-medium">${p.title}</div><p className="mt-1 text-[14.5px] text-white/65">${p.body}</p></div><//>`)}
+            <//>
+            <div className="mt-auto pt-10"><${Button} href="#" variant="cream">Discover ClubVIO<//></div>
+          </div>
+        </div>
+      <//>
+    </div>
+  </section>`;
+
+const Financing = ({ d }) => html`
+  <section id=${d.id} className="bg-sand-100 py-20 lg:py-24 scroll-mt-24">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      <${Reveal} className="lg:col-span-6"><${Eyebrow}>${d.eyebrow}<//><h2 className="mt-4 font-display font-semibold text-[34px] sm:text-[44px] tracking-[-0.03em] leading-[1.02]">${d.title}</h2><p className="mt-4 text-[16px] text-ink/65 max-w-lg">${d.body}</p><p className="mt-3 text-[12.5px] text-ink/45">${d.note}</p><div className="mt-6"><${Button} href="#" variant="outline">Explore financing<//></div><//>
+      <${motion.ul} className="lg:col-span-6 grid grid-cols-3 gap-3" variants=${stagger(0.08)} ...${inView}>
+        ${d.partners.map((p) => html`<${motion.li} key=${p.name} variants=${fadeUp} className="grid place-items-center h-28 rounded-2xl bg-white ring-1 ring-ink/5 px-5">${p.logo ? html`<img src=${p.logo} alt=${p.name} loading="lazy" className="max-h-9 w-auto" />` : html`<span className="font-display font-bold text-[26px] tracking-[-0.03em] text-[#E8173D]">${p.name.toLowerCase()}</span>`}<//>`)}
+      <//>
+    </div>
+  </section>`;
+
+const Faq = ({ d }) => {
+  const [o, setO] = useState(0);
+  return html`
+  <section className="bg-cream py-24 lg:py-32">
+    <div className="w-[92%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <${Reveal} className="lg:col-span-4"><${Eyebrow}>FAQ<//><${H2} className="mt-5">${d.title}<//><//>
+      <div className="lg:col-span-8 border-t border-ink/10">
+        ${d.items.map(([q, a], i) => html`<div key=${q} className="border-b border-ink/10">
+          <h3><button onClick=${() => setO(o === i ? -1 : i)} aria-expanded=${o === i} aria-controls=${`faq-${i}`} className="w-full flex items-center justify-between gap-6 py-6 text-left text-[19px] sm:text-[22px] font-display font-semibold tracking-[-0.01em]">${q}<${motion.span} animate=${{ rotate: o === i ? 45 : 0 }} className=${`grid place-items-center w-10 h-10 rounded-full shrink-0 ${o === i ? 'bg-ink text-cream' : 'ring-1 ring-ink/15'}`}><${Icon} name="plus" /><//></button></h3>
+          <${AnimatePresence} initial=${false}>${o === i && html`<${motion.div} id=${`faq-${i}`} key="a" initial=${{ height: 0, opacity: 0 }} animate=${{ height: 'auto', opacity: 1 }} exit=${{ height: 0, opacity: 0 }} transition=${{ duration: 0.3, ease }} className="overflow-hidden"><p className="pb-6 pr-16 text-[16px] leading-relaxed text-ink/65">${a}</p><//>`}<//>
+        </div>`)}
+      </div>
+    </div>
+  </section>`;
+};
+
+const Find = ({ d }) => html`
+  <section id=${d.id} className="relative bg-ink text-cream overflow-hidden scroll-mt-24">
+    <img src=${d.image} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+    <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-ink/20"></div>
+    <div className="relative w-[92%] mx-auto py-28 lg:py-40 text-center">
+      <${Reveal}><h2 className="font-display font-semibold tracking-[-0.04em] text-[44px] sm:text-[72px] lg:text-[96px] leading-[0.95]">${d.title[0]}</h2><p className="mt-4 font-serif italic text-[28px] sm:text-[40px] text-sand">${d.title[1]}</p><//>
+      <${Reveal} delay=${0.15} className="mt-10 mx-auto max-w-xl"><${FindVio} dark /><//>
+      <${Reveal} delay=${0.25} className="mt-8"><a href="https://www.instagram.com/viomedspa/" target="_blank" rel="noopener" className="inline-flex items-center gap-2 text-[13px] tracking-[0.2em] uppercase text-white/80 hover:text-white"><${Icon} name="insta" className="w-4 h-4" />Follow us ${d.handle}</a><//>
+    </div>
+  </section>`;
+
+const Footer = ({ g }) => html`
+  <footer className="bg-ink text-cream/65 border-t border-white/10">
+    <div className="w-[92%] mx-auto pt-16 pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-12 border-b border-white/10">
+        <div className="lg:col-span-5"><img src=${g.logo.light} alt=${g.logo.alt} className="h-10 w-auto" loading="lazy" /><p className="mt-6 font-serif italic text-[26px] text-cream leading-snug max-w-sm">Aesthetics, curated for you. Clinical care made personal.</p></div>
+        <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">${g.footer.map((c) => html`<div key=${c.title}><div className="text-[11.5px] tracking-[0.26em] uppercase text-sand mb-5">${c.title}</div><ul className="space-y-3 text-[14.5px]">${c.links.map((l) => html`<li key=${l}><a href="#" className="hover:text-cream">${l}</a></li>`)}</ul></div>`)}</div>
+      </div>
+      <div className="pt-8 flex flex-col md:flex-row gap-4 justify-between text-[12.5px] text-cream/40">
+        <p>© 2026 VIO Med Spa <span className="mx-2 text-cream/20">|</span>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" className="text-cream/75 hover:text-cream underline-offset-4 hover:underline">VOCSO</a></p>
+        <div className="flex flex-wrap gap-5">${['Privacy Policy', 'Your Privacy Choices', 'Terms & Conditions', 'Sitemap', 'Cookie Settings'].map((l) => html`<a key=${l} href="#" className="hover:text-cream">${l}</a>`)}</div>
+      </div>
+    </div>
+  </footer>`;
+
+/* =========================== Section renderer =========================== */
+const REGISTRY = {
+  'sections.hero': Hero, 'sections.categories': Categories, 'sections.concerns': Concerns, 'sections.quiz': Quiz,
+  'sections.results': Results, 'sections.reviews': Reviews, 'sections.clubvio': ClubVio, 'sections.financing': Financing,
+  'sections.faq': Faq, 'sections.find': Find,
+};
+const cats = CMS.page.sections.find((s) => s.__component === 'sections.categories').items;
+
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-ink focus:text-cream focus:px-4 focus:py-2 focus:rounded-full">Skip to content</a>
+    <${Header} g=${CMS.global} cats=${cats} />
+    <main id="main">${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} concerns=${CMS.global.concerns} />` : null; })}</main>
+    <${Footer} g=${CMS.global} />
+  <//>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+document.getElementById('boot').remove();
+</script>
+</body>
+</html>
