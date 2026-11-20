@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relive Health — Personalized Health, Wellness & Anti-Aging</title>
+<meta name="description" content="Feel like yourself again. 100+ biomarkers, a physician's review in 48 hours and a protocol built around your biology. Personalized health and medical aesthetics." />
+<link rel="icon" href="assets/logo-dark.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600&family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          cyan: { DEFAULT: '#39BCDD', 50: '#ECF8FC', 100: '#D3F0F8', 300: '#8AD6EB', 600: '#1F9CBD', 800: '#136A81' },
+          graphite: { DEFAULT: '#1F2124', 700: '#2B2E33', 600: '#3A3E44', 400: '#7A8089' },
+          mist: '#F1F5F7',
+        },
+        fontFamily: {
+          display: ['Unbounded', 'Inter', 'system-ui', 'sans-serif'],
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid #39BCDD; outline-offset: 3px; border-radius: 8px; }
+  .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+  .marquee { animation: marquee 40s linear infinite; } .marquee.rev { animation-direction: reverse; }
+  @media (prefers-reduced-motion: reduce) { .marquee { animation: none; } }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#1F2124; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-white text-graphite">
+<div id="boot"><img src="assets/logo.svg" alt="" width="140" /></div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, animate, useInView } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (header, footer) + Collection "page" with a
+   Dynamic Zone `sections`. Services, doctors and testimonials are their own
+   Collection Types. Media from relivehealth.com.
+   ========================================================================== */
+const A = (p) => `assets/${p}`;
+const U = (p) => `https://relivehealth.com/wp-content/uploads/2026/${p}`;
+
+const CMS = {
+  global: {
+    logo: { light: A('logo.svg'), dark: A('logo-dark.svg'), alt: 'Relive Health' },
+    nav: [
+      { label: 'Personalized Health', href: '#improve', menu: ['Blood Work', 'Regenerative Services', 'IV Therapy', 'Ozone', 'EBOO', 'Peptide Protocol', 'Medical Weight Loss', 'Male Hormone Optimization', 'Female Hormone Optimization'] },
+      { label: 'Aesthetics', href: '#improve', menu: ['PRF / PRP', 'Biostimulators', 'Dermal Fillers', 'Neuromodulators', 'Exosome Hair Restoration', 'Laser-assisted Hair Restoration', 'PRP / PRF Hair Restoration', 'Dermal Infusion Facial'] },
+      { label: 'Our Approach', href: '#approach' },
+      { label: 'Physicians', href: '#physicians' },
+      { label: 'Results', href: '#results' },
+    ],
+    cta: { label: 'Book appointment', href: '#book' },
+    cta2: { label: 'Find a location', href: '#book' },
+    footer: [
+      { title: 'Personalized Health', links: ['Blood Work', 'Regenerative Services', 'IV Therapy', 'Peptide Protocol', 'Medical Weight Loss', 'Hormone Optimization'] },
+      { title: 'Aesthetics', links: ['PRF / PRP', 'Biostimulators', 'Dermal Fillers', 'Neuromodulators', 'Hair Restoration', 'Dermal Infusion Facial'] },
+      { title: 'Relive Health', links: ['Locations', 'Our Physicians', 'Testimonials', 'Franchise', 'Contact'] },
+    ],
+  },
+
+  page: {
+    sections: [
+      {
+        __component: 'sections.hero',
+        slides: [
+          { tab: 'Restore', title: ['Feel like yourself again.', 'At your best.'], body: 'Personalized insights to restore your energy, balance your hormones, and help you feel in control again.', video: A('video/woman.webm'), poster: A('img/hero-woman.webp'),
+            metric: { label: 'Deep Sleep', value: '+41%', note: 'After protocol week 4' }, score: { label: 'Recovery score', value: 94, delta: '+18 pts', vs: 'vs. last month' },
+            markers: [['Testosterone', 'Optimal', 'good'], ['Cortisol (AM)', 'Normal', 'good'], ['Vitamin D', 'Low', 'warn']] },
+          { tab: 'Perform', title: ['Train harder.', 'Recover smarter.'], body: 'Data-driven insights to optimize recovery, improve performance, and push your limits with precision.', video: A('video/athlete.webm'), poster: A('img/hero-athlete.webp'),
+            metric: { label: 'Recovery Time', value: '+28%', note: 'Faster recovery rate' }, score: { label: 'Performance score', value: 92, delta: '+12 pts', vs: 'vs. last cycle' },
+            markers: [['Testosterone', 'Excellent', 'good'], ['Inflammation', 'Reduced', 'good'], ['VO2 Max', 'Improving', 'info']] },
+          { tab: 'Focus', title: ['Stay sharp.', 'Perform at your peak.'], body: 'Precision health insights to improve focus, regulate stress, and sustain high performance throughout your day.', video: A('video/executive.webm'), poster: A('img/hero-executive.webp'),
+            metric: { label: 'Stress Response', value: '−35%', note: 'More stable levels' }, score: { label: 'Cognitive score', value: 89, delta: '+15 pts', vs: 'vs. last month' },
+            markers: [['Cortisol', 'Balanced', 'good'], ['HRV', 'Improved', 'good'], ['Sleep Efficiency', '+22%', 'info']] },
+        ],
+        trust: ['Physician reviewed', 'Results in 48 hours', '100+ biomarkers', '4.9 average rating'],
+      },
+      {
+        __component: 'sections.goals',
+        id: 'improve',
+        eyebrow: 'Your goals',
+        title: ['What do you want to', 'improve?'],
+        body: 'Every protocol begins with your goals — not a generic wellness checklist.',
+        tabs: ['All Services', 'Personalized Health', 'Medical Aesthetics'],
+        items: [
+          { name: 'Energy & Focus', text: 'Sustain high performance and eliminate midday crashes.', tags: ['Mitochondria', 'Cortisol', 'B12'], cat: 'Personalized Health', icon: 'bolt' },
+          { name: 'Hormone Balance', text: 'Optimize testosterone, thyroid, and core endocrine health.', tags: ['Free T', 'DHEA', 'Estradiol'], cat: 'Personalized Health', icon: 'wave' },
+          { name: 'Gut Health', text: 'Improve digestion, nutrient absorption, and immunity.', tags: ['Microbiome', 'Inflammation', 'Absorption'], cat: 'Personalized Health', icon: 'leaf' },
+          { name: 'Recovery', text: 'Enhance sleep quality, HRV, and muscle repair.', tags: ['Magnesium', 'Zinc', 'Iron'], cat: 'Personalized Health', icon: 'moon' },
+          { name: 'Longevity', text: 'Slow aging pathways and protect cellular health.', tags: ['Telomeres', 'hs-CRP', 'Homocysteine'], cat: 'Personalized Health', icon: 'dna' },
+          { name: 'Body Optimization', text: 'Achieve and maintain your ideal body composition.', tags: ['Insulin', 'HbA1c', 'Leptin'], cat: 'Personalized Health', icon: 'target' },
+          { name: 'Skin Texture', text: 'Smooth rough patches, refine pores, and bring back an even, healthy glow.', tags: ['Collagen', 'Pores', 'Tone'], cat: 'Medical Aesthetics', icon: 'sparkle' },
+          { name: 'Fine Lines & Wrinkles', text: 'Soften expression lines and restore firmness for a naturally refreshed look.', tags: ['Neurotoxin', 'Filler', 'Firmness'], cat: 'Medical Aesthetics', icon: 'face' },
+          { name: 'Hair Growth', text: 'Reactivate dormant follicles and build thicker, fuller hair over time.', tags: ['Follicles', 'Density', 'PRP'], cat: 'Medical Aesthetics', icon: 'drop' },
+        ],
+      },
+      {
+        __component: 'sections.symptoms',
+        title: ['You might be', 'experiencing…'],
+        body: 'Most people accept these as “just getting older.” They’re not. They are signals — measurable, addressable, and fixable with the right data.',
+        video: A('video/symptoms.webm'),
+        chips: ['Chronic Fatigue', 'Brain Fog', 'Poor Sleep', 'Low Energy', 'Weight Gain', 'Mood Swings', 'Slow Recovery', 'Hormonal Imbalance', 'Lack of Focus', 'Anxiety', 'Low Libido', 'Digestive Issues'],
+        stats: [
+          { value: 100, suffix: '+', label: 'biomarkers analyzed in a single panel' },
+          { value: 4.5, suffix: '×', decimals: 1, label: 'more markers than standard care' },
+          { value: 48, suffix: 'h', label: 'to a physician-reviewed report' },
+        ],
+      },
+      {
+        __component: 'sections.approach',
+        id: 'approach',
+        eyebrow: 'Our approach',
+        title: ['A smarter approach', 'to your health.'],
+        body: 'We don’t guess. We measure, analyze, and act. Your journey to peak performance is designed around a continuous feedback loop.',
+        steps: [
+          { name: 'Test', text: 'Comprehensive biomarker and genetic analysis.' },
+          { name: 'Understand', text: 'In-depth clinical review of your personal data.' },
+          { name: 'Personalize', text: 'Tailored protocols for supplements, nutrition, and recovery.' },
+          { name: 'Optimize', text: 'Ongoing monitoring and dynamic adjustments.' },
+        ],
+      },
+      {
+        __component: 'sections.biomarkers',
+        eyebrow: 'Blood work',
+        title: ['This is where', 'everything starts.'],
+        body: 'Standard panels tell you if something is wrong. Ours tell you exactly how to perform at your best — long before anything goes wrong.',
+        points: ['100+ biomarkers in a single, comprehensive panel', 'Results reviewed by a licensed physician in 48 hours', 'Personalized reference ranges — not population averages', 'Longitudinal tracking across every visit', 'Actionable protocols, not just lab numbers'],
+        rows: [
+          ['Testosterone (Free)', '450 ng/dL', '+14%', 'good', 78], ['Cortisol (AM)', '18 μg/dL', 'Stable', 'info', 60], ['Free T3', '3.2 pg/mL', '+8%', 'good', 70],
+          ['Vitamin D3', '28 ng/mL', 'Action needed', 'warn', 34], ['hs-CRP', '0.8 mg/L', '−22%', 'good', 82], ['HbA1c', '5.1%', 'Optimal range', 'good', 88],
+        ],
+        footer: [['6 / 6', 'Panels done'], ['87', 'Health score'], ['4.5×', 'More markers']],
+      },
+      {
+        __component: 'sections.journey',
+        eyebrow: 'The journey',
+        title: ['From identifying issues', 'to optimal health.'],
+        body: 'Health optimization is a continuous journey. We guide you through every stage — with data, not guesswork.',
+        steps: [
+          { tag: 'Discovery', name: 'Identify', lead: 'Uncover what’s holding you back.', text: 'Your symptoms are signals. We start by listening — to your history, lifestyle, and your body’s own data — before designing a precise testing protocol.', image: A('img/hero-woman.webp') },
+          { tag: 'Analysis', name: 'Diagnose', lead: 'Precision data. Clinical clarity.', text: '100+ biomarkers analyzed. A physician reviews every result and explains what they mean for your specific goals — in plain language, not lab jargon.', image: A('img/venazio.jpg') },
+          { tag: 'Personalization', name: 'Design', lead: 'A protocol built around you.', text: 'No templates. Your plan covers supplementation, nutrition, sleep architecture, and recovery — calibrated to your biology and refined as you progress.', image: A('img/hero-executive.webp') },
+          { tag: 'Optimization', name: 'Elevate', lead: 'Live at your highest level.', text: 'Regular testing cycles and continuous adjustments mean your health doesn’t plateau. As your body changes, your protocol adapts — keeping you ahead.', image: A('img/hero-athlete.webp') },
+        ],
+      },
+      {
+        __component: 'sections.compare',
+        eyebrow: 'Relive vs. standard care',
+        title: ['Beyond the', 'standard checkup.'],
+        body: 'Standard care is designed to catch disease. We’re built to prevent it — and help you thrive long before any problem arises.',
+        rows: [
+          ['Comprehensive biomarker analysis', '100+', '12–15'], ['Clinical review by a doctor', true, true], ['Personalized protocol recommendations', true, false],
+          ['Follow-up lab work', true, false], ['Diet and nutrition strategy', true, false], ['Supplement optimization', true, false],
+          ['Direct access to care team', true, false], ['Focus on longevity and optimal performance', true, false], ['Actionable biological age analysis', true, false],
+        ],
+      },
+      {
+        __component: 'sections.physicians',
+        id: 'physicians',
+        eyebrow: 'Our physicians',
+        title: ['Medical care', 'designed around you.'],
+        body: 'Expert-led. Evidence-based. Medical authority.',
+        doctors: [
+          { name: 'Dr. Brian Brown', role: 'Medical Director', image: A('img/brown.jpg'), bio: 'Born and raised in Corpus Christi, TX, Dr. Brown earned his biology degree at Texas Tech University and attended medical school at the American University of the Caribbean. He trained in Baltimore, NYC and across Texas before returning to Corpus Christi to complete his residency.' },
+          { name: 'Dr. Michael Venazio', role: 'Medical Director', image: A('img/venazio.jpg'), bio: 'An internal medicine specialist who ran a private practice in South Florida for nearly 30 years, served as Chief of Staff at Sebastian River Medical Center and held medical director roles including with VNA Hospice. Board certified in Internal Medicine (ABIM, 2007).' },
+        ],
+        cmo: { name: 'Dr. Diyan Raza', role: 'Chief Medical Officer', image: A('img/raza.webp'), title: ['Modern medicine shouldn’t wait for decline.', 'It should prevent it.'],
+          bio: 'Dr. Raza is a longevity and regenerative medicine physician with specialized training in regenerative and restorative therapies, advanced interventional techniques, and precision procedures designed to optimize health, recovery, and performance.',
+          quote: 'Modern medicine must move beyond reactive care and begin addressing the underlying drivers of disease — before decline becomes irreversible.' },
+      },
+      {
+        __component: 'sections.testimonials',
+        id: 'results',
+        eyebrow: 'Testimonials',
+        title: ['Real people.', 'Real results.'],
+        body: 'Success stories, as told by you — thousands of clients across the Relive Health network living healthier, happier lives.',
+        videos: [
+          U('10/Relive-Testimonial-9_1.mp4'), U('09/relive_health_EliseC_38f392e8.webm'), U('10/Relive-Testimonial-8_1.mp4'),
+          U('09/relive_health_its-better-than-regular-bloodwork.webm'), U('10/Relive-Testimonial-7_1.mp4'), U('09/Relive_August25_Chris-HRT-at-home-1new-graphic_9x16.webm'),
+          U('10/Relive-Testimonial-6.mp4'), U('10/Relive-Testimonial-5.mp4'), U('10/Relive-Testimonial-4.mp4'),
+        ],
+        stats: [{ value: 4.9, decimals: 1, label: 'Average rating' }, { value: 48, suffix: 'h', label: 'Results turnaround' }, { value: 100, suffix: '+', label: 'Biomarkers per panel' }],
+      },
+      {
+        __component: 'sections.cta',
+        id: 'book',
+        title: ['Start understanding', 'your body today.'],
+        body: 'One appointment. 100+ biomarkers. A physician’s review. A protocol built around your biology — not a generic checklist.',
+        image: A('img/hero-woman.webp'),
+        badges: ['Physician reviewed', 'Results in 48 hours', '4.9 average rating'],
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M13 6l6 6-6 6', check: 'M5 12.5l4.5 4.5L19 7', x: 'M6 6l12 12M18 6L6 18', plus: 'M12 5v14M5 12h14',
+  play: 'M8 5.5v13l11-6.5z', pin: 'M12 21s-7-6.2-7-11.5a7 7 0 0114 0C19 14.8 12 21 12 21zM12 12a2.5 2.5 0 100-5 2.5 2.5 0 000 5z',
+  menu: 'M4 7h16M4 12h16M4 17h16', star: 'M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8z',
+  bolt: 'M13 3L5 13h6l-1 8 8-10h-6z', wave: 'M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0', leaf: 'M5 19c0-8 6-14 14-14 0 8-6 14-14 14zM5 19l7-7',
+  moon: 'M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z', dna: 'M7 3c0 6 10 6 10 12s-10 6-10 6M17 3c0 6-10 6-10 12M8 7h8M8 17h8', target: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 16a4 4 0 100-8 4 4 0 000 8z',
+  sparkle: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z', face: 'M12 21a9 9 0 100-18 9 9 0 000 18zM9 10h.01M15 10h.01M8.5 14.5c2 2 5 2 7 0',
+  drop: 'M12 3s-6 6.5-6 11a6 6 0 0012 0c0-4.5-6-11-6-11z', mute: 'M11 5L6 9H3v6h3l5 4zM22 9l-6 6M16 9l6 6', sound: 'M11 5L6 9H3v6h3l5 4zM15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13',
+};
+const Icon = ({ n, c = 'w-5 h-5', s = 1.7 }) => html`<svg class=${c} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=${s} stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${ICONS[n]} /></svg>`;
+
+const ease = [0.22, 1, 0.36, 1];
+const Reveal = ({ children, d = 0, y = 28, c = '' }) => html`<${motion.div} class=${c} initial=${{ opacity: 0, y }} whileInView=${{ opacity: 1, y: 0 }} viewport=${{ once: true, margin: '-60px' }} transition=${{ duration: 0.8, delay: d, ease }}>${children}</${motion.div}>`;
+const Eyebrow = ({ children, light }) => html`<p class=${`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] ${light ? 'text-cyan-300' : 'text-cyan-600'}`}><span class="w-1.5 h-1.5 rounded-full bg-cyan"></span>${children}</p>`;
+const H2 = ({ t, light, c = '' }) => html`<h2 class=${`font-display font-medium tracking-[-0.02em] leading-[1.08] text-[2rem] sm:text-[2.6rem] lg:text-[3.2rem] ${light ? 'text-white' : 'text-graphite'} ${c}`}>${t[0]}${t[1] && html` <span class="font-serif italic font-normal text-cyan tracking-normal text-[1.12em]">${t[1]}</span>`}</h2>`;
+const Btn = ({ href, children, v = 'primary', c = '' }) => {
+  const st = { primary: 'bg-cyan text-white hover:bg-cyan-600', dark: 'bg-graphite text-white hover:bg-graphite-700', ghost: 'border border-white/40 text-white hover:bg-white hover:text-graphite', outline: 'border border-graphite/20 text-graphite hover:border-graphite' }[v];
+  return html`<a href=${href} class=${`group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] transition-colors duration-300 ${st} ${c}`}>${children}<${Icon} n="arrow" c="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" /></a>`;
+};
+const Counter = ({ value, decimals = 0, suffix = '' }) => {
+  const ref = useRef(null); const inView = useInView(ref, { once: true, margin: '-10% 0px' }); const [v, setV] = useState(0);
+  useEffect(() => { if (!inView) return; const c = animate(0, value, { duration: 1.8, ease, onUpdate: (x) => setV(x) }); return () => c.stop(); }, [inView]);
+  return html`<span ref=${ref}>${v.toFixed(decimals)}${suffix}</span>`;
+};
+const TONE = { good: 'bg-emerald-50 text-emerald-700', warn: 'bg-amber-50 text-amber-700', info: 'bg-cyan-50 text-cyan-800' };
+const Wrap = ({ children, c = '' }) => html`<div class=${`mx-auto w-[90%] max-w-[1400px] ${c}`}>${children}</div>`;
+
+/* ================================ Header ================================ */
+const Header = ({ g }) => {
+  const [solid, setSolid] = useState(false); const [open, setOpen] = useState(false); const [mega, setMega] = useState(null);
+  useEffect(() => { const f = () => setSolid(window.scrollY > 40); f(); window.addEventListener('scroll', f, { passive: true }); return () => window.removeEventListener('scroll', f); }, []);
+  const dark = solid || open;
+  return html`
+  <header class=${`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${dark ? 'bg-white/90 backdrop-blur-xl shadow-[0_1px_0_rgba(31,33,36,0.06)]' : ''}`} onMouseLeave=${() => setMega(null)}>
+    <${Wrap} c="flex h-[76px] items-center justify-between gap-6">
+      <a href="#top" class="shrink-0"><img src=${dark ? g.logo.dark : g.logo.light} alt=${g.logo.alt} class="h-9 w-auto" /></a>
+      <nav class="hidden xl:flex items-center gap-1" aria-label="Main">
+        ${g.nav.map((n, i) => html`<a key=${i} href=${n.href} onMouseEnter=${() => setMega(n.menu ? i : null)} class=${`rounded-full px-4 py-2 text-[13.5px] font-medium transition-colors ${dark ? 'text-graphite/80 hover:text-graphite hover:bg-mist' : 'text-white/85 hover:text-white hover:bg-white/10'}`}>${n.label}${n.menu && html`<span class="ml-1 opacity-50">+</span>`}</a>`)}
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href=${g.cta2.href} class=${`hidden md:inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] ${dark ? 'text-graphite' : 'text-white'}`}><${Icon} n="pin" c="w-4 h-4" />${g.cta2.label}</a>
+        <a href=${g.cta.href} class="hidden sm:inline-flex rounded-full bg-cyan px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-white hover:bg-cyan-600 transition-colors">${g.cta.label}</a>
+        <button class=${`xl:hidden grid h-11 w-11 place-items-center rounded-full ${dark ? 'bg-mist text-graphite' : 'bg-white/10 text-white'}`} aria-label="Menu" aria-expanded=${open} onClick=${() => setOpen(!open)}><${Icon} n=${open ? 'x' : 'menu'} /></button>
+      </div>
+    </${Wrap}>
+    <${AnimatePresence}>${mega !== null && html`
+      <${motion.div} key="mega" initial=${{ opacity: 0, y: -8 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -8 }} transition=${{ duration: 0.25 }} class="absolute inset-x-0 top-full hidden xl:block">
+        <${Wrap} c="rounded-3xl bg-white p-8 shadow-2xl shadow-graphite/10 ring-1 ring-graphite/5 grid grid-cols-12 gap-8">
+          <div class="col-span-4 rounded-2xl bg-graphite p-6 text-white flex flex-col justify-between min-h-[200px]"><p class="font-display text-xl">${g.nav[mega].label}</p><p class="text-sm text-white/60">Every protocol starts with 100+ biomarkers and a physician’s review.</p></div>
+          <ul class="col-span-8 grid grid-cols-3 gap-x-6 gap-y-1 content-start">${g.nav[mega].menu.map((m) => html`<li key=${m}><a href="#improve" class="group flex items-center justify-between rounded-xl px-3 py-3 text-[14px] text-graphite/80 hover:bg-mist hover:text-graphite">${m}<${Icon} n="arrow" c="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition text-cyan" /></a></li>`)}</ul>
+        </${Wrap}>
+      </${motion.div}>`}
+    </${AnimatePresence}>
+    <${AnimatePresence}>${open && html`
+      <${motion.div} initial=${{ height: 0 }} animate=${{ height: 'auto' }} exit=${{ height: 0 }} class="xl:hidden overflow-hidden bg-white">
+        <${Wrap} c="py-6 flex flex-col gap-1">
+          ${g.nav.map((n) => html`<a key=${n.label} href=${n.href} onClick=${() => setOpen(false)} class="border-b border-graphite/5 py-4 font-display text-lg">${n.label}</a>`)}
+          <div class="mt-4 flex flex-col gap-3"><${Btn} href=${g.cta.href}>${g.cta.label}</${Btn}><${Btn} href=${g.cta2.href} v="outline">${g.cta2.label}</${Btn}></div>
+        </${Wrap}>
+      </${motion.div}>`}
+    </${AnimatePresence}>
+  </header>`;
+};
+
+/* ================================= Hero ================================= */
+const Ring = ({ value }) => {
+  const r = 30, C = 2 * Math.PI * r;
+  return html`<div class="relative h-20 w-20 shrink-0"><svg viewBox="0 0 72 72" class="h-full w-full -rotate-90"><circle cx="36" cy="36" r=${r} fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="5" /><${motion.circle} key=${value} cx="36" cy="36" r=${r} fill="none" stroke="#39BCDD" stroke-width="5" stroke-linecap="round" strokeDasharray=${C} initial=${{ strokeDashoffset: C }} animate=${{ strokeDashoffset: C * (1 - value / 100) }} transition=${{ duration: 1.4, ease }} /></svg><span class="absolute inset-0 grid place-items-center font-display text-xl text-white">${value}</span></div>`;
+};
+const Hero = ({ d, g }) => {
+  const [i, setI] = useState(0); const [paused, setPaused] = useState(false); const DUR = 8;
+  useEffect(() => { if (paused) return; const t = setTimeout(() => setI((i + 1) % d.slides.length), DUR * 1000); return () => clearTimeout(t); }, [i, paused]);
+  const s = d.slides[i];
+  return html`
+  <section id="top" class="relative min-h-[100svh] overflow-hidden bg-graphite text-white flex flex-col">
+    <${AnimatePresence}>
+      <${motion.div} key=${i} class="absolute inset-0" initial=${{ opacity: 0, scale: 1.06 }} animate=${{ opacity: 1, scale: 1 }} exit=${{ opacity: 0 }} transition=${{ duration: 1.2, ease }}>
+        <video class="h-full w-full object-cover" src=${s.video} poster=${s.poster} autoplay muted loop playsinline></video>
+      </${motion.div}>
+    </${AnimatePresence}>
+    <div class="absolute inset-0 bg-gradient-to-r from-graphite/85 via-graphite/45 to-graphite/10"></div>
+    <div class="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-graphite/80 to-transparent"></div>
+
+    <${Wrap} c="relative flex-1 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pt-32 pb-10">
+      <div class="lg:col-span-7">
+        <${AnimatePresence} mode="wait">
+          <${motion.div} key=${i} initial=${{ opacity: 0, y: 24 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -16 }} transition=${{ duration: 0.7, ease }}>
+            <${Eyebrow} light>Personalized health · ${s.tab}</${Eyebrow}>
+            <h1 class="mt-6 font-display font-medium tracking-[-0.025em] leading-[1.04] text-[2.4rem] sm:text-[3.4rem] lg:text-[4.4rem]">${s.title[0]}<br /><span class="font-serif italic font-normal tracking-normal text-cyan-300 text-[1.1em]">${s.title[1]}</span></h1>
+            <p class="mt-6 max-w-xl text-[17px] leading-relaxed text-white/75">${s.body}</p>
+          </${motion.div}>
+        </${AnimatePresence}>
+        <div class="mt-9 flex flex-wrap gap-3"><${Btn} href=${g.cta.href}>${g.cta.label}</${Btn}><${Btn} href=${g.cta2.href} v="ghost">${g.cta2.label}</${Btn}></div>
+      </div>
+      <div class="lg:col-span-5 lg:justify-self-end w-full max-w-[400px]">
+        <${AnimatePresence} mode="wait">
+          <${motion.div} key=${i} initial=${{ opacity: 0, y: 30, scale: 0.97 }} animate=${{ opacity: 1, y: 0, scale: 1 }} exit=${{ opacity: 0, y: -20 }} transition=${{ duration: 0.8, ease, delay: 0.15 }} class="relative">
+            <div class="absolute -top-6 -left-6 z-10 rounded-2xl bg-white px-5 py-4 text-graphite shadow-2xl shadow-black/30 hidden sm:block">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-graphite-400">${s.metric.label}</p>
+              <p class="mt-1 font-display text-2xl text-cyan-600">${s.metric.value}</p><p class="text-[12px] text-graphite-400">${s.metric.note}</p>
+            </div>
+            <div class="rounded-[28px] border border-white/15 bg-white/10 p-6 backdrop-blur-2xl shadow-2xl shadow-black/30">
+              <div class="flex items-center gap-5 sm:mt-10">
+                <${Ring} value=${s.score.value} />
+                <div><p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">${s.score.label}</p><p class="mt-1 text-lg font-medium"><span class="text-cyan-300">${s.score.delta}</span> <span class="text-white/60 text-sm">${s.score.vs}</span></p><p class="text-[12px] text-white/45">Updated today at 7:12 AM</p></div>
+              </div>
+              <p class="mt-6 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">Key biomarkers</p>
+              <ul class="mt-3 divide-y divide-white/10">${s.markers.map(([n, v, t], k) => html`<${motion.li} key=${n} initial=${{ opacity: 0, x: 12 }} animate=${{ opacity: 1, x: 0 }} transition=${{ delay: 0.4 + k * 0.12 }} class="flex items-center justify-between py-3 text-[14px]"><span class="text-white/85">${n}</span><span class=${`rounded-full px-2.5 py-1 text-[11px] font-semibold ${TONE[t]}`}>${v}</span></${motion.li}>`)}</ul>
+            </div>
+          </${motion.div}>
+        </${AnimatePresence}>
+      </div>
+    </${Wrap}>
+
+    <${Wrap} c="relative pb-8">
+      <div class="grid grid-cols-3 gap-3 sm:gap-6" role="tablist" aria-label="Hero stories">
+        ${d.slides.map((sl, k) => html`<button key=${k} role="tab" aria-selected=${k === i} onClick=${() => setI(k)} onMouseEnter=${() => k === i && setPaused(true)} onMouseLeave=${() => setPaused(false)} class="group text-left">
+          <div class="h-[2px] w-full bg-white/20 overflow-hidden rounded">${k === i && html`<${motion.div} key=${i + '-' + paused} class="h-full bg-cyan" initial=${{ width: paused ? '100%' : '0%' }} animate=${{ width: '100%' }} transition=${{ duration: paused ? 0 : DUR, ease: 'linear' }} />`}</div>
+          <p class=${`mt-3 text-[11px] font-semibold uppercase tracking-[0.2em] ${k === i ? 'text-cyan-300' : 'text-white/50'}`}>0${k + 1} · ${sl.tab}</p>
+          <p class=${`mt-1 hidden sm:block text-sm transition-colors ${k === i ? 'text-white' : 'text-white/50 group-hover:text-white/80'}`}>${sl.title[0]}</p>
+        </button>`)}
+      </div>
+    </${Wrap}>
+  </section>
+  <div class="bg-graphite text-white/80 border-t border-white/10"><${Wrap} c="flex flex-wrap justify-center sm:justify-between gap-x-8 gap-y-3 py-5 text-[12px] font-semibold uppercase tracking-[0.18em]">${d.trust.map((t) => html`<span key=${t} class="inline-flex items-center gap-2"><${Icon} n="check" c="w-4 h-4 text-cyan" />${t}</span>`)}</${Wrap}></div>`;
+};
+
+/* ================================ Goals ================================= */
+const Goals = ({ d }) => {
+  const [tab, setTab] = useState(0);
+  const items = d.items.filter((x) => tab === 0 || x.cat === d.tabs[tab]);
+  return html`
+  <section id=${d.id} class="py-24 lg:py-32 bg-white">
+    <${Wrap}>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <div class="lg:col-span-7"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}></div>
+        <div class="lg:col-span-5"><${Reveal} d=${0.1}><p class="text-[17px] leading-relaxed text-graphite/65">${d.body}</p></${Reveal}></div>
+      </div>
+      <div class="mt-12 inline-flex flex-wrap gap-1 rounded-full bg-mist p-1.5" role="tablist">
+        ${d.tabs.map((t, k) => html`<button key=${t} role="tab" aria-selected=${tab === k} onClick=${() => setTab(k)} class=${`relative rounded-full px-5 py-2.5 text-[13px] font-medium transition-colors ${tab === k ? 'text-white' : 'text-graphite/70 hover:text-graphite'}`}>${tab === k && html`<${motion.span} layoutId="goaltab" class="absolute inset-0 rounded-full bg-graphite" transition=${{ type: 'spring', stiffness: 400, damping: 34 }} />`}<span class="relative">${t}</span></button>`)}
+      </div>
+      <${motion.div} layout class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <${AnimatePresence} mode="popLayout">
+          ${items.map((x) => html`<${motion.a} layout key=${x.name} href="#book" initial=${{ opacity: 0, scale: 0.96 }} animate=${{ opacity: 1, scale: 1 }} exit=${{ opacity: 0, scale: 0.96 }} transition=${{ duration: 0.4, ease }}
+            class="group relative overflow-hidden rounded-3xl bg-mist p-7 flex flex-col min-h-[260px] hover:bg-graphite transition-colors duration-500">
+            <div class="flex items-start justify-between">
+              <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white text-cyan-600 group-hover:bg-cyan group-hover:text-white transition-colors duration-500"><${Icon} n=${x.icon} c="w-6 h-6" /></span>
+              <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-graphite/40 group-hover:text-white/40">${x.cat === 'Medical Aesthetics' ? 'Aesthetics' : 'Health'}</span>
+            </div>
+            <h3 class="mt-auto pt-10 font-display text-xl font-medium group-hover:text-white transition-colors">${x.name}</h3>
+            <p class="mt-2 text-[14.5px] leading-relaxed text-graphite/60 group-hover:text-white/65 transition-colors">${x.text}</p>
+            <div class="mt-5 flex flex-wrap gap-1.5">${x.tags.map((t) => html`<span key=${t} class="rounded-full border border-graphite/10 px-3 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-graphite/55 group-hover:border-cyan/40 group-hover:text-cyan-300 transition-colors">${t}</span>`)}</div>
+            <span class="absolute right-6 bottom-6 grid h-10 w-10 place-items-center rounded-full bg-cyan text-white opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition duration-500"><${Icon} n="arrow" c="w-4 h-4" /></span>
+          </${motion.a}>`)}
+        </${AnimatePresence}>
+      </${motion.div}>
+    </${Wrap}>
+  </section>`;
+};
+
+/* =============================== Symptoms =============================== */
+const Symptoms = ({ d }) => {
+  const half = Math.ceil(d.chips.length / 2); const rows = [d.chips.slice(0, half), d.chips.slice(half)];
+  return html`
+  <section class="relative overflow-hidden bg-graphite py-24 lg:py-32 text-white">
+    <video class="absolute inset-0 h-full w-full object-cover opacity-35" src=${d.video} autoplay muted loop playsinline aria-hidden="true"></video>
+    <div class="absolute inset-0 bg-gradient-to-b from-graphite via-graphite/70 to-graphite"></div>
+    <div class="relative">
+      <${Wrap} c="max-w-3xl text-center"><${Reveal}><${H2} t=${d.title} light /><p class="mt-6 text-[17px] leading-relaxed text-white/70">${d.body}</p></${Reveal}></${Wrap}>
+      <div class="mt-14 space-y-3 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
+        ${rows.map((r, k) => html`<div key=${k} class="flex w-max gap-3 marquee ${k ? 'rev' : ''}">${[...r, ...r, ...r, ...r].map((c, j) => html`<span key=${j} class="rounded-full border border-white/15 bg-white/[0.06] px-6 py-3.5 font-display text-[15px] sm:text-lg backdrop-blur whitespace-nowrap">${c}</span>`)}</div>`)}
+      </div>
+      <${Wrap} c="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-px overflow-hidden rounded-3xl bg-white/10">
+        ${d.stats.map((s, k) => html`<${Reveal} key=${k} d=${k * 0.1} c="bg-graphite/80 backdrop-blur p-8 text-center"><p class="font-display text-5xl text-cyan-300"><${Counter} ...${s} /></p><p class="mt-3 text-sm text-white/60">${s.label}</p></${Reveal}>`)}
+      </${Wrap}>
+    </div>
+  </section>`;
+};
+
+/* =============================== Approach =============================== */
+const Approach = ({ d, g }) => {
+  const [a, setA] = useState(0); const ref = useRef(null); const inView = useInView(ref, { margin: '-20%' });
+  useEffect(() => { if (!inView) return; const t = setInterval(() => setA((x) => (x + 1) % d.steps.length), 2600); return () => clearInterval(t); }, [inView]);
+  return html`
+  <section id=${d.id} ref=${ref} class="py-24 lg:py-32 bg-mist">
+    <${Wrap}>
+      <div class="max-w-3xl"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /><p class="mt-6 text-[17px] leading-relaxed text-graphite/65">${d.body}</p></${Reveal}></div>
+      <div class="relative mt-16">
+        <div class="absolute left-0 right-0 top-7 hidden lg:block h-px bg-graphite/10"><${motion.div} class="h-full bg-cyan" animate=${{ width: `${((a + 1) / d.steps.length) * 100}%` }} transition=${{ duration: 0.8, ease }} /></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          ${d.steps.map((s, k) => html`<button key=${k} onClick=${() => setA(k)} class="text-left group">
+            <span class=${`relative z-10 grid h-14 w-14 place-items-center rounded-full font-display text-sm transition-all duration-500 ${k <= a ? 'bg-cyan text-white shadow-lg shadow-cyan/30' : 'bg-white text-graphite/50'}`}>0${k + 1}</span>
+            <div class=${`mt-6 rounded-3xl p-7 min-h-[180px] transition-all duration-500 ${k === a ? 'bg-graphite text-white -translate-y-1 shadow-xl' : 'bg-white'}`}>
+              <h3 class="font-display text-2xl font-medium">${s.name}</h3>
+              <p class=${`mt-3 text-[15px] leading-relaxed ${k === a ? 'text-white/70' : 'text-graphite/60'}`}>${s.text}</p>
+            </div>
+          </button>`)}
+        </div>
+      </div>
+      <div class="mt-12 flex flex-wrap gap-3"><${Btn} href=${g.cta.href}>${g.cta.label}</${Btn}><${Btn} href=${g.cta2.href} v="outline">${g.cta2.label}</${Btn}></div>
+    </${Wrap}>
+  </section>`;
+};
+
+/* ============================== Biomarkers ============================== */
+const Biomarkers = ({ d }) => html`
+  <section class="py-24 lg:py-32 bg-white">
+    <${Wrap} c="grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
+      <div class="lg:col-span-5">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /><p class="mt-6 text-[17px] leading-relaxed text-graphite/65">${d.body}</p></${Reveal}>
+        <ul class="mt-9 space-y-3">${d.points.map((p, k) => html`<${Reveal} key=${k} d=${k * 0.06} y=${12}><li class="flex items-start gap-4 rounded-2xl border border-graphite/[0.07] px-5 py-4"><span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-cyan-50 text-cyan-600"><${Icon} n="check" c="w-3.5 h-3.5" s=${2.4} /></span><span class="text-[15px] text-graphite/80">${p}</span></li></${Reveal}>`)}</ul>
+        <div class="mt-9"><${Btn} href="#book" v="dark">Learn more</${Btn}></div>
+      </div>
+      <div class="lg:col-span-7">
+        <${Reveal} d=${0.1}>
+          <div class="relative rounded-[32px] bg-graphite p-3 shadow-2xl shadow-graphite/20">
+            <div class="rounded-[26px] bg-white p-6 sm:p-8">
+              <div class="flex items-center justify-between"><div><p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-graphite/45">Biomarker report</p><p class="mt-1 font-display text-xl sm:text-2xl">Your Health Profile</p></div><span class="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-800"><span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan opacity-75"></span><span class="relative h-2 w-2 rounded-full bg-cyan"></span></span>Live data</span></div>
+              <ul class="mt-7 divide-y divide-graphite/[0.06]">
+                ${d.rows.map(([n, v, ch, t, pct], k) => html`<li key=${n} class="grid grid-cols-12 items-center gap-3 py-4">
+                  <span class="col-span-5 sm:col-span-4 text-[14px] font-medium">${n}</span>
+                  <div class="hidden sm:block col-span-4 h-1.5 rounded-full bg-mist overflow-hidden"><${motion.div} class=${`h-full rounded-full ${t === 'warn' ? 'bg-amber-400' : 'bg-cyan'}`} initial=${{ width: 0 }} whileInView=${{ width: pct + '%' }} viewport=${{ once: true }} transition=${{ duration: 1.2, delay: 0.2 + k * 0.1, ease }} /></div>
+                  <span class="col-span-3 sm:col-span-2 text-[13px] text-graphite/70 tabular-nums">${v}</span>
+                  <span class=${`col-span-4 sm:col-span-2 justify-self-end rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap ${TONE[t]}`}>${ch}</span>
+                </li>`)}
+              </ul>
+              <div class="mt-6 grid grid-cols-3 gap-3">${d.footer.map(([v, l]) => html`<div key=${l} class="rounded-2xl bg-mist p-4 text-center"><p class="font-display text-xl sm:text-2xl">${v}</p><p class="mt-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-graphite/50">${l}</p></div>`)}</div>
+            </div>
+          </div>
+        </${Reveal}>
+      </div>
+    </${Wrap}>
+  </section>`;
+
+/* =============================== Journey ================================ */
+const Journey = ({ d }) => {
+  const ref = useRef(null); const { scrollYProgress } = useScroll({ target: ref, offset: ['start 60%', 'end 60%'] });
+  const h = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  return html`
+  <section class="py-24 lg:py-32 bg-graphite text-white">
+    <${Wrap} c="grid grid-cols-1 lg:grid-cols-12 gap-14">
+      <div class="lg:col-span-4"><div class="lg:sticky lg:top-32"><${Reveal}><${Eyebrow} light>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} light c="mt-5" /><p class="mt-6 text-[17px] leading-relaxed text-white/65">${d.body}</p></${Reveal}></div></div>
+      <div ref=${ref} class="lg:col-span-8 relative pl-10 sm:pl-14">
+        <div class="absolute left-3 sm:left-5 top-0 bottom-0 w-px bg-white/10"><${motion.div} class="w-full bg-cyan origin-top" style=${{ height: h }} /></div>
+        <div class="space-y-8">
+          ${d.steps.map((s, k) => html`<${Reveal} key=${k}>
+            <article class="relative grid grid-cols-1 md:grid-cols-5 gap-0 overflow-hidden rounded-[28px] bg-graphite-700 ring-1 ring-white/5">
+              <span class="absolute -left-[38px] sm:-left-[46px] top-8 grid h-6 w-6 place-items-center rounded-full bg-cyan ring-4 ring-graphite"><span class="h-1.5 w-1.5 rounded-full bg-white"></span></span>
+              <div class="md:col-span-3 p-7 sm:p-9">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300">${s.tag} · Step 0${k + 1}</p>
+                <h3 class="mt-4 font-display text-3xl font-medium">${s.name}</h3>
+                <p class="mt-2 font-serif italic text-xl text-white/80">${s.lead}</p>
+                <p class="mt-4 text-[15px] leading-relaxed text-white/60">${s.text}</p>
+              </div>
+              <div class="md:col-span-2 relative min-h-[200px] overflow-hidden"><img src=${s.image} alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover opacity-80" /><div class="absolute inset-0 bg-gradient-to-r from-graphite-700 via-transparent to-transparent"></div><span class="absolute right-5 bottom-3 font-display text-7xl text-white/15">0${k + 1}</span></div>
+            </article>
+          </${Reveal}>`)}
+        </div>
+      </div>
+    </${Wrap}>
+  </section>`;
+};
+
+/* =============================== Compare ================================ */
+const Cell = ({ v, hi }) => typeof v === 'string'
+  ? html`<span class=${`font-display text-lg ${hi ? 'text-white' : 'text-graphite/50'}`}>${v}</span>`
+  : html`<span class=${`inline-grid h-8 w-8 place-items-center rounded-full ${v ? (hi ? 'bg-white text-cyan-600' : 'bg-graphite/10 text-graphite/60') : 'text-graphite/25'}`}><${Icon} n=${v ? 'check' : 'x'} c="w-4 h-4" s=${2.2} /></span>`;
+const Compare = ({ d, g }) => html`
+  <section class="py-24 lg:py-32 bg-mist">
+    <${Wrap} c="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <div class="lg:col-span-4 lg:sticky lg:top-32"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /><p class="mt-6 text-[17px] leading-relaxed text-graphite/65">${d.body}</p><div class="mt-9"><${Btn} href=${g.cta.href}>${g.cta.label}</${Btn}></div></${Reveal}></div>
+      <${Reveal} d=${0.1} c="lg:col-span-8">
+        <div class="relative overflow-hidden rounded-[32px] bg-white">
+          <div class="absolute top-0 bottom-0 right-[88px] sm:right-[160px] w-[88px] sm:w-[160px] bg-cyan"></div>
+          <div class="relative grid grid-cols-[1fr_88px_88px] sm:grid-cols-[1fr_160px_160px] items-center border-b border-graphite/[0.06]">
+            <span class="p-5 sm:p-7 text-[11px] font-semibold uppercase tracking-[0.2em] text-graphite/45">What you get</span>
+            <span class="text-center"><span class="font-display text-sm sm:text-base text-white">Relive</span></span>
+            <span class="text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-graphite/45">Standard</span>
+          </div>
+          ${d.rows.map(([l, a, b], k) => html`<div key=${k} class="relative grid grid-cols-[1fr_88px_88px] sm:grid-cols-[1fr_160px_160px] items-center border-b border-graphite/[0.06] last:border-0">
+            <span class="p-5 sm:px-7 text-[14px] sm:text-[15px] text-graphite/80">${l}</span><span class="text-center"><${Cell} v=${a} hi /></span><span class="text-center"><${Cell} v=${b} /></span>
+          </div>`)}
+        </div>
+      </${Reveal}>
+    </${Wrap}>
+  </section>`;
+
+/* ============================== Physicians ============================== */
+const Physicians = ({ d }) => {
+  const [open, setOpen] = useState(null);
+  return html`
+  <section id=${d.id} class="py-24 lg:py-32 bg-white">
+    <${Wrap}>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end"><div class="lg:col-span-7"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}></div><div class="lg:col-span-5"><p class="font-serif italic text-2xl text-graphite/70">${d.body}</p></div></div>
+
+      <${Reveal} c="mt-14">
+        <div class="grid grid-cols-1 lg:grid-cols-12 overflow-hidden rounded-[36px] bg-graphite text-white">
+          <div class="lg:col-span-5 relative min-h-[420px] bg-gradient-to-b from-cyan-800 to-graphite"><img src=${d.cmo.image} alt=${d.cmo.name} class="absolute inset-x-0 bottom-0 mx-auto h-full w-auto max-w-none object-contain object-bottom" /></div>
+          <div class="lg:col-span-7 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300">Meet our CMO — ${d.cmo.name}</p>
+            <h3 class="mt-5 font-display text-2xl sm:text-3xl leading-tight font-medium">${d.cmo.title[0]} <span class="font-serif italic font-normal text-cyan-300">${d.cmo.title[1]}</span></h3>
+            <p class="mt-5 text-[15px] leading-relaxed text-white/65">${d.cmo.bio}</p>
+            <blockquote class="mt-8 border-l-2 border-cyan pl-6 font-serif italic text-xl sm:text-2xl leading-snug text-white/90">“${d.cmo.quote}”</blockquote>
+            <p class="mt-4 pl-6 text-[12px] font-semibold uppercase tracking-[0.2em] text-white/50">${d.cmo.name} · ${d.cmo.role}</p>
+          </div>
+        </div>
+      </${Reveal}>
+
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        ${d.doctors.map((m, k) => html`<${Reveal} key=${k} d=${k * 0.1}>
+          <article class="group grid grid-cols-1 sm:grid-cols-5 overflow-hidden rounded-[32px] bg-mist h-full">
+            <div class="sm:col-span-2 relative min-h-[300px] overflow-hidden"><img src=${m.image} alt=${m.name} loading="lazy" class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105" /></div>
+            <div class="sm:col-span-3 p-7 flex flex-col">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-600">${m.role}</p>
+              <h3 class="mt-2 font-display text-2xl font-medium">${m.name}</h3>
+              <${motion.p} initial=${false} animate=${{ height: open === k ? 'auto' : 96 }} class="mt-4 overflow-hidden text-[14.5px] leading-relaxed text-graphite/65">${m.bio}</${motion.p}>
+              <button onClick=${() => setOpen(open === k ? null : k)} aria-expanded=${open === k} class="mt-auto pt-5 inline-flex items-center gap-2 self-start text-[12px] font-semibold uppercase tracking-[0.16em] text-graphite"><span class=${`grid h-7 w-7 place-items-center rounded-full bg-graphite text-white transition-transform ${open === k ? 'rotate-45' : ''}`}><${Icon} n="plus" c="w-3.5 h-3.5" /></span>${open === k ? 'Show less' : 'Read bio'}</button>
+            </div>
+          </article>
+        </${Reveal}>`)}
+      </div>
+    </${Wrap}>
+  </section>`;
+};
+
+/* ============================= Testimonials ============================= */
+const Reel = ({ src, k }) => {
+  const v = useRef(null); const [on, setOn] = useState(false);
+  const toggle = () => { const el = v.current; if (!el) return; if (el.paused) { document.querySelectorAll('video[data-reel]').forEach((o) => o !== el && o.pause()); el.muted = false; el.play(); } else el.pause(); };
+  return html`<div class="relative shrink-0 w-[240px] sm:w-[270px] aspect-[9/16] snap-start overflow-hidden rounded-[28px] bg-graphite-700">
+    <video ref=${v} data-reel src=${src + '#t=0.5'} preload="metadata" playsinline class="absolute inset-0 h-full w-full object-cover" onPlay=${() => setOn(true)} onPause=${() => setOn(false)} onEnded=${() => setOn(false)}></video>
+    <button onClick=${toggle} aria-label=${on ? 'Pause testimonial' : `Play testimonial ${k + 1}`} class=${`absolute inset-0 flex flex-col justify-between p-5 text-left transition-opacity ${on ? 'opacity-0 hover:opacity-100' : ''}`}>
+      <span class="self-start rounded-full bg-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">Member story</span>
+      <span class="flex items-center gap-3"><span class="grid h-12 w-12 place-items-center rounded-full bg-white text-graphite shadow-xl"><${Icon} n=${on ? 'mute' : 'play'} c="w-5 h-5" /></span><span class="text-sm font-medium text-white drop-shadow">${on ? 'Pause' : 'Watch story'}</span></span>
+    </button>
+  </div>`;
+};
+const Testimonials = ({ d }) => {
+  const track = useRef(null);
+  const nudge = (dir) => track.current?.scrollBy({ left: dir * 560, behavior: 'smooth' });
+  return html`
+  <section id=${d.id} class="py-24 lg:py-32 bg-graphite text-white overflow-hidden">
+    <${Wrap}>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <div class="lg:col-span-6"><${Reveal}><${Eyebrow} light>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} light c="mt-5" /></${Reveal}></div>
+        <div class="lg:col-span-4"><p class="text-[16px] leading-relaxed text-white/65">${d.body}</p></div>
+        <div class="lg:col-span-2 flex lg:justify-end gap-2">${[-1, 1].map((x) => html`<button key=${x} onClick=${() => nudge(x)} aria-label=${x < 0 ? 'Previous' : 'Next'} class="grid h-12 w-12 place-items-center rounded-full border border-white/20 hover:bg-white hover:text-graphite transition"><${Icon} n="arrow" c=${`w-5 h-5 ${x < 0 ? 'rotate-180' : ''}`} /></button>`)}</div>
+      </div>
+    </${Wrap}>
+    <div ref=${track} class="no-scrollbar mt-12 flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-px-[5vw] px-[5vw]">${d.videos.map((src, k) => html`<${Reel} key=${k} src=${src} k=${k} />`)}</div>
+    <${Wrap} c="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      ${d.stats.map((s, k) => html`<div key=${k} class="rounded-3xl border border-white/10 p-7 flex items-end justify-between"><p class="text-[12px] font-semibold uppercase tracking-[0.18em] text-white/50">${s.label}</p><p class="font-display text-4xl text-cyan-300 flex items-center gap-2">${k === 0 && html`<${Icon} n="star" c="w-6 h-6 fill-cyan-300" />`}<${Counter} ...${s} /></p></div>`)}
+    </${Wrap}>
+  </section>`;
+};
+
+/* ================================= CTA ================================== */
+const CTA = ({ d, g }) => {
+  const [zip, setZip] = useState(''); const [done, setDone] = useState(false);
+  return html`
+  <section id=${d.id} class="py-6 sm:py-10 bg-white">
+    <${Wrap}>
+      <div class="relative overflow-hidden rounded-[40px] bg-graphite text-white">
+        <img src=${d.image} alt="" class="absolute inset-0 h-full w-full object-cover object-right opacity-60" loading="lazy" />
+        <div class="absolute inset-0 bg-gradient-to-r from-graphite via-graphite/85 to-graphite/20"></div>
+        <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-10 p-8 sm:p-14 lg:p-20">
+          <div class="lg:col-span-7">
+            <${Reveal}><${H2} t=${d.title} light /><p class="mt-6 max-w-xl text-[17px] leading-relaxed text-white/70">${d.body}</p></${Reveal}>
+            <form onSubmit=${(e) => { e.preventDefault(); setDone(true); }} class="mt-9 flex max-w-lg flex-col sm:flex-row gap-2 rounded-[28px] sm:rounded-full bg-white p-2">
+              <label class="flex flex-1 items-center gap-3 px-4 text-graphite"><${Icon} n="pin" c="w-5 h-5 text-cyan-600" /><span class="sr-only">ZIP code or city</span><input value=${zip} onInput=${(e) => setZip(e.target.value)} placeholder="ZIP code or city" class="w-full bg-transparent py-3 text-[15px] outline-none placeholder:text-graphite/40" /></label>
+              <button class="rounded-full bg-cyan px-6 py-3.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white hover:bg-cyan-600 transition">${done ? 'Searching…' : g.cta2.label}</button>
+            </form>
+            <div class="mt-6"><${Btn} href="#book" v="ghost">${g.cta.label}</${Btn}></div>
+          </div>
+          <div class="lg:col-span-5 flex lg:flex-col lg:items-end lg:justify-end flex-wrap gap-2">${d.badges.map((b) => html`<span key=${b} class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] backdrop-blur"><${Icon} n="check" c="w-4 h-4 text-cyan-300" />${b}</span>`)}</div>
+        </div>
+      </div>
+    </${Wrap}>
+  </section>`;
+};
+
+/* ================================ Footer ================================ */
+const Footer = ({ g }) => html`
+  <footer class="bg-white pt-16 pb-8">
+    <${Wrap}>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 border-t border-graphite/10 pt-14">
+        <div class="md:col-span-4"><img src=${g.logo.dark} alt=${g.logo.alt} class="h-10 w-auto" /><p class="mt-5 max-w-xs text-[15px] leading-relaxed text-graphite/60">Personalized health, wellness and anti-aging — guided by data and reviewed by physicians.</p></div>
+        <div class="md:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">${g.footer.map((c) => html`<div key=${c.title}><p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-graphite/45">${c.title}</p><ul class="mt-5 space-y-3">${c.links.map((l) => html`<li key=${l}><a href="#top" class="text-[14.5px] text-graphite/75 hover:text-cyan-600 transition-colors">${l}</a></li>`)}</ul></div>`)}</div>
+      </div>
+      <div class="mt-14 flex flex-col sm:flex-row justify-between gap-4 border-t border-graphite/10 pt-6 text-[13px] text-graphite/50">
+        <p>© ${new Date().getFullYear()} Relive Health. All rights reserved.</p>
+        <p>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" class="font-semibold text-graphite hover:text-cyan-600">VOCSO</a></p>
+      </div>
+    </${Wrap}>
+  </footer>`;
+
+/* ================================ App =================================== */
+const REGISTRY = {
+  'sections.hero': Hero, 'sections.goals': Goals, 'sections.symptoms': Symptoms, 'sections.approach': Approach,
+  'sections.biomarkers': Biomarkers, 'sections.journey': Journey, 'sections.compare': Compare,
+  'sections.physicians': Physicians, 'sections.testimonials': Testimonials, 'sections.cta': CTA,
+};
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2">Skip to content</a>
+    <${Header} g=${CMS.global} />
+    <main id="main">${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} g=${CMS.global} />` : null; })}</main>
+    <${Footer} g=${CMS.global} />
+  </${MotionConfig}>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+requestAnimationFrame(() => document.getElementById('boot')?.remove());
+</script>
+</body>
+</html>
