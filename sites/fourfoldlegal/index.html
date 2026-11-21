@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FourFold Legal — Loan Settlement, SARFAESI, GST & Corporate Lawyers in India</title>
+<meta name="description" content="FourFold Legal: 120+ advocates across 25+ states. Loan settlement, SARFAESI & DRT, banking law, family, GST invoice disputes, contracts and trademarks. Free consultation." />
+<link rel="icon" href="assets/logo-black.webp" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          violet: { DEFAULT: '#7C3AED', 50: '#F5F0FF', 100: '#EDE4FE', 300: '#B79BF8', 400: '#9D6CF4', 700: '#6D28D9', 900: '#3B1278' },
+          amber: { DEFAULT: '#FBBF24', 300: '#FCD34D', 600: '#D97706' },
+          ink: { DEFAULT: '#0F172A', 800: '#1E293B', 600: '#475569', 400: '#94A3B8' },
+          fog: '#F4F3F8',
+        },
+        fontFamily: {
+          serif: ['Fraunces', 'Georgia', 'serif'],
+          sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 2px solid #7C3AED; outline-offset: 3px; border-radius: 8px; }
+  .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+  .marquee { animation: marquee 60s linear infinite; } .marquee:hover { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) { .marquee { animation: none; } }
+  .grain { background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 22px 22px; }
+  #boot { position:fixed; inset:0; display:grid; place-items:center; background:#0F172A; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.17?external=react,react-dom",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body class="bg-white text-ink">
+<div id="boot"><img src="assets/logo-white.webp" alt="" width="180" /></div>
+<div id="root"></div>
+
+<script type="module">
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence, MotionConfig, useScroll, useTransform, animate, useInView } from 'framer-motion';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
+
+/* ==========================================================================
+   CMS CONTENT — mirrors the Strapi model 1:1.
+   Strapi: Single Type "global" (contact, header, footer) + Collection "page"
+   with a Dynamic Zone `sections`. Services, case results, testimonials and
+   insights are their own Collection Types. Photos from fourfoldlegal.com.
+   ========================================================================== */
+const A = (p) => `assets/${p}`;
+
+const CMS = {
+  global: {
+    logo: { dark: A('logo-black.webp'), light: A('logo-white.webp'), alt: 'FourFold Legal — Advocate and Solicitors' },
+    phone: { label: '+91 98726 75722', href: 'tel:+919872675722' },
+    email: 'contact@fourfoldlegal.com',
+    topbar: ['Response within 15 minutes', 'Free first consultation', '100% confidential'],
+    nav: [
+      { label: 'Services', href: '#services', menu: [['Loan Settlement', 'Resolve loan disputes'], ['GST Disputes', 'Invoice & GST disputes'], ['SARFAESI & DRT', 'Emergency relief'], ['Banking & Finance', 'Bank disputes'], ['Property & Real Estate', 'RERA matters'], ['Family Law', 'Divorce, custody, maintenance']] },
+      { label: 'About', href: '#about' },
+      { label: 'Results', href: '#results' },
+      { label: 'Process', href: '#process' },
+      { label: 'Insights', href: '#insights' },
+      { label: 'Contact', href: '#contact' },
+    ],
+    cta: { label: 'Free Consultation', href: '#contact' },
+    footer: [
+      { title: 'Practice areas', links: ['Loan Settlement', 'SARFAESI & DRT', 'Banking & Finance', 'Property & Real Estate', 'GST Invoice Disputes', 'Family Law'] },
+      { title: 'For business', links: ['Legal Retainer', 'Contract Drafting', 'Trademark & IP', 'Dues Recovery'] },
+      { title: 'Firm', links: ['About', 'Insights', 'Contact', 'Pay Now', 'Privacy Policy', 'Terms of Use'] },
+    ],
+  },
+
+  page: {
+    sections: [
+      {
+        __component: 'sections.hero',
+        image: A('img/team.webp'),
+        badges: ['25+ States · 10,000+ Clients', '99% Success Rate', 'Handled 1000+ Cases', 'Confidential Process'],
+        slides: [
+          { tab: 'Loan Settlement', eyebrow: 'Facing bank pressure?', title: ['Settle your loans.', 'Regain peace of mind.'], body: 'We legally negotiate with banks to reduce EMI, stop harassment, and close your debts safely.', cta: 'Start Loan Settlement' },
+          { tab: 'Family Disputes', eyebrow: 'Personal matters need privacy', title: ['Strong legal support', 'for family disputes.'], body: 'Professional guidance for divorce, maintenance, custody and domestic issues — handled with care.', cta: 'Consult Family Lawyer' },
+          { tab: 'GST Invoice Disputes', eyebrow: 'Recover business dues', title: ['Legal support for', 'GST invoice disputes.'], body: 'Resolve unpaid invoices through legal notices, negotiation, settlement, and litigation support.', cta: 'Recover Outstanding Dues' },
+          { tab: 'Legal Retainer', eyebrow: 'For founders & businesses', title: ['Your on-demand', 'legal team.'], body: 'From contracts to compliance — we act as your long-term legal partner.', cta: 'Get Legal Retainer' },
+          { tab: 'Contracts', eyebrow: 'Before you sign anything', title: ['Make your contracts', 'work for you.'], body: 'We draft and review agreements to protect your money, rights, and future.', cta: 'Review My Agreement' },
+          { tab: 'Trademark & IP', eyebrow: 'Protect what you build', title: ['Secure your brand', '& ideas legally.'], body: 'Trademark, copyright and IP protection for creators, startups and companies.', cta: 'Register My Trademark' },
+        ],
+        stats: [{ value: 25, suffix: '+', label: 'States covered' }, { value: 10000, suffix: '+', label: 'Clients served' }, { value: 99, suffix: '%', label: 'Success rate' }, { value: 120, suffix: '+', label: 'Expert advocates' }],
+      },
+      {
+        __component: 'sections.about',
+        id: 'about',
+        eyebrow: 'About FourFold Legal',
+        title: ['Building trust through', 'fourfold excellence.'],
+        body: 'At FourFold Legal, we stand as a beacon of integrity and excellence in the legal field. Our mission is simple yet profound: to provide unparalleled legal services that empower our clients to achieve their goals with confidence. With a team of seasoned legal experts, we specialize in a wide range of practice areas, from litigation to corporate law.',
+        points: ['Unwavering commitment to client success', 'Open communication and transparency', 'Personalized attention for every client'],
+        images: [A('img/img5.webp'), A('img/img2.webp'), A('img/img6.webp')],
+      },
+      {
+        __component: 'sections.pillars',
+        eyebrow: 'Fourfold excellence',
+        title: ['Four pillars.', 'One promise.'],
+        body: 'Our foundation rests on four unbreakable pillars that ensure exceptional legal service and client satisfaction.',
+        items: [
+          { name: 'Legal Expertise', text: 'Banking law, SARFAESI, DRT, IPR, litigation mastery.', icon: 'scale' },
+          { name: 'Structured Process', text: 'System-driven workflows & CRM tracking.', icon: 'flow' },
+          { name: 'Client Focus', text: 'Transparency, accessibility, regular communication.', icon: 'users' },
+          { name: 'Execution & Results', text: 'Practical solutions, settlements, case resolution.', icon: 'award' },
+        ],
+      },
+      {
+        __component: 'sections.results',
+        id: 'results',
+        eyebrow: 'Real results. Real clients.',
+        title: ['Thousands of families', 'protected from bank harassment.'],
+        cases: [
+          { area: 'Home Loan', title: '₹12 Crore Home Loan Resolution', outcome: 'Negotiated settlement at ₹4.8 Crore', from: 12, to: 4.8, client: 'Residential Housing Group, NCR' },
+          { area: 'Personal Loans', title: 'High-Value Personal Loan Portfolio', outcome: 'One-Time Settlement concluded at ₹2.4 Crore', client: 'Senior IT Professionals Consortium, Hyderabad' },
+          { area: 'SARFAESI', title: 'SARFAESI Enforcement Proceedings', outcome: 'Auction process stayed and property retained', client: 'Commercial Property Owner, Delhi' },
+          { area: 'Business Loan', title: 'Business Expansion Loan Dispute', outcome: 'Liability restructured and settled at ₹6.2 Crore', client: 'Mid-Market Manufacturing Enterprise, Pune' },
+          { area: 'Harassment', title: 'Bank Recovery & Harassment Litigation', outcome: 'Complete cessation of coercive recovery actions', client: 'Retail Business Group, Rajasthan' },
+          { area: 'Real Estate', title: 'Commercial Real Estate Loan Resolution', outcome: 'Court-granted auction stay and revised repayment framework', client: 'Corporate Asset Holding Company, Gurugram' },
+        ],
+      },
+      {
+        __component: 'sections.services',
+        id: 'services',
+        eyebrow: 'Practice areas',
+        title: ['Expert solutions for', 'every legal challenge.'],
+        body: 'Specialized practice areas with proven results. Offices in Noida, Hyderabad & 11+ cities.',
+        featured: [
+          { name: 'Loan Settlement & Debt Resolution', tag: '99% success', line: 'Reduce EMIs, stop harassment and close debts with one-time settlements.', icon: 'coins' },
+          { name: 'SARFAESI Act & DRT Matters', tag: 'Urgent relief', line: 'Emergency relief against auctions, possession notices and recovery.', icon: 'shield' },
+          { name: 'Banking & Finance Law', tag: 'Fast resolution', line: 'Fix bank disputes, wrongful charges and recovery actions fast.', icon: 'bank' },
+          { name: 'Property & Real Estate Law', tag: 'RERA', line: 'Secure property deals, title checks and builder disputes.', icon: 'home' },
+        ],
+        more: ['Family Law', 'GST Invoice Disputes', 'Legal Retainer', 'Contract Drafting & Review', 'Trademark & IP', 'Credit Card Settlement', 'Mudra & CGTMSE Loans', 'Cyber Crime'],
+      },
+      {
+        __component: 'sections.network',
+        image: A('img/img3.webp'),
+        title: ['Trusted by thousands', 'across India.'],
+        stats: [['120+', 'Expert advocates', 'Pan-India legal network'], ['10,000+', 'Clients served', 'Individuals & businesses'], ['13+', 'Cities', 'Noida, Hyderabad & 11+ more']],
+        points: ['Experienced advocates', 'Professional systems', 'Structured processes', 'Proven results'],
+      },
+      {
+        __component: 'sections.process',
+        id: 'process',
+        eyebrow: 'Your journey with us',
+        title: ['A structured, transparent', 'legal process.'],
+        body: 'Designed to reduce stress and deliver results. You receive documented updates, clear legal advice and written confirmation at every stage.',
+        steps: [
+          { name: 'Consultation', text: 'We understand your financial or legal situation and identify immediate risks.' },
+          { name: 'Case Review', text: 'Our legal team analyses documents, notices and bank actions.' },
+          { name: 'Legal Strategy', text: 'A clear plan is created covering settlement, defence or litigation.' },
+          { name: 'Negotiation / Action', text: 'We deal with banks, authorities or courts on your behalf.' },
+          { name: 'Resolution', text: 'You receive written closure, compliance and legal confirmation.' },
+        ],
+        banner: { kicker: '99% of our clients save 75%+ on settlements', title: 'Ready to become debt-free?', sub: 'Most cases resolved within 120 days.' },
+      },
+      {
+        __component: 'sections.testimonials',
+        eyebrow: 'Client stories',
+        title: ['Trusted by clients', 'across India.'],
+        body: 'Real experiences from individuals and businesses who relied on FourFold Legal for clear guidance, ethical representation, and dependable outcomes.',
+        items: [
+          { name: 'Sudarshan Mishra', text: 'Very good service, nice and caring staff, will support you at each level and take care of your harassment calls and legal problems. Adv. Archana was very helpful at each phase. My loan settlement was done in 25%. One of the best firms.' },
+          { name: 'Malkeet Singh', text: 'I talked to many companies, but this one seemed the most trustworthy. They assigned Adv. Antra — she understood the problem, is managing all my calls and giving her best to help me become debt-free.' },
+          { name: 'Dhananjay Gupta', text: 'Advocates Sanjay, Deepansh and Mannat were professional, attentive, and really knew their stuff. From start to finish they made sure I was well-informed and confident in the process.' },
+          { name: 'Kamal Sharma Ravindhar', text: 'One of the best firms I have ever seen for loan and credit card issues. My personal lawyer Archana Sharma guided me really well and is taking care of my cases smoothly.' },
+          { name: 'Akshay Thorat', text: 'My case has been handled very well. Every problem has been resolved. Special thanks to Adv. Shrija who supported me in every difficult situation — and finally my loan is settled.' },
+          { name: 'Khalil Khan', text: 'I have been taking help from FourFold for 4 months and everything is working smoothly. Staff is very supportive — special thanks to Mr. Jayant who always stays in touch with me.' },
+          { name: 'Himanshu Dixit', text: 'Thank you very much, Advocate Nayanshi, for your assistance in clarifying our loan matters. We also extend our sincere thanks to FourFold Legal for their support.' },
+        ],
+      },
+      {
+        __component: 'sections.insights',
+        id: 'insights',
+        eyebrow: 'Latest legal insights',
+        title: ['Know your rights', 'before the bank calls.'],
+        posts: [
+          { title: 'Is it important to reply to a legal notice sent by the bank on loan default?', date: '28 Mar 2024', cat: 'Banking law', image: 'https://blogs.fourfoldlegal.com/wp-content/uploads/2024/03/OIP.jpeg' },
+          { title: 'Loan Settlement: laws & the Reserve Bank of India', date: '28 Mar 2024', cat: 'Loan settlement', image: 'https://blogs.fourfoldlegal.com/wp-content/uploads/2024/03/R.jpeg' },
+          { title: 'Hindu Marriage Law: do you know about it?', date: '28 Mar 2024', cat: 'Family law', image: A('img/img1.webp') },
+        ],
+      },
+      {
+        __component: 'sections.contact',
+        id: 'contact',
+        eyebrow: 'Response within 15 minutes',
+        title: ['Get expert help', 'today.'],
+        body: 'Choose your legal need. Our experts will contact you immediately.',
+        image: A('img/img4.webp'),
+        loanTypes: ['Personal Loan', 'Business Loan', 'Credit Card', 'Mudra Loan', 'Bike/Car Loan', 'Home Loan', 'Loan Against Property', 'CGTMSE', 'Education Loan', 'Other'],
+        amounts: ['Below ₹2 Lakh', '₹2 – ₹5 Lakh', '₹5 – ₹10 Lakh', '₹10 – ₹20 Lakh', '₹20 – ₹50 Lakh', '₹50 Lakh – ₹1 Cr', '₹1 Cr – ₹2 Cr', '₹2 Cr – ₹5 Cr', 'Above ₹5 Cr'],
+        topics: ['Family Law', 'GST Invoice Dispute', 'Legal Retainer', 'Contract Review', 'Trademark & IP', 'Property', 'Other'],
+      },
+    ],
+  },
+};
+
+/* ============================== Primitives ============================== */
+const ICONS = {
+  arrow: 'M5 12h14M13 6l6 6-6 6', check: 'M5 12.5l4.5 4.5L19 7', x: 'M6 6l12 12M18 6L6 18', menu: 'M4 7h16M4 12h16M4 17h16',
+  phone: 'M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z', mail: 'M4 6h16v12H4zM4 7l8 6 8-6',
+  scale: 'M12 3v18M7 21h10M5 7h14M5 7l-3 7a3.5 3.5 0 006 0zM19 7l-3 7a3.5 3.5 0 006 0z', flow: 'M4 5h6v5H4zM14 14h6v5h-6zM7 10v4a2 2 0 002 2h5',
+  users: 'M9 11a4 4 0 100-8 4 4 0 000 8zM2 21a7 7 0 0114 0M16 3.5a4 4 0 010 7.5M22 21a7 7 0 00-4-6.3', award: 'M12 15a6 6 0 100-12 6 6 0 000 12zM8.5 14L7 22l5-3 5 3-1.5-8',
+  coins: 'M9 10a6 3 0 100-.01M3 10v4c0 1.7 2.7 3 6 3s6-1.3 6-3v-4M15 7.5c3.3 0 6 1.3 6 3v4c0 1.7-2.7 3-6 3', shield: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4',
+  bank: 'M3 9l9-5 9 5M5 9v9M9.5 9v9M14.5 9v9M19 9v9M3 21h18', home: 'M3 11l9-7 9 7M5 9.5V20h14V9.5M10 20v-6h4v6', star: 'M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8z',
+  quote: 'M7 17c-2 0-3-1.5-3-3.5C4 10 6 7.5 9 6.5M17 17c-2 0-3-1.5-3-3.5 0-3.5 2-6 5-7', lock: 'M6 11h12v10H6zM8 11V8a4 4 0 018 0v3', clock: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2',
+  whatsapp: 'M4 20l1.3-4A8 8 0 1112 20a8 8 0 01-4-1.1zM9 9c0 3 2.5 6 6 6l1-1.5-2-1-1 1c-1-.5-2-1.5-2.5-2.5l1-1-1-2z',
+};
+const Icon = ({ n, c = 'w-5 h-5', s = 1.7 }) => html`<svg class=${c} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=${s} stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${ICONS[n]} /></svg>`;
+const ease = [0.22, 1, 0.36, 1];
+const Reveal = ({ children, d = 0, y = 28, c = '' }) => html`<${motion.div} class=${c} initial=${{ opacity: 0, y }} whileInView=${{ opacity: 1, y: 0 }} viewport=${{ once: true, margin: '-60px' }} transition=${{ duration: 0.8, delay: d, ease }}>${children}</${motion.div}>`;
+const Eyebrow = ({ children, light }) => html`<p class=${`inline-flex items-center gap-2.5 text-[11.5px] font-bold uppercase tracking-[0.2em] ${light ? 'text-amber' : 'text-violet'}`}><span class=${`h-px w-8 ${light ? 'bg-amber' : 'bg-violet'}`}></span>${children}</p>`;
+const H2 = ({ t, light, c = '' }) => html`<h2 class=${`font-serif font-medium tracking-[-0.02em] leading-[1.06] text-[2.1rem] sm:text-[2.8rem] lg:text-[3.4rem] ${light ? 'text-white' : 'text-ink'} ${c}`}>${t[0]}${t[1] && html`<br class="hidden sm:block" /> <em class=${`italic ${light ? 'text-violet-300' : 'text-violet'}`}>${t[1]}</em>`}</h2>`;
+const Btn = ({ href, children, v = 'primary', c = '', icon = 'arrow' }) => {
+  const st = { primary: 'bg-violet text-white hover:bg-violet-700 shadow-lg shadow-violet/25', amber: 'bg-amber text-ink hover:bg-amber-300', ghost: 'border border-white/30 text-white hover:bg-white hover:text-ink', outline: 'border border-ink/15 text-ink hover:border-ink', dark: 'bg-ink text-white hover:bg-ink-800' }[v];
+  return html`<a href=${href} class=${`group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[14px] font-semibold transition-all duration-300 ${st} ${c}`}>${children}<${Icon} n=${icon} c="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" /></a>`;
+};
+const fmt = (n) => Math.round(n).toLocaleString('en-IN');
+const Counter = ({ value, suffix = '' }) => {
+  const ref = useRef(null); const inView = useInView(ref, { once: true, margin: '-10% 0px' }); const [v, setV] = useState(0);
+  useEffect(() => { if (!inView) return; const c = animate(0, value, { duration: 1.8, ease, onUpdate: setV }); return () => c.stop(); }, [inView]);
+  return html`<span ref=${ref}>${fmt(v)}${suffix}</span>`;
+};
+const Wrap = ({ children, c = '' }) => html`<div class=${`mx-auto w-[90%] max-w-[1360px] ${c}`}>${children}</div>`;
+
+/* ================================ Header ================================ */
+const Header = ({ g }) => {
+  const [solid, setSolid] = useState(false); const [open, setOpen] = useState(false); const [mega, setMega] = useState(false);
+  useEffect(() => { const f = () => setSolid(window.scrollY > 60); f(); window.addEventListener('scroll', f, { passive: true }); return () => window.removeEventListener('scroll', f); }, []);
+  const dark = solid || open;
+  return html`
+  <header class="fixed inset-x-0 top-0 z-50" onMouseLeave=${() => setMega(false)}>
+    <div class=${`bg-violet-900 text-white/85 text-[12.5px] transition-all duration-500 overflow-hidden ${solid ? 'h-0' : 'h-9'}`}>
+      <${Wrap} c="flex h-9 items-center justify-between gap-6">
+        <div class="hidden md:flex items-center gap-6">${g.topbar.map((t) => html`<span key=${t} class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-amber"></span>${t}</span>`)}</div>
+        <div class="flex items-center gap-5 mx-auto md:mx-0"><a href=${g.phone.href} class="inline-flex items-center gap-1.5 hover:text-white"><${Icon} n="phone" c="w-3.5 h-3.5" />${g.phone.label}</a><a href=${'mailto:' + g.email} class="hidden sm:inline-flex items-center gap-1.5 hover:text-white"><${Icon} n="mail" c="w-3.5 h-3.5" />${g.email}</a></div>
+      </${Wrap}>
+    </div>
+    <div class=${`transition-all duration-500 ${dark ? 'bg-white/95 backdrop-blur-xl shadow-[0_1px_0_rgba(15,23,42,0.08)]' : ''}`}>
+      <${Wrap} c="flex h-[74px] items-center justify-between gap-6">
+        <a href="#top" class="shrink-0"><img src=${dark ? g.logo.dark : g.logo.light} alt=${g.logo.alt} class="h-9 sm:h-10 w-auto" /></a>
+        <nav class="hidden xl:flex items-center gap-1" aria-label="Main">
+          ${g.nav.map((n) => html`<a key=${n.label} href=${n.href} onMouseEnter=${() => setMega(!!n.menu)} class=${`rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${dark ? 'text-ink/75 hover:text-ink hover:bg-fog' : 'text-white/85 hover:text-white hover:bg-white/10'}`}>${n.label}${n.menu && html`<span class="ml-1 text-[10px] opacity-60">▾</span>`}</a>`)}
+        </nav>
+        <div class="flex items-center gap-2">
+          <a href="#contact" class=${`hidden lg:inline-flex rounded-full px-4 py-2.5 text-[13.5px] font-semibold ${dark ? 'text-ink' : 'text-white'}`}>Pay Now</a>
+          <a href=${g.cta.href} class="hidden sm:inline-flex rounded-full bg-violet px-5 py-2.5 text-[13.5px] font-semibold text-white hover:bg-violet-700 transition-colors">${g.cta.label}</a>
+          <button class=${`xl:hidden grid h-11 w-11 place-items-center rounded-full ${dark ? 'bg-fog text-ink' : 'bg-white/10 text-white'}`} aria-label="Menu" aria-expanded=${open} onClick=${() => setOpen(!open)}><${Icon} n=${open ? 'x' : 'menu'} /></button>
+        </div>
+      </${Wrap}>
+    </div>
+    <${AnimatePresence}>${mega && html`
+      <${motion.div} initial=${{ opacity: 0, y: -8 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -8 }} transition=${{ duration: 0.25 }} class="hidden xl:block">
+        <${Wrap} c="mt-2 grid grid-cols-12 gap-6 rounded-3xl bg-white p-6 shadow-2xl shadow-ink/15 ring-1 ring-ink/5">
+          <div class="col-span-4 relative overflow-hidden rounded-2xl bg-ink"><img src=${A('img/img4.webp')} alt="" class="absolute inset-0 h-full w-full object-cover opacity-60" /><div class="relative p-6 h-full flex flex-col justify-end text-white"><p class="font-serif text-2xl">120+ advocates.</p><p class="text-sm text-white/70">One structured process.</p></div></div>
+          <ul class="col-span-8 grid grid-cols-2 gap-1">${g.nav[0].menu.map(([m, s]) => html`<li key=${m}><a href="#services" class="group flex items-center justify-between rounded-2xl px-4 py-4 hover:bg-fog"><span><span class="block font-semibold text-ink">${m}</span><span class="text-[13px] text-ink-600">${s}</span></span><${Icon} n="arrow" c="w-4 h-4 text-violet opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition" /></a></li>`)}</ul>
+        </${Wrap}>
+      </${motion.div}>`}
+    </${AnimatePresence}>
+    <${AnimatePresence}>${open && html`
+      <${motion.div} initial=${{ height: 0 }} animate=${{ height: 'auto' }} exit=${{ height: 0 }} class="xl:hidden overflow-hidden bg-white">
+        <${Wrap} c="py-6 flex flex-col">
+          ${g.nav.map((n) => html`<a key=${n.label} href=${n.href} onClick=${() => setOpen(false)} class="border-b border-ink/5 py-4 font-serif text-xl">${n.label}</a>`)}
+          <div class="mt-5 flex flex-col gap-3"><${Btn} href=${g.cta.href}>${g.cta.label}</${Btn}><${Btn} href=${g.phone.href} v="outline" icon="phone">${g.phone.label}</${Btn}></div>
+        </${Wrap}>
+      </${motion.div}>`}
+    </${AnimatePresence}>
+  </header>`;
+};
+
+/* ================================= Hero ================================= */
+const Hero = ({ d, g }) => {
+  const [i, setI] = useState(0); const [hold, setHold] = useState(false); const DUR = 6;
+  useEffect(() => { if (hold) return; const t = setTimeout(() => setI((i + 1) % d.slides.length), DUR * 1000); return () => clearTimeout(t); }, [i, hold]);
+  const { scrollY } = useScroll(); const y = useTransform(scrollY, [0, 800], [0, 160]);
+  const s = d.slides[i];
+  return html`
+  <section id="top" class="relative overflow-hidden bg-ink text-white">
+    <${motion.img} src=${d.image} alt="The FourFold Legal team" style=${{ y }} class="absolute inset-0 h-[115%] w-full object-cover object-[50%_35%]" />
+    <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-violet-900/40"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60"></div>
+    <div class="absolute inset-0 grain"></div>
+
+    <${Wrap} c="relative grid grid-cols-1 lg:grid-cols-12 gap-10 pt-40 pb-16 lg:pt-48 lg:pb-24 min-h-[100svh] items-center">
+      <div class="lg:col-span-7">
+        <div class="flex flex-wrap gap-2">${d.badges.map((b, k) => html`<${motion.span} key=${b} initial=${{ opacity: 0, y: 10 }} animate=${{ opacity: 1, y: 0 }} transition=${{ delay: 0.2 + k * 0.08 }} class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.07] px-3.5 py-1.5 text-[12px] font-medium text-white/85 backdrop-blur"><${Icon} n="check" c="w-3.5 h-3.5 text-amber" s=${2.4} />${b}</${motion.span}>`)}</div>
+        <${AnimatePresence} mode="wait">
+          <${motion.div} key=${i} initial=${{ opacity: 0, y: 24 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -16 }} transition=${{ duration: 0.6, ease }} class="mt-8">
+            <p class="text-amber font-semibold text-[15px]">${s.eyebrow}</p>
+            <h1 class="mt-3 font-serif font-medium tracking-[-0.025em] leading-[1.02] text-[2.6rem] sm:text-[3.6rem] lg:text-[4.6rem]">${s.title[0]}<br /><em class="italic text-violet-300">${s.title[1]}</em></h1>
+            <p class="mt-6 max-w-xl text-[17px] leading-relaxed text-white/75">${s.body}</p>
+            <div class="mt-9 flex flex-wrap gap-3"><${Btn} href=${g.cta.href}>${s.cta}</${Btn}><${Btn} href=${g.phone.href} v="ghost" icon="phone">Free Consultation</${Btn}></div>
+          </${motion.div}>
+        </${AnimatePresence}>
+      </div>
+
+      <div class="lg:col-span-5 lg:justify-self-end w-full max-w-[420px]" onMouseEnter=${() => setHold(true)} onMouseLeave=${() => setHold(false)}>
+        <div class="rounded-[28px] border border-white/10 bg-white/[0.06] p-3 backdrop-blur-xl">
+          <p class="px-4 pt-3 pb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">How can we help?</p>
+          <ul role="tablist" aria-label="Legal needs">${d.slides.map((sl, k) => html`<li key=${k}><button role="tab" aria-selected=${k === i} onClick=${() => setI(k)} class=${`relative w-full overflow-hidden rounded-2xl px-4 py-3.5 text-left flex items-center justify-between transition-colors ${k === i ? 'bg-white text-ink' : 'text-white/80 hover:bg-white/10'}`}>
+            <span class="flex items-center gap-3"><span class=${`font-serif text-sm ${k === i ? 'text-violet' : 'text-white/40'}`}>0${k + 1}</span><span class="font-semibold text-[15px]">${sl.tab}</span></span>
+            <${Icon} n="arrow" c=${`w-4 h-4 transition ${k === i ? 'text-violet' : 'opacity-0'}`} />
+            ${k === i && !hold && html`<${motion.span} key=${'b' + i} class="absolute left-0 bottom-0 h-[3px] bg-violet" initial=${{ width: 0 }} animate=${{ width: '100%' }} transition=${{ duration: DUR, ease: 'linear' }} />`}
+          </button></li>`)}</ul>
+        </div>
+      </div>
+    </${Wrap}>
+  </section>
+  <section class="relative z-10 -mt-px bg-ink pb-0">
+    <${Wrap} c="grid grid-cols-2 lg:grid-cols-4 overflow-hidden rounded-t-[28px] lg:rounded-[28px] lg:translate-y-1/2 bg-white shadow-2xl shadow-ink/20">
+      ${d.stats.map((s, k) => html`<div key=${k} class=${`p-6 sm:p-8 ${k % 2 ? '' : 'border-r'} lg:border-r border-ink/10 ${k < 2 ? 'border-b lg:border-b-0' : ''} last:border-r-0`}><p class="font-serif text-4xl sm:text-5xl text-ink"><${Counter} ...${s} /></p><p class="mt-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink-600">${s.label}</p></div>`)}
+    </${Wrap}>
+  </section>`;
+};
+
+/* ================================ About ================================= */
+const About = ({ d }) => html`
+  <section id=${d.id} class="pt-20 lg:pt-44 pb-24 lg:pb-32 bg-white">
+    <${Wrap} c="grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
+      <div class="lg:col-span-6 relative">
+        <${Reveal}><div class="overflow-hidden rounded-[32px] aspect-[4/3]"><img src=${d.images[0]} alt="FourFold Legal partners" loading="lazy" class="h-full w-full object-cover" /></div></${Reveal}>
+        <${Reveal} d=${0.15} c="absolute -bottom-10 -right-2 sm:right-[-6%] w-[48%]"><div class="overflow-hidden rounded-[24px] border-[6px] border-white shadow-2xl aspect-[4/3]"><img src=${d.images[2]} alt="FourFold Legal office" loading="lazy" class="h-full w-full object-cover" /></div></${Reveal}>
+        <div class="absolute -top-5 left-6 rounded-2xl bg-amber px-5 py-4 shadow-xl"><p class="font-serif text-3xl text-ink">1000+</p><p class="text-[12px] font-semibold text-ink/70">Cases handled</p></div>
+      </div>
+      <div class="lg:col-span-6 lg:pl-10 pt-10 lg:pt-0">
+        <${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /><p class="mt-7 text-[16.5px] leading-[1.8] text-ink-600">${d.body}</p></${Reveal}>
+        <ul class="mt-8 space-y-3">${d.points.map((p, k) => html`<${Reveal} key=${k} d=${k * 0.08} y=${12}><li class="flex items-center gap-4"><span class="grid h-8 w-8 place-items-center rounded-full bg-violet-50 text-violet"><${Icon} n="check" c="w-4 h-4" s=${2.4} /></span><span class="font-medium">${p}</span></li></${Reveal}>`)}</ul>
+        <div class="mt-10 flex flex-wrap gap-3"><${Btn} href="#contact">Talk to an advocate</${Btn}><${Btn} href="#results" v="outline">See our results</${Btn}></div>
+      </div>
+    </${Wrap}>
+  </section>`;
+
+/* =============================== Pillars ================================ */
+const Pillars = ({ d }) => html`
+  <section class="relative overflow-hidden py-24 lg:py-32 bg-ink text-white">
+    <div class="absolute inset-0 grain"></div>
+    <div class="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet/25 blur-[120px]"></div>
+    <${Wrap} c="relative">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end"><div class="lg:col-span-7"><${Reveal}><${Eyebrow} light>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} light c="mt-5" /></${Reveal}></div><div class="lg:col-span-5"><p class="text-[17px] leading-relaxed text-white/65">${d.body}</p></div></div>
+      <div class="relative mt-16 grid grid-cols-1 sm:grid-cols-2 gap-4" style=${{ perspective: '1400px' }}>
+        <div class="pointer-events-none absolute left-1/2 top-1/2 z-10 hidden sm:grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-amber text-ink shadow-[0_0_0_10px_rgba(15,23,42,1)]"><span class="font-serif text-4xl italic">4×</span></div>
+        ${d.items.map((p, k) => html`<${motion.article} key=${k}
+          initial=${{ opacity: 0, rotateX: k < 2 ? -50 : 50, rotateY: k % 2 ? -30 : 30, scale: 0.9 }} whileInView=${{ opacity: 1, rotateX: 0, rotateY: 0, scale: 1 }} viewport=${{ once: true, margin: '-80px' }} transition=${{ duration: 1, delay: k * 0.12, ease }}
+          class=${`group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] p-8 sm:p-10 min-h-[240px] flex flex-col hover:bg-violet transition-colors duration-500 ${['sm:rounded-br-[80px]', 'sm:rounded-bl-[80px]', 'sm:rounded-tr-[80px]', 'sm:rounded-tl-[80px]'][k]}`}>
+          <div class="flex items-start justify-between"><span class="grid h-14 w-14 place-items-center rounded-2xl bg-white/10 text-amber group-hover:bg-white group-hover:text-violet transition-colors duration-500"><${Icon} n=${p.icon} c="w-7 h-7" /></span><span class="font-serif italic text-6xl text-white/10 group-hover:text-white/25 transition-colors">${['I', 'II', 'III', 'IV'][k]}</span></div>
+          <h3 class="mt-auto pt-10 font-serif text-[1.8rem] font-medium">${p.name}</h3>
+          <p class="mt-2 text-[15.5px] text-white/65 group-hover:text-white/85 transition-colors">${p.text}</p>
+        </${motion.article}>`)}
+      </div>
+    </${Wrap}>
+  </section>`;
+
+/* =============================== Results ================================ */
+const Results = ({ d }) => {
+  const [a, setA] = useState(0); const c = d.cases[a];
+  return html`
+  <section id=${d.id} class="py-24 lg:py-32 bg-fog">
+    <${Wrap}>
+      <${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5 max-w-4xl" /></${Reveal}>
+      <div class="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7">
+          <${AnimatePresence} mode="wait">
+            <${motion.article} key=${a} initial=${{ opacity: 0, y: 20 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -12 }} transition=${{ duration: 0.5, ease }} class="relative h-full overflow-hidden rounded-[32px] bg-violet-900 p-8 sm:p-12 text-white flex flex-col min-h-[440px]">
+              <div class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-violet blur-3xl opacity-60"></div>
+              <div class="relative flex items-center justify-between"><span class="rounded-full bg-amber px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-ink">${c.area}</span><span class="text-[12px] text-white/50">Case ${a + 1} / ${d.cases.length}</span></div>
+              <h3 class="relative mt-8 font-serif text-3xl sm:text-[2.6rem] leading-tight">${c.title}</h3>
+              <p class="relative mt-4 text-xl text-violet-300 font-medium">${c.outcome}</p>
+              ${c.from && html`<div class="relative mt-8 space-y-3">
+                ${[['Original liability', c.from, 'bg-white/20'], ['Settled at', c.to, 'bg-amber']].map(([l, v, bg], k) => html`<div key=${l}><div class="flex justify-between text-[13px] text-white/70"><span>${l}</span><span class="font-semibold text-white">₹${v} Cr</span></div><div class="mt-1.5 h-3 rounded-full bg-white/10 overflow-hidden"><${motion.div} class=${`h-full rounded-full ${bg}`} initial=${{ width: 0 }} animate=${{ width: (v / c.from) * 100 + '%' }} transition=${{ duration: 1.2, delay: 0.3 + k * 0.3, ease }} /></div></div>`)}
+                <p class="pt-1 font-serif italic text-2xl text-amber">60% liability reduction</p></div>`}
+              <p class="relative mt-auto pt-10 text-[14px] text-white/60">— ${c.client}</p>
+            </${motion.article}>
+          </${AnimatePresence}>
+        </div>
+        <ul class="lg:col-span-5 grid grid-cols-1 gap-2">${d.cases.map((x, k) => html`<li key=${k}><button onClick=${() => setA(k)} onMouseEnter=${() => setA(k)} aria-pressed=${a === k} class=${`w-full rounded-2xl px-5 py-4 text-left flex items-center gap-4 transition-all duration-300 ${a === k ? 'bg-white shadow-lg shadow-ink/5' : 'hover:bg-white/60'}`}>
+          <span class=${`grid h-10 w-10 shrink-0 place-items-center rounded-xl font-serif ${a === k ? 'bg-violet text-white' : 'bg-white text-ink-600'}`}>${k + 1}</span>
+          <span class="flex-1"><span class="block font-semibold text-[15px]">${x.title}</span><span class="block text-[13px] text-ink-600">${x.client}</span></span>
+          <${Icon} n="arrow" c=${`w-4 h-4 ${a === k ? 'text-violet' : 'text-ink/20'}`} />
+        </button></li>`)}</ul>
+      </div>
+    </${Wrap}>
+  </section>`;
+};
+
+/* =============================== Services =============================== */
+const Services = ({ d }) => html`
+  <section id=${d.id} class="py-24 lg:py-32 bg-white">
+    <${Wrap}>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end"><div class="lg:col-span-7"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}></div><div class="lg:col-span-5"><p class="text-[17px] leading-relaxed text-ink-600">${d.body}</p></div></div>
+      <div class="mt-14 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        ${d.featured.map((s, k) => html`<${Reveal} key=${k} d=${k * 0.08}>
+          <a href="#contact" class="group relative flex h-full min-h-[340px] flex-col overflow-hidden rounded-[28px] border border-ink/10 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-violet hover:shadow-2xl hover:shadow-violet/15">
+            <div class="absolute inset-x-0 bottom-0 h-0 bg-violet transition-all duration-500 ease-out group-hover:h-full"></div>
+            <div class="relative flex items-start justify-between"><span class="grid h-14 w-14 place-items-center rounded-2xl bg-violet-50 text-violet group-hover:bg-white/15 group-hover:text-white transition-colors duration-500"><${Icon} n=${s.icon} c="w-7 h-7" /></span><span class="rounded-full bg-amber/20 px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.14em] text-amber-600 group-hover:bg-amber group-hover:text-ink transition-colors duration-500">${s.tag}</span></div>
+            <h3 class="relative mt-auto pt-12 font-serif text-[1.6rem] leading-tight font-medium group-hover:text-white transition-colors duration-500">${s.name}</h3>
+            <p class="relative mt-3 text-[14.5px] text-ink-600 group-hover:text-white/80 transition-colors duration-500">${s.line}</p>
+            <span class="relative mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-violet group-hover:text-white transition-colors duration-500">Know more <${Icon} n="arrow" c="w-4 h-4 transition-transform group-hover:translate-x-1" /></span>
+          </a>
+        </${Reveal}>`)}
+      </div>
+      <${Reveal} c="mt-8 flex flex-wrap items-center gap-2">
+        <span class="mr-2 text-[13px] font-semibold text-ink-600">Also handling:</span>
+        ${d.more.map((m) => html`<a key=${m} href="#contact" class="rounded-full border border-ink/10 px-4 py-2 text-[13.5px] font-medium hover:border-violet hover:text-violet transition-colors">${m}</a>`)}
+      </${Reveal}>
+    </${Wrap}>
+  </section>`;
+
+/* =============================== Network ================================ */
+const Network = ({ d }) => {
+  const ref = useRef(null); const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const scale = useTransform(scrollYProgress, [0, 0.5], [0.88, 1]); const radius = useTransform(scrollYProgress, [0, 0.5], [48, 0]);
+  return html`
+  <section ref=${ref} class="bg-white">
+    <${motion.div} style=${{ scale, borderRadius: radius }} class="relative overflow-hidden bg-ink text-white">
+      <img src=${d.image} alt="The FourFold Legal team" loading="lazy" class="absolute inset-0 h-full w-full object-cover object-[50%_40%]" />
+      <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/10"></div>
+      <${Wrap} c="relative flex min-h-[640px] flex-col justify-end py-14">
+        <${Reveal}><${H2} t=${d.title} light /></${Reveal}>
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">${d.stats.map(([v, l, s], k) => html`<${Reveal} key=${k} d=${k * 0.1}><div class="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-md"><p class="font-serif text-5xl text-amber">${v}</p><p class="mt-2 font-semibold">${l}</p><p class="text-[13px] text-white/60">${s}</p></div></${Reveal}>`)}</div>
+        <div class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-[14px] text-white/80">${d.points.map((p) => html`<span key=${p} class="inline-flex items-center gap-2"><${Icon} n="check" c="w-4 h-4 text-amber" s=${2.4} />${p}</span>`)}</div>
+      </${Wrap}>
+    </${motion.div}>
+  </section>`;
+};
+
+/* =============================== Process ================================ */
+const Process = ({ d, g }) => {
+  const ref = useRef(null); const { scrollYProgress } = useScroll({ target: ref, offset: ['start 75%', 'end 60%'] });
+  const w = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  return html`
+  <section id=${d.id} class="py-24 lg:py-32 bg-white">
+    <${Wrap}>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end"><div class="lg:col-span-7"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}></div><div class="lg:col-span-5"><p class="text-[16.5px] leading-relaxed text-ink-600">${d.body}</p></div></div>
+      <div ref=${ref} class="relative mt-16">
+        <div class="absolute left-0 right-0 top-[27px] hidden lg:block h-[2px] bg-ink/10 rounded"><${motion.div} class="h-full bg-gradient-to-r from-violet to-amber rounded" style=${{ width: w }} /></div>
+        <ol class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
+          ${d.steps.map((s, k) => html`<${Reveal} key=${k} d=${k * 0.1}><li class="relative">
+            <span class="relative z-10 grid h-14 w-14 place-items-center rounded-full bg-white border-2 border-violet font-serif text-lg text-violet shadow-[0_0_0_8px_#fff]">${k + 1}</span>
+            <h3 class="mt-6 font-serif text-2xl font-medium">${s.name}</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-ink-600">${s.text}</p>
+          </li></${Reveal}>`)}
+        </ol>
+      </div>
+      <${Reveal} c="mt-20">
+        <div class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-violet to-violet-900 p-8 sm:p-12 lg:p-14 text-white grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="absolute inset-0 grain"></div>
+          <div class="relative lg:col-span-8">
+            <p class="inline-flex items-center gap-2 rounded-full bg-amber px-4 py-1.5 text-[12.5px] font-bold text-ink"><${Icon} n="star" c="w-4 h-4 fill-ink" />${d.banner.kicker}</p>
+            <h3 class="mt-5 font-serif text-4xl sm:text-5xl font-medium">${d.banner.title}</h3>
+            <p class="mt-3 text-lg text-white/75 inline-flex items-center gap-2"><${Icon} n="clock" c="w-5 h-5 text-amber" />${d.banner.sub}</p>
+          </div>
+          <div class="relative lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3"><${Btn} href="#contact" v="amber">Start Free Assessment</${Btn}><${Btn} href=${g.phone.href} v="ghost" icon="phone">Call Now</${Btn}></div>
+        </div>
+      </${Reveal}>
+    </${Wrap}>
+  </section>`;
+};
+
+/* ============================= Testimonials ============================= */
+const Testimonials = ({ d }) => html`
+  <section class="py-24 lg:py-32 bg-fog overflow-hidden">
+    <${Wrap} c="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+      <div class="lg:col-span-7"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}></div>
+      <div class="lg:col-span-5"><p class="text-[16.5px] leading-relaxed text-ink-600">${d.body}</p><p class="mt-4 inline-flex items-center gap-1 text-amber">${[0, 1, 2, 3, 4].map((k) => html`<${Icon} key=${k} n="star" c="w-5 h-5 fill-amber" />`)}<span class="ml-2 text-sm font-semibold text-ink">5/5 from verified clients</span></p></div>
+    </${Wrap}>
+    <div class="mt-14 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
+      <div class="flex w-max gap-5 marquee">
+        ${[...d.items, ...d.items].map((t, k) => html`<figure key=${k} class="w-[340px] sm:w-[400px] shrink-0 rounded-[28px] bg-white p-7 flex flex-col">
+          <${Icon} n="quote" c="w-8 h-8 text-violet-300" s=${2} />
+          <blockquote class="mt-4 text-[15.5px] leading-relaxed text-ink/85">“${t.text}”</blockquote>
+          <figcaption class="mt-auto pt-6 flex items-center gap-3"><span class="grid h-11 w-11 place-items-center rounded-full bg-violet text-white text-[13px] font-bold">${t.name.split(' ').map((p) => p[0]).slice(0, 2).join('')}</span><span><span class="block font-semibold">${t.name}</span><span class="text-[12.5px] text-ink-600">Verified client · 5/5</span></span></figcaption>
+        </figure>`)}
+      </div>
+    </div>
+  </section>`;
+
+/* =============================== Insights =============================== */
+const Insights = ({ d }) => html`
+  <section id=${d.id} class="py-24 lg:py-32 bg-white">
+    <${Wrap}>
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}><${Btn} href="#insights" v="outline">Read more insights</${Btn}></div>
+      <div class="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6">
+        ${d.posts.map((p, k) => html`<${Reveal} key=${k} d=${k * 0.1}><a href="#insights" class="group block">
+          <div class="overflow-hidden rounded-[24px] aspect-[16/10] bg-fog"><img src=${p.image} alt="" loading="lazy" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" /></div>
+          <div class="mt-5 flex items-center gap-3 text-[12.5px]"><span class="rounded-full bg-violet-50 px-3 py-1 font-semibold text-violet">${p.cat}</span><span class="text-ink-600">${p.date}</span></div>
+          <h3 class="mt-3 font-serif text-[1.45rem] leading-snug font-medium group-hover:text-violet transition-colors">${p.title}</h3>
+        </a></${Reveal}>`)}
+      </div>
+    </${Wrap}>
+  </section>`;
+
+/* =============================== Contact ================================ */
+const Field = ({ label, children }) => html`<label class="block"><span class="text-[12.5px] font-semibold text-ink-600">${label}</span><div class="mt-1.5">${children}</div></label>`;
+const inp = 'w-full rounded-xl border border-ink/10 bg-fog px-4 py-3.5 text-[15px] outline-none focus:border-violet focus:bg-white transition';
+const Contact = ({ d, g }) => {
+  const [tab, setTab] = useState(0); const [sent, setSent] = useState(false); const [type, setType] = useState('');
+  return html`
+  <section id=${d.id} class="relative overflow-hidden py-24 lg:py-32 bg-ink text-white">
+    <img src=${d.image} alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover opacity-25" />
+    <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/95 to-violet-900/80"></div>
+    <${Wrap} c="relative grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div class="lg:col-span-5">
+        <${Reveal}><${Eyebrow} light>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} light c="mt-5" /><p class="mt-6 text-[17px] text-white/70">${d.body}</p></${Reveal}>
+        <div class="mt-10 space-y-3">
+          ${[['phone', 'Call an advocate', g.phone.label, g.phone.href], ['whatsapp', 'WhatsApp us', 'Chat on WhatsApp', 'https://wa.me/919872675722'], ['mail', 'Email', g.email, 'mailto:' + g.email]].map(([ic, l, v, h]) => html`<a key=${l} href=${h} class="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition"><span class="grid h-12 w-12 place-items-center rounded-xl bg-amber text-ink"><${Icon} n=${ic} /></span><span><span class="block text-[12px] text-white/55">${l}</span><span class="font-semibold">${v}</span></span><${Icon} n="arrow" c="ml-auto w-4 h-4 text-white/40 group-hover:text-white group-hover:translate-x-1 transition" /></a>`)}
+        </div>
+        <p class="mt-6 inline-flex items-center gap-2 text-[13px] text-white/55"><${Icon} n="lock" c="w-4 h-4" />Every enquiry is confidential and protected by advocate–client privilege.</p>
+      </div>
+      <div class="lg:col-span-7">
+        <${Reveal} d=${0.1}><div class="rounded-[32px] bg-white p-6 sm:p-10 text-ink shadow-2xl">
+          <div class="grid grid-cols-2 gap-1 rounded-full bg-fog p-1.5" role="tablist">${['Loan Settlement', 'General Consultation'].map((t, k) => html`<button key=${t} role="tab" aria-selected=${tab === k} onClick=${() => { setTab(k); setSent(false); }} class=${`relative rounded-full py-3 text-[14px] font-semibold transition-colors ${tab === k ? 'text-white' : 'text-ink-600'}`}>${tab === k && html`<${motion.span} layoutId="ctab" class="absolute inset-0 rounded-full bg-violet" transition=${{ type: 'spring', stiffness: 400, damping: 34 }} />`}<span class="relative">${t}</span></button>`)}</div>
+          <${AnimatePresence} mode="wait">${sent ? html`
+            <${motion.div} key="ok" initial=${{ opacity: 0, scale: 0.96 }} animate=${{ opacity: 1, scale: 1 }} class="py-16 text-center"><span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-violet text-white"><${Icon} n="check" c="w-8 h-8" s=${2.4} /></span><p class="mt-6 font-serif text-3xl">Thank you.</p><p class="mt-2 text-ink-600">An advocate will call you within 15 minutes.</p></${motion.div}>` : html`
+            <${motion.form} key=${tab} initial=${{ opacity: 0, y: 12 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0 }} onSubmit=${(e) => { e.preventDefault(); setSent(true); }} class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <p class="sm:col-span-2 font-serif text-2xl">${tab ? 'General legal consultation' : 'Loan settlement assistance'}<span class="block font-sans text-[14px] text-ink-600 mt-1">${tab ? 'Tell us about your matter' : 'Specialized help for debt resolution'}</span></p>
+              <${Field} label="Full name"><input required class=${inp} placeholder="Your name" autocomplete="name" /></${Field}>
+              <${Field} label="Mobile number"><input required type="tel" class=${inp} placeholder="+91" autocomplete="tel" /></${Field}>
+              ${tab === 0 ? html`
+                <div class="sm:col-span-2"><span class="text-[12.5px] font-semibold text-ink-600">Loan type</span><div class="mt-2 flex flex-wrap gap-2">${d.loanTypes.map((t) => html`<button type="button" key=${t} aria-pressed=${type === t} onClick=${() => setType(t)} class=${`rounded-full border px-3.5 py-2 text-[13px] font-medium transition ${type === t ? 'border-violet bg-violet text-white' : 'border-ink/10 hover:border-violet'}`}>${t}</button>`)}</div></div>
+                <div class="sm:col-span-2"><${Field} label="Outstanding amount (₹)"><select required class=${inp}><option value="">Select amount</option>${d.amounts.map((a) => html`<option key=${a}>${a}</option>`)}</select></${Field}></div>` : html`
+                <div class="sm:col-span-2"><${Field} label="Legal need"><select required class=${inp}><option value="">Select a topic</option>${d.topics.map((a) => html`<option key=${a}>${a}</option>`)}</select></${Field}></div>
+                <div class="sm:col-span-2"><${Field} label="Briefly describe your matter"><textarea rows="3" class=${inp} placeholder="Optional"></textarea></${Field}></div>`}
+              <button class="sm:col-span-2 mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-violet py-4 text-[15px] font-semibold text-white hover:bg-violet-700 transition">${tab ? 'Book Free Consultation' : 'Start Loan Settlement'}<${Icon} n="arrow" c="w-4 h-4" /></button>
+              <p class="sm:col-span-2 text-center text-[12px] text-ink-600">By submitting, you agree to our Terms of Service and Privacy Policy.</p>
+            </${motion.form}>`}
+          </${AnimatePresence}>
+        </div></${Reveal}>
+      </div>
+    </${Wrap}>
+  </section>`;
+};
+
+/* ================================ Footer ================================ */
+const Footer = ({ g }) => html`
+  <footer class="bg-ink text-white/70 pt-20 pb-8 border-t border-white/10">
+    <${Wrap}>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div class="lg:col-span-4"><img src=${g.logo.light} alt=${g.logo.alt} class="h-11 w-auto" /><p class="mt-6 max-w-sm text-[15px] leading-relaxed">Financial dispute advocates and solicitors — 120+ advocates across 25+ states, with offices in Noida, Hyderabad & 11+ cities.</p>
+          <div class="mt-6 space-y-2 text-[14.5px]"><a href=${g.phone.href} class="flex items-center gap-2 hover:text-white"><${Icon} n="phone" c="w-4 h-4 text-amber" />${g.phone.label}</a><a href=${'mailto:' + g.email} class="flex items-center gap-2 hover:text-white"><${Icon} n="mail" c="w-4 h-4 text-amber" />${g.email}</a></div></div>
+        <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">${g.footer.map((c) => html`<div key=${c.title}><p class="text-[11.5px] font-bold uppercase tracking-[0.2em] text-white/40">${c.title}</p><ul class="mt-5 space-y-3">${c.links.map((l) => html`<li key=${l}><a href="#top" class="text-[14.5px] hover:text-amber transition-colors">${l}</a></li>`)}</ul></div>`)}</div>
+      </div>
+      <p class="mt-14 text-[12px] leading-relaxed text-white/40">Disclaimer: As per the rules of the Bar Council of India, advocates are not permitted to solicit work or advertise. This website is for informational purposes only and does not constitute legal advice.</p>
+      <div class="mt-6 flex flex-col sm:flex-row justify-between gap-4 border-t border-white/10 pt-6 text-[13px] text-white/50">
+        <p>© ${new Date().getFullYear()} FourFold Legal. All rights reserved.</p>
+        <p>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" class="font-semibold text-white hover:text-amber">VOCSO</a></p>
+      </div>
+    </${Wrap}>
+  </footer>
+  <a href="https://wa.me/919872675722" aria-label="Chat on WhatsApp" class="fixed bottom-5 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-xl shadow-black/20 hover:scale-105 transition"><${Icon} n="whatsapp" c="w-7 h-7" s=${1.8} /></a>`;
+
+/* ================================ App =================================== */
+const REGISTRY = {
+  'sections.hero': Hero, 'sections.about': About, 'sections.pillars': Pillars, 'sections.results': Results, 'sections.services': Services,
+  'sections.network': Network, 'sections.process': Process, 'sections.testimonials': Testimonials, 'sections.insights': Insights, 'sections.contact': Contact,
+};
+const App = () => html`
+  <${MotionConfig} reducedMotion="user">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2">Skip to content</a>
+    <${Header} g=${CMS.global} />
+    <main id="main">${CMS.page.sections.map((s, i) => { const C = REGISTRY[s.__component]; return C ? html`<${C} key=${i} d=${s} g=${CMS.global} />` : null; })}</main>
+    <${Footer} g=${CMS.global} />
+  </${MotionConfig}>`;
+
+createRoot(document.getElementById('root')).render(html`<${App} />`);
+requestAnimationFrame(() => document.getElementById('boot')?.remove());
+</script>
+</body>
+</html>
