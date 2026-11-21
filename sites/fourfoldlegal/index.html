@@ -16,7 +16,7 @@
       extend: {
         colors: {
           violet: { DEFAULT: '#7C3AED', 50: '#F5F0FF', 100: '#EDE4FE', 300: '#B79BF8', 400: '#9D6CF4', 700: '#6D28D9', 900: '#3B1278' },
-          amber: { DEFAULT: '#FBBF24', 300: '#FCD34D', 600: '#D97706' },
+          mint: { DEFAULT: '#34D399', 300: '#6EE7B7', 600: '#059669' },
           ink: { DEFAULT: '#0F172A', 800: '#1E293B', 600: '#475569', 400: '#94A3B8' },
           fog: '#F4F3F8',
         },
@@ -236,10 +236,10 @@ const ICONS = {
 const Icon = ({ n, c = 'w-5 h-5', s = 1.7 }) => html`<svg class=${c} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=${s} stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${ICONS[n]} /></svg>`;
 const ease = [0.22, 1, 0.36, 1];
 const Reveal = ({ children, d = 0, y = 28, c = '' }) => html`<${motion.div} class=${c} initial=${{ opacity: 0, y }} whileInView=${{ opacity: 1, y: 0 }} viewport=${{ once: true, margin: '-60px' }} transition=${{ duration: 0.8, delay: d, ease }}>${children}</${motion.div}>`;
-const Eyebrow = ({ children, light }) => html`<p class=${`inline-flex items-center gap-2.5 text-[11.5px] font-bold uppercase tracking-[0.2em] ${light ? 'text-amber' : 'text-violet'}`}><span class=${`h-px w-8 ${light ? 'bg-amber' : 'bg-violet'}`}></span>${children}</p>`;
+const Eyebrow = ({ children, light }) => html`<p class=${`inline-flex items-center gap-2.5 text-[11.5px] font-bold uppercase tracking-[0.2em] ${light ? 'text-mint' : 'text-violet'}`}><span class=${`h-px w-8 ${light ? 'bg-mint' : 'bg-violet'}`}></span>${children}</p>`;
 const H2 = ({ t, light, c = '' }) => html`<h2 class=${`font-serif font-medium tracking-[-0.02em] leading-[1.06] text-[2.1rem] sm:text-[2.8rem] lg:text-[3.4rem] ${light ? 'text-white' : 'text-ink'} ${c}`}>${t[0]}${t[1] && html`<br class="hidden sm:block" /> <em class=${`italic ${light ? 'text-violet-300' : 'text-violet'}`}>${t[1]}</em>`}</h2>`;
 const Btn = ({ href, children, v = 'primary', c = '', icon = 'arrow' }) => {
-  const st = { primary: 'bg-violet text-white hover:bg-violet-700 shadow-lg shadow-violet/25', amber: 'bg-amber text-ink hover:bg-amber-300', ghost: 'border border-white/30 text-white hover:bg-white hover:text-ink', outline: 'border border-ink/15 text-ink hover:border-ink', dark: 'bg-ink text-white hover:bg-ink-800' }[v];
+  const st = { primary: 'bg-violet text-white hover:bg-violet-700 shadow-lg shadow-violet/25', mint: 'bg-mint text-ink hover:bg-mint-300 shadow-lg shadow-mint/25', ghost: 'border border-white/30 text-white hover:bg-white hover:text-ink', outline: 'border border-ink/15 text-ink hover:border-ink', dark: 'bg-ink text-white hover:bg-ink-800' }[v];
   return html`<a href=${href} class=${`group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[14px] font-semibold transition-all duration-300 ${st} ${c}`}>${children}<${Icon} n=${icon} c="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" /></a>`;
 };
 const fmt = (n) => Math.round(n).toLocaleString('en-IN');
@@ -259,7 +259,7 @@ const Header = ({ g }) => {
   <header class="fixed inset-x-0 top-0 z-50" onMouseLeave=${() => setMega(false)}>
     <div class=${`bg-violet-900 text-white/85 text-[12.5px] transition-all duration-500 overflow-hidden ${solid ? 'h-0' : 'h-9'}`}>
       <${Wrap} c="flex h-9 items-center justify-between gap-6">
-        <div class="hidden md:flex items-center gap-6">${g.topbar.map((t) => html`<span key=${t} class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-amber"></span>${t}</span>`)}</div>
+        <div class="hidden md:flex items-center gap-6">${g.topbar.map((t) => html`<span key=${t} class="inline-flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-mint"></span>${t}</span>`)}</div>
         <div class="flex items-center gap-5 mx-auto md:mx-0"><a href=${g.phone.href} class="inline-flex items-center gap-1.5 hover:text-white"><${Icon} n="phone" c="w-3.5 h-3.5" />${g.phone.label}</a><a href=${'mailto:' + g.email} class="hidden sm:inline-flex items-center gap-1.5 hover:text-white"><${Icon} n="mail" c="w-3.5 h-3.5" />${g.email}</a></div>
       </${Wrap}>
     </div>
@@ -270,8 +270,8 @@ const Header = ({ g }) => {
           ${g.nav.map((n) => html`<a key=${n.label} href=${n.href} onMouseEnter=${() => setMega(!!n.menu)} class=${`rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${dark ? 'text-ink/75 hover:text-ink hover:bg-fog' : 'text-white/85 hover:text-white hover:bg-white/10'}`}>${n.label}${n.menu && html`<span class="ml-1 text-[10px] opacity-60">▾</span>`}</a>`)}
         </nav>
         <div class="flex items-center gap-2">
-          <a href="#contact" class=${`hidden lg:inline-flex rounded-full px-4 py-2.5 text-[13.5px] font-semibold ${dark ? 'text-ink' : 'text-white'}`}>Pay Now</a>
-          <a href=${g.cta.href} class="hidden sm:inline-flex rounded-full bg-violet px-5 py-2.5 text-[13.5px] font-semibold text-white hover:bg-violet-700 transition-colors">${g.cta.label}</a>
+          <a href="#contact" class="inline-flex items-center gap-2 rounded-full bg-mint px-4 sm:px-5 py-2.5 text-[13.5px] font-bold text-ink shadow-lg shadow-mint/30 ring-2 ring-mint/40 ring-offset-0 hover:bg-mint-300 transition"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v11H3zM3 11h18M7 15h3"/></svg>Pay Now</a>
+          <a href=${g.cta.href} class="hidden lg:inline-flex rounded-full bg-violet px-5 py-2.5 text-[13.5px] font-semibold text-white hover:bg-violet-700 transition-colors">${g.cta.label}</a>
           <button class=${`xl:hidden grid h-11 w-11 place-items-center rounded-full ${dark ? 'bg-fog text-ink' : 'bg-white/10 text-white'}`} aria-label="Menu" aria-expanded=${open} onClick=${() => setOpen(!open)}><${Icon} n=${open ? 'x' : 'menu'} /></button>
         </div>
       </${Wrap}>
@@ -295,45 +295,46 @@ const Header = ({ g }) => {
   </header>`;
 };
 
-/* ================================= Hero ================================= */
+/* ======================= Hero (Layout B: open photo) ======================= */
 const Hero = ({ d, g }) => {
   const [i, setI] = useState(0); const [hold, setHold] = useState(false); const DUR = 6;
   useEffect(() => { if (hold) return; const t = setTimeout(() => setI((i + 1) % d.slides.length), DUR * 1000); return () => clearTimeout(t); }, [i, hold]);
-  const { scrollY } = useScroll(); const y = useTransform(scrollY, [0, 800], [0, 160]);
+  const { scrollY } = useScroll(); const y = useTransform(scrollY, [0, 800], [0, 120]); const sc = useTransform(scrollY, [0, 800], [1, 1.08]);
   const s = d.slides[i];
   return html`
   <section id="top" class="relative overflow-hidden bg-ink text-white">
-    <${motion.img} src=${d.image} alt="The FourFold Legal team" style=${{ y }} class="absolute inset-0 h-[115%] w-full object-cover object-[50%_35%]" />
-    <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-violet-900/40"></div>
-    <div class="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60"></div>
-    <div class="absolute inset-0 grain"></div>
+    <${motion.img} src=${d.image} alt="The FourFold Legal team" style=${{ y, scale: sc }} class="absolute inset-0 h-full w-full object-cover object-[50%_45%]" />
+    <div class="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-ink/70 to-transparent"></div>
+    <div class="absolute inset-0 bg-ink/45 sm:hidden"></div>
+    <div class="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-ink via-ink/75 to-transparent"></div>
 
-    <${Wrap} c="relative grid grid-cols-1 lg:grid-cols-12 gap-10 pt-40 pb-16 lg:pt-48 lg:pb-24 min-h-[100svh] items-center">
-      <div class="lg:col-span-7">
-        <div class="flex flex-wrap gap-2">${d.badges.map((b, k) => html`<${motion.span} key=${b} initial=${{ opacity: 0, y: 10 }} animate=${{ opacity: 1, y: 0 }} transition=${{ delay: 0.2 + k * 0.08 }} class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.07] px-3.5 py-1.5 text-[12px] font-medium text-white/85 backdrop-blur"><${Icon} n="check" c="w-3.5 h-3.5 text-amber" s=${2.4} />${b}</${motion.span}>`)}</div>
-        <${AnimatePresence} mode="wait">
-          <${motion.div} key=${i} initial=${{ opacity: 0, y: 24 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -16 }} transition=${{ duration: 0.6, ease }} class="mt-8">
-            <p class="text-amber font-semibold text-[15px]">${s.eyebrow}</p>
-            <h1 class="mt-3 font-serif font-medium tracking-[-0.025em] leading-[1.02] text-[2.6rem] sm:text-[3.6rem] lg:text-[4.6rem]">${s.title[0]}<br /><em class="italic text-violet-300">${s.title[1]}</em></h1>
-            <p class="mt-6 max-w-xl text-[17px] leading-relaxed text-white/75">${s.body}</p>
-            <div class="mt-9 flex flex-wrap gap-3"><${Btn} href=${g.cta.href}>${s.cta}</${Btn}><${Btn} href=${g.phone.href} v="ghost" icon="phone">Free Consultation</${Btn}></div>
-          </${motion.div}>
-        </${AnimatePresence}>
+    <${Wrap} c="relative flex min-h-[100svh] flex-col justify-end pt-40 pb-10">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+        <div class="max-w-3xl">
+          <${AnimatePresence} mode="wait">
+            <${motion.div} key=${i} initial=${{ opacity: 0, y: 24 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -16 }} transition=${{ duration: 0.6, ease }}>
+              <p class="inline-flex items-center gap-2 rounded-full bg-mint px-4 py-1.5 text-[13px] font-bold text-ink"><span class="h-1.5 w-1.5 rounded-full bg-ink"></span>${s.eyebrow}</p>
+              <h1 class="mt-5 font-serif font-medium tracking-[-0.025em] leading-[1.02] text-[2.6rem] sm:text-[3.8rem] lg:text-[5rem] drop-shadow-[0_2px_24px_rgba(15,23,42,0.5)]">${s.title[0]} <em class="italic text-mint">${s.title[1]}</em></h1>
+              <p class="mt-5 max-w-xl text-[17px] leading-relaxed text-white/85">${s.body}</p>
+            </${motion.div}>
+          </${AnimatePresence}>
+          <div class="mt-8 flex flex-wrap gap-3"><${Btn} href=${g.cta.href} v="mint">${s.cta}</${Btn}><${Btn} href=${g.phone.href} v="ghost" icon="phone">Free Consultation</${Btn}></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 lg:w-[360px] shrink-0">${d.badges.map((b, k) => html`<${motion.div} key=${b} initial=${{ opacity: 0, y: 12 }} animate=${{ opacity: 1, y: 0 }} transition=${{ delay: 0.3 + k * 0.08 }} class="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md"><${Icon} n="check" c="w-4 h-4 text-mint" s=${2.4} /><p class="mt-2 text-[13px] font-semibold leading-snug">${b}</p></${motion.div}>`)}</div>
       </div>
 
-      <div class="lg:col-span-5 lg:justify-self-end w-full max-w-[420px]" onMouseEnter=${() => setHold(true)} onMouseLeave=${() => setHold(false)}>
-        <div class="rounded-[28px] border border-white/10 bg-white/[0.06] p-3 backdrop-blur-xl">
-          <p class="px-4 pt-3 pb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">How can we help?</p>
-          <ul role="tablist" aria-label="Legal needs">${d.slides.map((sl, k) => html`<li key=${k}><button role="tab" aria-selected=${k === i} onClick=${() => setI(k)} class=${`relative w-full overflow-hidden rounded-2xl px-4 py-3.5 text-left flex items-center justify-between transition-colors ${k === i ? 'bg-white text-ink' : 'text-white/80 hover:bg-white/10'}`}>
-            <span class="flex items-center gap-3"><span class=${`font-serif text-sm ${k === i ? 'text-violet' : 'text-white/40'}`}>0${k + 1}</span><span class="font-semibold text-[15px]">${sl.tab}</span></span>
-            <${Icon} n="arrow" c=${`w-4 h-4 transition ${k === i ? 'text-violet' : 'opacity-0'}`} />
-            ${k === i && !hold && html`<${motion.span} key=${'b' + i} class="absolute left-0 bottom-0 h-[3px] bg-violet" initial=${{ width: 0 }} animate=${{ width: '100%' }} transition=${{ duration: DUR, ease: 'linear' }} />`}
-          </button></li>`)}</ul>
-        </div>
+      <div class="mt-12 border-t border-white/15 pt-5" onMouseEnter=${() => setHold(true)} onMouseLeave=${() => setHold(false)}>
+        <ul class="no-scrollbar -mx-[5vw] px-[5vw] flex gap-2 overflow-x-auto lg:grid lg:grid-cols-6 lg:mx-0 lg:px-0" role="tablist" aria-label="Legal needs">
+          ${d.slides.map((sl, k) => html`<li key=${k} class="shrink-0"><button role="tab" aria-selected=${k === i} onClick=${() => setI(k)} class=${`relative w-full overflow-hidden rounded-2xl px-4 py-3 text-left transition-colors ${k === i ? 'bg-white text-ink' : 'bg-white/5 text-white/75 hover:bg-white/15 backdrop-blur'}`}>
+            <span class=${`block font-serif text-[12px] ${k === i ? 'text-violet' : 'text-white/45'}`}>0${k + 1}</span>
+            <span class="block whitespace-nowrap font-semibold text-[14px]">${sl.tab}</span>
+            ${k === i && !hold && html`<${motion.span} key=${'b' + i} class="absolute left-0 bottom-0 h-[3px] bg-mint" initial=${{ width: 0 }} animate=${{ width: '100%' }} transition=${{ duration: DUR, ease: 'linear' }} />`}
+          </button></li>`)}
+        </ul>
       </div>
     </${Wrap}>
   </section>
-  <section class="relative z-10 -mt-px bg-ink pb-0">
+  <section class="relative z-10 bg-ink pb-0">
     <${Wrap} c="grid grid-cols-2 lg:grid-cols-4 overflow-hidden rounded-t-[28px] lg:rounded-[28px] lg:translate-y-1/2 bg-white shadow-2xl shadow-ink/20">
       ${d.stats.map((s, k) => html`<div key=${k} class=${`p-6 sm:p-8 ${k % 2 ? '' : 'border-r'} lg:border-r border-ink/10 ${k < 2 ? 'border-b lg:border-b-0' : ''} last:border-r-0`}><p class="font-serif text-4xl sm:text-5xl text-ink"><${Counter} ...${s} /></p><p class="mt-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink-600">${s.label}</p></div>`)}
     </${Wrap}>
@@ -347,7 +348,7 @@ const About = ({ d }) => html`
       <div class="lg:col-span-6 relative">
         <${Reveal}><div class="overflow-hidden rounded-[32px] aspect-[4/3]"><img src=${d.images[0]} alt="FourFold Legal partners" loading="lazy" class="h-full w-full object-cover" /></div></${Reveal}>
         <${Reveal} d=${0.15} c="absolute -bottom-10 -right-2 sm:right-[-6%] w-[48%]"><div class="overflow-hidden rounded-[24px] border-[6px] border-white shadow-2xl aspect-[4/3]"><img src=${d.images[2]} alt="FourFold Legal office" loading="lazy" class="h-full w-full object-cover" /></div></${Reveal}>
-        <div class="absolute -top-5 left-6 rounded-2xl bg-amber px-5 py-4 shadow-xl"><p class="font-serif text-3xl text-ink">1000+</p><p class="text-[12px] font-semibold text-ink/70">Cases handled</p></div>
+        <div class="absolute -top-5 left-6 rounded-2xl bg-mint px-5 py-4 shadow-xl"><p class="font-serif text-3xl text-ink">1000+</p><p class="text-[12px] font-semibold text-ink/70">Cases handled</p></div>
       </div>
       <div class="lg:col-span-6 lg:pl-10 pt-10 lg:pt-0">
         <${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /><p class="mt-7 text-[16.5px] leading-[1.8] text-ink-600">${d.body}</p></${Reveal}>
@@ -365,11 +366,11 @@ const Pillars = ({ d }) => html`
     <${Wrap} c="relative">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end"><div class="lg:col-span-7"><${Reveal}><${Eyebrow} light>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} light c="mt-5" /></${Reveal}></div><div class="lg:col-span-5"><p class="text-[17px] leading-relaxed text-white/65">${d.body}</p></div></div>
       <div class="relative mt-16 grid grid-cols-1 sm:grid-cols-2 gap-4" style=${{ perspective: '1400px' }}>
-        <div class="pointer-events-none absolute left-1/2 top-1/2 z-10 hidden sm:grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-amber text-ink shadow-[0_0_0_10px_rgba(15,23,42,1)]"><span class="font-serif text-4xl italic">4×</span></div>
+        <div class="pointer-events-none absolute left-1/2 top-1/2 z-10 hidden sm:grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-mint text-ink shadow-[0_0_0_10px_rgba(15,23,42,1)]"><span class="font-serif text-4xl italic">4×</span></div>
         ${d.items.map((p, k) => html`<${motion.article} key=${k}
           initial=${{ opacity: 0, rotateX: k < 2 ? -50 : 50, rotateY: k % 2 ? -30 : 30, scale: 0.9 }} whileInView=${{ opacity: 1, rotateX: 0, rotateY: 0, scale: 1 }} viewport=${{ once: true, margin: '-80px' }} transition=${{ duration: 1, delay: k * 0.12, ease }}
           class=${`group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] p-8 sm:p-10 min-h-[240px] flex flex-col hover:bg-violet transition-colors duration-500 ${['sm:rounded-br-[80px]', 'sm:rounded-bl-[80px]', 'sm:rounded-tr-[80px]', 'sm:rounded-tl-[80px]'][k]}`}>
-          <div class="flex items-start justify-between"><span class="grid h-14 w-14 place-items-center rounded-2xl bg-white/10 text-amber group-hover:bg-white group-hover:text-violet transition-colors duration-500"><${Icon} n=${p.icon} c="w-7 h-7" /></span><span class="font-serif italic text-6xl text-white/10 group-hover:text-white/25 transition-colors">${['I', 'II', 'III', 'IV'][k]}</span></div>
+          <div class="flex items-start justify-between"><span class="grid h-14 w-14 place-items-center rounded-2xl bg-white/10 text-mint group-hover:bg-white group-hover:text-violet transition-colors duration-500"><${Icon} n=${p.icon} c="w-7 h-7" /></span><span class="font-serif italic text-6xl text-white/10 group-hover:text-white/25 transition-colors">${['I', 'II', 'III', 'IV'][k]}</span></div>
           <h3 class="mt-auto pt-10 font-serif text-[1.8rem] font-medium">${p.name}</h3>
           <p class="mt-2 text-[15.5px] text-white/65 group-hover:text-white/85 transition-colors">${p.text}</p>
         </${motion.article}>`)}
@@ -389,12 +390,12 @@ const Results = ({ d }) => {
           <${AnimatePresence} mode="wait">
             <${motion.article} key=${a} initial=${{ opacity: 0, y: 20 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0, y: -12 }} transition=${{ duration: 0.5, ease }} class="relative h-full overflow-hidden rounded-[32px] bg-violet-900 p-8 sm:p-12 text-white flex flex-col min-h-[440px]">
               <div class="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-violet blur-3xl opacity-60"></div>
-              <div class="relative flex items-center justify-between"><span class="rounded-full bg-amber px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-ink">${c.area}</span><span class="text-[12px] text-white/50">Case ${a + 1} / ${d.cases.length}</span></div>
+              <div class="relative flex items-center justify-between"><span class="rounded-full bg-mint px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-ink">${c.area}</span><span class="text-[12px] text-white/50">Case ${a + 1} / ${d.cases.length}</span></div>
               <h3 class="relative mt-8 font-serif text-3xl sm:text-[2.6rem] leading-tight">${c.title}</h3>
               <p class="relative mt-4 text-xl text-violet-300 font-medium">${c.outcome}</p>
               ${c.from && html`<div class="relative mt-8 space-y-3">
-                ${[['Original liability', c.from, 'bg-white/20'], ['Settled at', c.to, 'bg-amber']].map(([l, v, bg], k) => html`<div key=${l}><div class="flex justify-between text-[13px] text-white/70"><span>${l}</span><span class="font-semibold text-white">₹${v} Cr</span></div><div class="mt-1.5 h-3 rounded-full bg-white/10 overflow-hidden"><${motion.div} class=${`h-full rounded-full ${bg}`} initial=${{ width: 0 }} animate=${{ width: (v / c.from) * 100 + '%' }} transition=${{ duration: 1.2, delay: 0.3 + k * 0.3, ease }} /></div></div>`)}
-                <p class="pt-1 font-serif italic text-2xl text-amber">60% liability reduction</p></div>`}
+                ${[['Original liability', c.from, 'bg-white/20'], ['Settled at', c.to, 'bg-mint']].map(([l, v, bg], k) => html`<div key=${l}><div class="flex justify-between text-[13px] text-white/70"><span>${l}</span><span class="font-semibold text-white">₹${v} Cr</span></div><div class="mt-1.5 h-3 rounded-full bg-white/10 overflow-hidden"><${motion.div} class=${`h-full rounded-full ${bg}`} initial=${{ width: 0 }} animate=${{ width: (v / c.from) * 100 + '%' }} transition=${{ duration: 1.2, delay: 0.3 + k * 0.3, ease }} /></div></div>`)}
+                <p class="pt-1 font-serif italic text-2xl text-mint">60% liability reduction</p></div>`}
               <p class="relative mt-auto pt-10 text-[14px] text-white/60">— ${c.client}</p>
             </${motion.article}>
           </${AnimatePresence}>
@@ -409,21 +410,31 @@ const Results = ({ d }) => {
   </section>`;
 };
 
-/* =============================== Services =============================== */
-const Services = ({ d }) => html`
+/* ===================== Services (Layout B: photo bento) ===================== */
+const Services = ({ d }) => {
+  const [a, setA] = useState(0);
+  const photos = [A('img/img5.webp'), A('img/img4.webp'), A('img/img1.webp'), A('img/img2.webp')];
+  return html`
   <section id=${d.id} class="py-24 lg:py-32 bg-white">
     <${Wrap}>
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end"><div class="lg:col-span-7"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}></div><div class="lg:col-span-5"><p class="text-[17px] leading-relaxed text-ink-600">${d.body}</p></div></div>
-      <div class="mt-14 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        ${d.featured.map((s, k) => html`<${Reveal} key=${k} d=${k * 0.08}>
-          <a href="#contact" class="group relative flex h-full min-h-[340px] flex-col overflow-hidden rounded-[28px] border border-ink/10 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-violet hover:shadow-2xl hover:shadow-violet/15">
-            <div class="absolute inset-x-0 bottom-0 h-0 bg-violet transition-all duration-500 ease-out group-hover:h-full"></div>
-            <div class="relative flex items-start justify-between"><span class="grid h-14 w-14 place-items-center rounded-2xl bg-violet-50 text-violet group-hover:bg-white/15 group-hover:text-white transition-colors duration-500"><${Icon} n=${s.icon} c="w-7 h-7" /></span><span class="rounded-full bg-amber/20 px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.14em] text-amber-600 group-hover:bg-amber group-hover:text-ink transition-colors duration-500">${s.tag}</span></div>
-            <h3 class="relative mt-auto pt-12 font-serif text-[1.6rem] leading-tight font-medium group-hover:text-white transition-colors duration-500">${s.name}</h3>
-            <p class="relative mt-3 text-[14.5px] text-ink-600 group-hover:text-white/80 transition-colors duration-500">${s.line}</p>
-            <span class="relative mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-violet group-hover:text-white transition-colors duration-500">Know more <${Icon} n="arrow" c="w-4 h-4 transition-transform group-hover:translate-x-1" /></span>
-          </a>
-        </${Reveal}>`)}
+      <div class="mt-14 flex flex-col lg:flex-row gap-3 lg:h-[520px]">
+        ${d.featured.map((s, k) => { const on = a === k; return html`<${motion.a} key=${k} href="#contact" layout onMouseEnter=${() => setA(k)} onFocus=${() => setA(k)}
+          animate=${{ flex: on ? 3.2 : 1 }} transition=${{ duration: 0.7, ease }}
+          class="group relative min-h-[300px] lg:min-h-0 overflow-hidden rounded-[28px] bg-ink text-white">
+          <img src=${photos[k]} alt="" loading="lazy" class=${`absolute inset-0 h-full w-full object-cover transition-all duration-700 ${on ? 'opacity-70 scale-100' : 'opacity-35 scale-110 grayscale'}`} />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent"></div>
+          <div class="relative flex h-full flex-col p-7">
+            <div class="flex items-start justify-between gap-3"><span class=${`grid h-12 w-12 shrink-0 place-items-center rounded-2xl transition-colors ${on ? 'bg-mint text-ink' : 'bg-white/10 text-white'}`}><${Icon} n=${s.icon} c="w-6 h-6" /></span><span class="rounded-full bg-white/15 px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.14em] backdrop-blur">${s.tag}</span></div>
+            <div class="mt-auto">
+              <h3 class=${`font-serif leading-tight font-medium transition-all duration-500 ${on ? 'text-[2rem]' : 'text-[1.35rem]'}`}>${s.name}</h3>
+              <${AnimatePresence}>${on && html`<${motion.div} initial=${{ opacity: 0, y: 10 }} animate=${{ opacity: 1, y: 0 }} exit=${{ opacity: 0 }} transition=${{ delay: 0.25 }}>
+                <p class="mt-3 max-w-md text-[15px] text-white/80">${s.line}</p>
+                <span class="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[13.5px] font-semibold text-ink">Know more <${Icon} n="arrow" c="w-4 h-4" /></span>
+              </${motion.div}>`}</${AnimatePresence}>
+            </div>
+          </div>
+        </${motion.a}>`; })}
       </div>
       <${Reveal} c="mt-8 flex flex-wrap items-center gap-2">
         <span class="mr-2 text-[13px] font-semibold text-ink-600">Also handling:</span>
@@ -431,6 +442,7 @@ const Services = ({ d }) => html`
       </${Reveal}>
     </${Wrap}>
   </section>`;
+};
 
 /* =============================== Network ================================ */
 const Network = ({ d }) => {
@@ -443,8 +455,8 @@ const Network = ({ d }) => {
       <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/10"></div>
       <${Wrap} c="relative flex min-h-[640px] flex-col justify-end py-14">
         <${Reveal}><${H2} t=${d.title} light /></${Reveal}>
-        <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">${d.stats.map(([v, l, s], k) => html`<${Reveal} key=${k} d=${k * 0.1}><div class="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-md"><p class="font-serif text-5xl text-amber">${v}</p><p class="mt-2 font-semibold">${l}</p><p class="text-[13px] text-white/60">${s}</p></div></${Reveal}>`)}</div>
-        <div class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-[14px] text-white/80">${d.points.map((p) => html`<span key=${p} class="inline-flex items-center gap-2"><${Icon} n="check" c="w-4 h-4 text-amber" s=${2.4} />${p}</span>`)}</div>
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">${d.stats.map(([v, l, s], k) => html`<${Reveal} key=${k} d=${k * 0.1}><div class="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-md"><p class="font-serif text-5xl text-mint">${v}</p><p class="mt-2 font-semibold">${l}</p><p class="text-[13px] text-white/60">${s}</p></div></${Reveal}>`)}</div>
+        <div class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-[14px] text-white/80">${d.points.map((p) => html`<span key=${p} class="inline-flex items-center gap-2"><${Icon} n="check" c="w-4 h-4 text-mint" s=${2.4} />${p}</span>`)}</div>
       </${Wrap}>
     </${motion.div}>
   </section>`;
@@ -459,7 +471,7 @@ const Process = ({ d, g }) => {
     <${Wrap}>
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end"><div class="lg:col-span-7"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}></div><div class="lg:col-span-5"><p class="text-[16.5px] leading-relaxed text-ink-600">${d.body}</p></div></div>
       <div ref=${ref} class="relative mt-16">
-        <div class="absolute left-0 right-0 top-[27px] hidden lg:block h-[2px] bg-ink/10 rounded"><${motion.div} class="h-full bg-gradient-to-r from-violet to-amber rounded" style=${{ width: w }} /></div>
+        <div class="absolute left-0 right-0 top-[27px] hidden lg:block h-[2px] bg-ink/10 rounded"><${motion.div} class="h-full bg-gradient-to-r from-violet to-mint rounded" style=${{ width: w }} /></div>
         <ol class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
           ${d.steps.map((s, k) => html`<${Reveal} key=${k} d=${k * 0.1}><li class="relative">
             <span class="relative z-10 grid h-14 w-14 place-items-center rounded-full bg-white border-2 border-violet font-serif text-lg text-violet shadow-[0_0_0_8px_#fff]">${k + 1}</span>
@@ -472,11 +484,11 @@ const Process = ({ d, g }) => {
         <div class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-violet to-violet-900 p-8 sm:p-12 lg:p-14 text-white grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div class="absolute inset-0 grain"></div>
           <div class="relative lg:col-span-8">
-            <p class="inline-flex items-center gap-2 rounded-full bg-amber px-4 py-1.5 text-[12.5px] font-bold text-ink"><${Icon} n="star" c="w-4 h-4 fill-ink" />${d.banner.kicker}</p>
+            <p class="inline-flex items-center gap-2 rounded-full bg-mint px-4 py-1.5 text-[12.5px] font-bold text-ink"><${Icon} n="star" c="w-4 h-4 fill-ink" />${d.banner.kicker}</p>
             <h3 class="mt-5 font-serif text-4xl sm:text-5xl font-medium">${d.banner.title}</h3>
-            <p class="mt-3 text-lg text-white/75 inline-flex items-center gap-2"><${Icon} n="clock" c="w-5 h-5 text-amber" />${d.banner.sub}</p>
+            <p class="mt-3 text-lg text-white/75 inline-flex items-center gap-2"><${Icon} n="clock" c="w-5 h-5 text-mint" />${d.banner.sub}</p>
           </div>
-          <div class="relative lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3"><${Btn} href="#contact" v="amber">Start Free Assessment</${Btn}><${Btn} href=${g.phone.href} v="ghost" icon="phone">Call Now</${Btn}></div>
+          <div class="relative lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3"><${Btn} href="#contact" v="mint">Start Free Assessment</${Btn}><${Btn} href=${g.phone.href} v="ghost" icon="phone">Call Now</${Btn}></div>
         </div>
       </${Reveal}>
     </${Wrap}>
@@ -488,7 +500,7 @@ const Testimonials = ({ d }) => html`
   <section class="py-24 lg:py-32 bg-fog overflow-hidden">
     <${Wrap} c="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
       <div class="lg:col-span-7"><${Reveal}><${Eyebrow}>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} c="mt-5" /></${Reveal}></div>
-      <div class="lg:col-span-5"><p class="text-[16.5px] leading-relaxed text-ink-600">${d.body}</p><p class="mt-4 inline-flex items-center gap-1 text-amber">${[0, 1, 2, 3, 4].map((k) => html`<${Icon} key=${k} n="star" c="w-5 h-5 fill-amber" />`)}<span class="ml-2 text-sm font-semibold text-ink">5/5 from verified clients</span></p></div>
+      <div class="lg:col-span-5"><p class="text-[16.5px] leading-relaxed text-ink-600">${d.body}</p><p class="mt-4 inline-flex items-center gap-1 text-mint">${[0, 1, 2, 3, 4].map((k) => html`<${Icon} key=${k} n="star" c="w-5 h-5 fill-mint" />`)}<span class="ml-2 text-sm font-semibold text-ink">5/5 from verified clients</span></p></div>
     </${Wrap}>
     <div class="mt-14 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
       <div class="flex w-max gap-5 marquee">
@@ -529,7 +541,7 @@ const Contact = ({ d, g }) => {
       <div class="lg:col-span-5">
         <${Reveal}><${Eyebrow} light>${d.eyebrow}</${Eyebrow}><${H2} t=${d.title} light c="mt-5" /><p class="mt-6 text-[17px] text-white/70">${d.body}</p></${Reveal}>
         <div class="mt-10 space-y-3">
-          ${[['phone', 'Call an advocate', g.phone.label, g.phone.href], ['whatsapp', 'WhatsApp us', 'Chat on WhatsApp', 'https://wa.me/919872675722'], ['mail', 'Email', g.email, 'mailto:' + g.email]].map(([ic, l, v, h]) => html`<a key=${l} href=${h} class="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition"><span class="grid h-12 w-12 place-items-center rounded-xl bg-amber text-ink"><${Icon} n=${ic} /></span><span><span class="block text-[12px] text-white/55">${l}</span><span class="font-semibold">${v}</span></span><${Icon} n="arrow" c="ml-auto w-4 h-4 text-white/40 group-hover:text-white group-hover:translate-x-1 transition" /></a>`)}
+          ${[['phone', 'Call an advocate', g.phone.label, g.phone.href], ['whatsapp', 'WhatsApp us', 'Chat on WhatsApp', 'https://wa.me/919872675722'], ['mail', 'Email', g.email, 'mailto:' + g.email]].map(([ic, l, v, h]) => html`<a key=${l} href=${h} class="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition"><span class="grid h-12 w-12 place-items-center rounded-xl bg-mint text-ink"><${Icon} n=${ic} /></span><span><span class="block text-[12px] text-white/55">${l}</span><span class="font-semibold">${v}</span></span><${Icon} n="arrow" c="ml-auto w-4 h-4 text-white/40 group-hover:text-white group-hover:translate-x-1 transition" /></a>`)}
         </div>
         <p class="mt-6 inline-flex items-center gap-2 text-[13px] text-white/55"><${Icon} n="lock" c="w-4 h-4" />Every enquiry is confidential and protected by advocate–client privilege.</p>
       </div>
@@ -563,13 +575,13 @@ const Footer = ({ g }) => html`
     <${Wrap}>
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         <div class="lg:col-span-4"><img src=${g.logo.light} alt=${g.logo.alt} class="h-11 w-auto" /><p class="mt-6 max-w-sm text-[15px] leading-relaxed">Financial dispute advocates and solicitors — 120+ advocates across 25+ states, with offices in Noida, Hyderabad & 11+ cities.</p>
-          <div class="mt-6 space-y-2 text-[14.5px]"><a href=${g.phone.href} class="flex items-center gap-2 hover:text-white"><${Icon} n="phone" c="w-4 h-4 text-amber" />${g.phone.label}</a><a href=${'mailto:' + g.email} class="flex items-center gap-2 hover:text-white"><${Icon} n="mail" c="w-4 h-4 text-amber" />${g.email}</a></div></div>
-        <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">${g.footer.map((c) => html`<div key=${c.title}><p class="text-[11.5px] font-bold uppercase tracking-[0.2em] text-white/40">${c.title}</p><ul class="mt-5 space-y-3">${c.links.map((l) => html`<li key=${l}><a href="#top" class="text-[14.5px] hover:text-amber transition-colors">${l}</a></li>`)}</ul></div>`)}</div>
+          <div class="mt-6 space-y-2 text-[14.5px]"><a href=${g.phone.href} class="flex items-center gap-2 hover:text-white"><${Icon} n="phone" c="w-4 h-4 text-mint" />${g.phone.label}</a><a href=${'mailto:' + g.email} class="flex items-center gap-2 hover:text-white"><${Icon} n="mail" c="w-4 h-4 text-mint" />${g.email}</a></div></div>
+        <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">${g.footer.map((c) => html`<div key=${c.title}><p class="text-[11.5px] font-bold uppercase tracking-[0.2em] text-white/40">${c.title}</p><ul class="mt-5 space-y-3">${c.links.map((l) => html`<li key=${l}><a href="#top" class="text-[14.5px] hover:text-mint transition-colors">${l}</a></li>`)}</ul></div>`)}</div>
       </div>
       <p class="mt-14 text-[12px] leading-relaxed text-white/40">Disclaimer: As per the rules of the Bar Council of India, advocates are not permitted to solicit work or advertise. This website is for informational purposes only and does not constitute legal advice.</p>
       <div class="mt-6 flex flex-col sm:flex-row justify-between gap-4 border-t border-white/10 pt-6 text-[13px] text-white/50">
         <p>© ${new Date().getFullYear()} FourFold Legal. All rights reserved.</p>
-        <p>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" class="font-semibold text-white hover:text-amber">VOCSO</a></p>
+        <p>Free design preview by <a href="https://www.vocso.com" target="_blank" rel="noopener" class="font-semibold text-white hover:text-mint">VOCSO</a></p>
       </div>
     </${Wrap}>
   </footer>
